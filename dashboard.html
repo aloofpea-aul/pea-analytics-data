@@ -1351,13 +1351,13 @@ function renderCharts(h){
   }
   if(dtC) filteredData.forEach(r=>{const k=dateKey(r[dtC]);if(dayCounts.hasOwnProperty(k))dayCounts[k]++;});
   const trendData=days30.map(k=>dayCounts[k]);
-  const maData=trendData.map((_,i)=>{const sl=trendData.slice(Math.max(0,i-2),i+1);return Math.round(sl.reduce((a,b)=>a+b,0)/sl.length*10)/10;});
+  const maData=trendData.map((_,i)=>{const sl=trendData.slice(Math.max(0,i-6),i+1);return Math.round(sl.reduce((a,b)=>a+b,0)/sl.length*10)/10;});
 
   charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
     type:'line',
     data:{labels:dayLabels,datasets:[
       {label:'เหตุการณ์',data:trendData,borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.08)',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.4,fill:true},
-      {label:'MA 3 วัน',data:maData,borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4},
+      {label:'MA 7 วัน',data:maData,borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4},
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},datalabels:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8}}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:8}},beginAtZero:true}}}
   });
