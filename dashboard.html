@@ -222,6 +222,33 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .mobile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;display:none;backdrop-filter:blur(2px);}
 .sidebar-overlay.open{display:block;}
+
+/* ---- KPI TREND BADGE ---- */
+.kpi-trend{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:12px;margin-top:5px;}
+.kpi-trend.bad{background:rgba(244,63,94,.1);color:var(--rose);}
+.kpi-trend.good{background:rgba(16,185,129,.1);color:var(--emerald);}
+.kpi-trend.neu{background:rgba(140,150,165,.08);color:var(--text3);}
+
+/* ---- INSIGHT CARDS ---- */
+.insight-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 15px;display:flex;align-items:flex-start;gap:11px;transition:all .2s;}
+.insight-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.insight-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.insight-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
+.insight-val{font-size:13px;font-weight:700;color:var(--text1);line-height:1.3;}
+.insight-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+
+/* ---- CALENDAR HEATMAP ---- */
+.cal-wrap{overflow-x:auto;padding-bottom:4px;}
+.cal-grid{display:inline-flex;gap:3px;}
+.cal-col{display:flex;flex-direction:column;gap:3px;}
+.cal-cell{width:12px;height:12px;border-radius:2px;cursor:pointer;transition:transform .15s;}
+.cal-cell:hover{transform:scale(1.4);}
+.cal-cell.lv0{background:var(--bg3);}
+.cal-cell.lv1{background:rgba(59,126,248,.25);}
+.cal-cell.lv2{background:rgba(59,126,248,.5);}
+.cal-cell.lv3{background:rgba(59,126,248,.75);}
+.cal-cell.lv4{background:#3b7ef8;}
+.cal-tooltip{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text1);pointer-events:none;z-index:9999;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 </style>
 </head>
 <body data-theme="dark" data-lang="th">
@@ -229,6 +256,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div id="topProgress"><div id="topProgressBar"></div></div>
 <div class="notif-stack" id="notifStack"></div>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="cal-tooltip" id="calTooltip"></div>
 
 <!-- ===== SIDEBAR ===== -->
 <nav class="sidebar" id="sidebar">
@@ -366,12 +394,48 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px;">
-        <div class="kpi-card k-saifi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--rose)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="kpi-label" data-i="kpi_saifi_label">SAIFI</div><div class="kpi-value" id="kpi-saifi">—</div><div class="kpi-sub" data-i="kpi_saifi_sub">ครั้ง/ผู้ใช้ไฟ</div></div>
-        <div class="kpi-card k-saidi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="kpi-label" data-i="kpi_saidi_label">SAIDI</div><div class="kpi-value" id="kpi-saidi">—</div><div class="kpi-sub" data-i="kpi_saidi_sub">นาที/ผู้ใช้ไฟ</div></div>
+        <div class="kpi-card k-saifi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--rose)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="kpi-label" data-i="kpi_saifi_label">SAIFI</div><div class="kpi-value" id="kpi-saifi">—</div><div class="kpi-sub" data-i="kpi_saifi_sub">ครั้ง/ผู้ใช้ไฟ</div><div class="kpi-trend neu" id="trend-saifi">—</div></div>
+        <div class="kpi-card k-saidi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="kpi-label" data-i="kpi_saidi_label">SAIDI</div><div class="kpi-value" id="kpi-saidi">—</div><div class="kpi-sub" data-i="kpi_saidi_sub">นาที/ผู้ใช้ไฟ</div><div class="kpi-trend neu" id="trend-saidi">—</div></div>
         <div class="kpi-card k-con"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="kpi-label" data-i="kpi_total_label">ผู้ใช้ไฟรวม</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" data-i="kpi_total_sub">ราย</div></div>
-        <div class="kpi-card k-aff"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><div class="kpi-label" data-i="kpi_aff_label">ผู้ได้รับผลกระทบ</div><div class="kpi-value" id="kpi-affected">—</div><div class="kpi-sub" data-i="kpi_aff_sub">ราย</div></div>
-        <div class="kpi-card k-dur"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="kpi-label" data-i="kpi_dur_label">ระยะเวลาไฟดับรวม</div><div class="kpi-value" id="kpi-dur">—</div><div class="kpi-sub" data-i="kpi_dur_sub">นาที</div></div>
-        <div class="kpi-card k-node"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div class="kpi-label" data-i="kpi_node_label">จำนวนเหตุการณ์</div><div class="kpi-value" id="kpi-nodes">—</div><div class="kpi-sub" data-i="kpi_node_sub">รายการ</div></div>
+        <div class="kpi-card k-aff"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><div class="kpi-label" data-i="kpi_aff_label">ผู้ได้รับผลกระทบ</div><div class="kpi-value" id="kpi-affected">—</div><div class="kpi-sub" data-i="kpi_aff_sub">ราย</div><div class="kpi-trend neu" id="trend-affected">—</div></div>
+        <div class="kpi-card k-dur"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="kpi-label" data-i="kpi_dur_label">ระยะเวลาไฟดับรวม</div><div class="kpi-value" id="kpi-dur">—</div><div class="kpi-sub" data-i="kpi_dur_sub">นาที</div><div class="kpi-trend neu" id="trend-dur">—</div></div>
+        <div class="kpi-card k-node"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div class="kpi-label" data-i="kpi_node_label">จำนวนเหตุการณ์</div><div class="kpi-value" id="kpi-nodes">—</div><div class="kpi-sub" data-i="kpi_node_sub">รายการ</div><div class="kpi-trend neu" id="trend-nodes">—</div></div>
+      </div>
+
+      <!-- Insight Cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(244,63,94,.1);">🔴</div>
+          <div style="min-width:0;">
+            <div class="insight-lbl" data-i="insight_top_eq">อุปกรณ์เสียบ่อยสุด</div>
+            <div class="insight-val" id="insight-top-eq">—</div>
+            <div class="insight-sub" id="insight-top-count">—</div>
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(245,158,11,.1);">⏱️</div>
+          <div style="min-width:0;">
+            <div class="insight-lbl" data-i="insight_avg_dur">ระยะเวลาเฉลี่ย/ครั้ง</div>
+            <div class="insight-val" id="insight-avg-dur">—</div>
+            <div class="insight-sub" data-i="insight_avg_dur_sub">นาทีต่อเหตุการณ์</div>
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(167,139,250,.1);">📍</div>
+          <div style="min-width:0;">
+            <div class="insight-lbl" data-i="insight_top_area">พื้นที่เสี่ยงสูงสุด</div>
+            <div class="insight-val" id="insight-top-area">—</div>
+            <div class="insight-sub" id="insight-area-count">—</div>
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(34,211,238,.1);">📊</div>
+          <div style="min-width:0;">
+            <div class="insight-lbl" data-i="insight_top_cause">สาเหตุหลัก</div>
+            <div class="insight-val" id="insight-top-cause">—</div>
+            <div class="insight-sub" id="insight-cause-pct">—</div>
+          </div>
+        </div>
       </div>
 
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
@@ -383,6 +447,25 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="card-header"><span class="card-title" data-i="chart_dist_title">การกระจายการดำเนินงาน</span></div>
           <div class="card-body"><div id="distLegend" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div><div class="chart-wrap" style="height:260px;"><canvas id="distChart"></canvas></div></div>
         </div>
+      </div>
+
+      <!-- Calendar Heatmap -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-header">
+          <span class="card-title" data-i="cal_title">ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)</span>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3);">
+            <span data-i="cal_less">น้อย</span>
+            <div style="display:flex;gap:2px;">
+              <div style="width:10px;height:10px;border-radius:2px;background:var(--bg3);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.25);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.5);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.75);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:#3b7ef8;"></div>
+            </div>
+            <span data-i="cal_more">มาก</span>
+          </div>
+        </div>
+        <div class="card-body"><div class="cal-wrap" id="calendarWrap"></div></div>
       </div>
 
       <div class="card">
@@ -463,7 +546,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 // ⚙️  GITHUB CONFIG — แก้ค่าตรงนี้หลังสร้าง repo แล้ว
 // ================================================================
 const GH = {
-  OWNER: 'aloofpea-aul',
+  OWNER: 'your-username',
   REPO:  'pea-analytics-data',
   BRANCH: 'main',
 
@@ -524,6 +607,10 @@ const LANG = {
     notif_filter_applied:'ใช้ตัวกรองแล้ว',notif_export_ok:'Export สำเร็จ',notif_export_fail:'ไม่มีข้อมูล',
     notif_dur_alert:'แจ้งเตือนระยะเวลาสูง',notif_cust_alert:'แจ้งเตือนผลกระทบสูง',
     notif_affected:'ราย',dur_unit:'นาที',records_unit:'รายการ',
+    vs_prev:'vs เดือนก่อน',trend_up:'↑',trend_down:'↓',
+    cal_title:'ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)',cal_less:'น้อย',cal_more:'มาก',cal_events:'เหตุการณ์',
+    insight_top_eq:'อุปกรณ์เสียบ่อยสุด',insight_avg_dur:'ระยะเวลาเฉลี่ย/ครั้ง',
+    insight_avg_dur_sub:'นาทีต่อเหตุการณ์',insight_top_area:'พื้นที่เสี่ยงสูงสุด',insight_top_cause:'สาเหตุหลัก',
     task_status_progress:'กำลังดำเนินการ',task_status_pending:'รอดำเนินการ',task_status_done:'เสร็จสิ้น',
     task_prio_critical:'วิกฤต',task_prio_high:'สูง',task_prio_normal:'ปกติ',
     mit_pm_title:'บำรุงรักษาเชิงป้องกัน',mit_pm_text:'ต้องการ PM เร่งด่วนสำหรับอุปกรณ์ความเสี่ยงสูง ภายใน 14 วัน',
@@ -579,6 +666,10 @@ const LANG = {
     notif_filter_applied:'Filter Applied',notif_export_ok:'Export Complete',notif_export_fail:'No Data',
     notif_dur_alert:'High Duration Alert',notif_cust_alert:'High Impact Alert',
     notif_affected:'affected',dur_unit:'min',records_unit:'records',
+    vs_prev:'vs prev month',trend_up:'↑',trend_down:'↓',
+    cal_title:'Daily Incident Frequency (Last 30 Days)',cal_less:'Less',cal_more:'More',cal_events:'events',
+    insight_top_eq:'Most Frequent Equipment',insight_avg_dur:'Avg Duration / Event',
+    insight_avg_dur_sub:'Minutes per incident',insight_top_area:'Highest Risk Area',insight_top_cause:'Top Cause',
     task_status_progress:'In Progress',task_status_pending:'Pending',task_status_done:'Completed',
     task_prio_critical:'Critical',task_prio_high:'High',task_prio_normal:'Normal',
     mit_pm_title:'Preventive Maintenance',mit_pm_text:'Urgent PM needed for high-risk units within 14 days.',
@@ -926,6 +1017,7 @@ function processRender(sName,full){
   const h=metaStore[sName].headers;
   const dC=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
+  const dtC=h.find(n=>n==='Date-Time')||h.find(n=>n.includes('Date'));
   let durSum=0,affSum=0,custMin=0;
   filteredData.forEach(r=>{
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
@@ -942,8 +1034,133 @@ function processRender(sName,full){
   currentTableData=filteredData;
   document.getElementById('rowBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   document.getElementById('recordCountBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
-  requestAnimationFrame(()=>{ renderTable(h); if(full)renderCharts(h); if(currentView==='analysis')renderAnalysis(); });
+
+  // --- KPI TREND vs เดือนก่อน ---
+  if(dtC){
+    const now=new Date();
+    const tmS=new Date(now.getFullYear(),now.getMonth(),1);
+    const pmS=new Date(now.getFullYear(),now.getMonth()-1,1);
+    const pmE=new Date(now.getFullYear(),now.getMonth(),0);
+    const thisM=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=tmS;});
+    const prevM=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=pmS&&d<=pmE;});
+    let tAff=0,tCM=0,tDur=0,pAff=0,pCM=0,pDur=0;
+    thisM.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){tAff+=c;tCM+=d*c;tDur+=d;}});
+    prevM.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){pAff+=c;pCM+=d*c;pDur+=d;}});
+    setTrendBadge('trend-saifi',tot?tAff/tot:0,tot?pAff/tot:0,true);
+    setTrendBadge('trend-saidi',tot?tCM/tot:0,tot?pCM/tot:0,true);
+    setTrendBadge('trend-affected',tAff,pAff,true);
+    setTrendBadge('trend-dur',tDur,pDur,true);
+    setTrendBadge('trend-nodes',thisM.length,prevM.length,true);
+  }
+
+  // --- INSIGHTS ---
+  renderInsights(h);
+
+  requestAnimationFrame(()=>{
+    renderTable(h);
+    if(full){renderCharts(h);renderCalendar(h);}
+    if(currentView==='analysis')renderAnalysis();
+  });
 }
+
+function setTrendBadge(id,curr,prev,invertBad=false){
+  const el=document.getElementById(id);if(!el)return;
+  if(!prev||prev===0){el.textContent='— '+t('vs_prev');el.className='kpi-trend neu';return;}
+  const diff=curr-prev,pct=Math.abs(diff/prev*100).toFixed(1);
+  const isUp=diff>0,isBad=invertBad?isUp:!isUp;
+  el.textContent=`${isUp?t('trend_up'):t('trend_down')} ${pct}% ${t('vs_prev')}`;
+  el.className='kpi-trend '+(isBad?'bad':'good');
+}
+
+function renderInsights(h){
+  const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const peaC=h.find(n=>n.includes('PEA_Code'));
+  const causeC=h.find(n=>n==='CauseData')||h.find(n=>n.toLowerCase().includes('cause'));
+  const dC=h.find(n=>n.toLowerCase()==='duration');
+
+  // Top equipment
+  const ec={};filteredData.forEach(r=>{const e=String(r[eC]||'—');ec[e]=(ec[e]||0)+1;});
+  const mx=Object.entries(ec).sort((a,b)=>b[1]-a[1])[0];
+  const topEqEl=document.getElementById('insight-top-eq');
+  const topCntEl=document.getElementById('insight-top-count');
+  if(topEqEl)topEqEl.textContent=mx?mx[0]:'—';
+  if(topCntEl)topCntEl.textContent=mx?`${mx[1]} ${t('cal_events')}`:'—';
+
+  // Avg duration
+  const totalDur=filteredData.reduce((s,r)=>s+(parseFloat(String(r[dC]||'').replace(/,/g,''))||0),0);
+  const avgDurEl=document.getElementById('insight-avg-dur');
+  if(avgDurEl)avgDurEl.textContent=filteredData.length?`${Math.round(totalDur/filteredData.length)} ${t('dur_unit')}`:'—';
+
+  // Top area
+  const ac={};filteredData.forEach(r=>{const a=String(r[peaC]||'—');ac[a]=(ac[a]||0)+1;});
+  const ma=Object.entries(ac).sort((a,b)=>b[1]-a[1])[0];
+  const topAreaEl=document.getElementById('insight-top-area');
+  const areaCntEl=document.getElementById('insight-area-count');
+  if(topAreaEl)topAreaEl.textContent=ma?ma[0]:'—';
+  if(areaCntEl)areaCntEl.textContent=ma?`${ma[1]} ${t('cal_events')}`:'—';
+
+  // Top cause
+  const causeEl=document.getElementById('insight-top-cause');
+  const causePctEl=document.getElementById('insight-cause-pct');
+  if(causeC&&causeEl){
+    const cc={};filteredData.forEach(r=>{const c=String(r[causeC]||'').trim();if(c)cc[c]=(cc[c]||0)+1;});
+    const mc=Object.entries(cc).sort((a,b)=>b[1]-a[1])[0];
+    causeEl.textContent=mc?mc[0]:'—';
+    if(causePctEl)causePctEl.textContent=mc?`${Math.round(mc[1]/filteredData.length*100)}% ของทั้งหมด`:'—';
+  } else {
+    if(causeEl)causeEl.textContent='—';
+    if(causePctEl)causePctEl.textContent='ไม่มีข้อมูลสาเหตุ';
+  }
+}
+
+// ================================================================
+// CALENDAR HEATMAP
+// ================================================================
+function renderCalendar(h){
+  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
+  const headers=h||metaStore[sName]?.headers||[];
+  const dtC=headers.find(n=>n==='Date-Time')||headers.find(n=>n.includes('Date'));
+  if(!dtC)return;
+
+  const today=new Date();
+  const days={};
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days[d.toISOString().split('T')[0]]=0;}
+  filteredData.forEach(r=>{const k=String(r[dtC]||'').substring(0,10);if(days.hasOwnProperty(k))days[k]++;});
+
+  const counts=Object.values(days);
+  const maxCount=Math.max(...counts,1);
+  const getLevel=n=>{if(n===0)return 0;const r=n/maxCount;return r<.25?1:r<.5?2:r<.75?3:4;};
+
+  const entries=Object.entries(days);
+  // แบ่งเป็น columns ทีละ 7 วัน
+  const cols=[];let col=[];
+  entries.forEach(([date,count],i)=>{
+    col.push({date,count});
+    if(col.length===7||i===entries.length-1){cols.push([...col]);col=[];}
+  });
+
+  const wrap=document.getElementById('calendarWrap');
+  if(!wrap)return;
+  wrap.innerHTML=`<div class="cal-grid">${cols.map(c=>`
+    <div class="cal-col">${c.map(({date,count})=>`
+      <div class="cal-cell lv${getLevel(count)}"
+        onmouseenter="showCalTip(event,'${date}',${count})"
+        onmouseleave="hideCalTip()"></div>`).join('')}
+    </div>`).join('')}
+  </div>`;
+}
+
+function showCalTip(e,date,count){
+  const tp=document.getElementById('calTooltip');if(!tp)return;
+  const d=new Date(date);
+  const locale=currentLang==='th'?'th-TH':'en-GB';
+  tp.innerHTML=`<div style="font-weight:700;margin-bottom:2px;">${d.toLocaleDateString(locale,{weekday:'short',day:'numeric',month:'short'})}</div>
+    <div style="color:var(--blue);font-weight:700;">${count} ${t('cal_events')}</div>`;
+  tp.style.display='block';
+  tp.style.left=(e.clientX+14)+'px';
+  tp.style.top=(e.clientY-10)+'px';
+}
+function hideCalTip(){const tp=document.getElementById('calTooltip');if(tp)tp.style.display='none';}
 
 // ================================================================
 // TABLE
