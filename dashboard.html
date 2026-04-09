@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Distribution Analytics · PEA กฟต.2</title>
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -27,8 +26,7 @@
 [data-theme="light"]{
   --bg0:#f0f4fb;--bg1:#ffffff;--bg2:#f5f8ff;--bg3:#eaf0fb;
   --panel:rgba(255,255,255,0.98);--border:#d4dff0;--border2:#c1d0e8;
-  --text1:#0f1923;--text2:#4a5f78;--text3:#8fa3bc;
-  --blue-glow:rgba(59,126,248,0.08);
+  --text1:#0f1923;--text2:#4a5f78;--text3:#8fa3bc;--blue-glow:rgba(59,126,248,0.08);
 }
 [data-lang="th"] body{font-family:'Sarabun',sans-serif;}
 [data-lang="en"] body{font-family:'Space Grotesk',sans-serif;}
@@ -39,9 +37,9 @@ html{overflow-x:hidden;scroll-behavior:smooth}
 body{background:var(--bg0);color:var(--text1);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(59,126,248,0.05) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(10,60,120,0.07) 0%,transparent 60%);pointer-events:none;z-index:0;}
 
-/* LANG TOGGLE */
+/* LANG */
 .lang-toggle{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.lang-btn{padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
+.lang-btn{padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
 .lang-btn.active{background:var(--blue);color:#fff;}
 
 /* SIDEBAR */
@@ -67,36 +65,35 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* MAIN */
 .main{margin-left:var(--sidebar);min-height:100vh;position:relative;z-index:1;}
 .topbar{height:var(--header);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:90;gap:12px;}
-.topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0;}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.page-title{font-weight:700;font-size:15px;letter-spacing:.2px;white-space:nowrap;}
-.content{padding:18px 22px 32px;}
+.page-title{font-weight:700;font-size:15px;white-space:nowrap;}
+.content{padding:16px 22px 32px;}
 
-/* SOURCE BADGE — แสดงว่าดึงข้อมูลจากไหน */
-.source-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;
-  background:rgba(16,185,129,.1);color:var(--emerald);border:1px solid rgba(16,185,129,.2);
-}
-.source-badge.github{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.2);}
-.source-badge.demo{background:rgba(245,158,11,.1);color:var(--amber);border-color:rgba(245,158,11,.2);}
-.source-badge.error{background:rgba(244,63,94,.1);color:var(--rose);border-color:rgba(244,63,94,.2);}
+/* SOURCE BADGE */
+.source-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.source-badge.github{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.source-badge.demo{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.source-badge.error{background:rgba(244,63,94,.1);color:var(--rose);border:1px solid rgba(244,63,94,.2);}
 
 /* CARDS */
 .card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:visible;transition:border-color .2s;position:relative;}
 .card:hover{border-color:var(--border2);}
 .card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-radius:var(--radius-lg) var(--radius-lg) 0 0;overflow:hidden;}
-.card-title{font-weight:700;font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text2);}
-.card-body{padding:16px;overflow:visible;}
+.card-title{font-weight:700;font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--text2);}
+.card-body{padding:14px;overflow:visible;}
 
-/* KPI CARDS */
-.kpi-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;position:relative;overflow:hidden;transition:all .2s;}
-.kpi-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.012) 0%,transparent 60%);pointer-events:none;}
+/* KPI CARDS — compact with trend */
+.kpi-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 15px;position:relative;overflow:hidden;transition:all .2s;}
 .kpi-card:hover{border-color:var(--border2);transform:translateY(-1px);}
-.kpi-label{font-size:9.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;}
-.kpi-value{font-family:'DM Mono',monospace;font-weight:500;font-size:26px;line-height:1;margin-bottom:5px;}
-.kpi-sub{font-size:10.5px;color:var(--text3);}
-.kpi-icon{position:absolute;right:12px;top:12px;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.kpi-label{font-size:9px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
+.kpi-value{font-family:'DM Mono',monospace;font-weight:500;font-size:22px;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--text3);}
+.kpi-trend{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:12px;margin-top:4px;}
+.kpi-trend.up{background:rgba(244,63,94,.1);color:var(--rose);}
+.kpi-trend.down{background:rgba(16,185,129,.1);color:var(--emerald);}
+.kpi-trend.flat{background:rgba(140,150,165,.08);color:var(--text2);}
+.kpi-icon{position:absolute;right:11px;top:11px;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
 .kpi-card.k-saifi{border-left:3px solid var(--rose);}.kpi-card.k-saifi .kpi-value{color:var(--rose);}.kpi-card.k-saifi .kpi-icon{background:rgba(244,63,94,.1);}
 .kpi-card.k-saidi{border-left:3px solid var(--amber);}.kpi-card.k-saidi .kpi-value{color:var(--amber);}.kpi-card.k-saidi .kpi-icon{background:rgba(245,158,11,.1);}
 .kpi-card.k-con{border-left:3px solid var(--blue);}.kpi-card.k-con .kpi-value{color:var(--blue);}.kpi-card.k-con .kpi-icon{background:rgba(59,126,248,.1);}
@@ -104,24 +101,45 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .kpi-card.k-dur{border-left:3px solid var(--cyan);}.kpi-card.k-dur .kpi-value{color:var(--cyan);}.kpi-card.k-dur .kpi-icon{background:rgba(34,211,238,.1);}
 .kpi-card.k-node{border-left:3px solid var(--emerald);}.kpi-card.k-node .kpi-value{color:var(--emerald);}.kpi-card.k-node .kpi-icon{background:rgba(16,185,129,.1);}
 
+/* INSIGHT CARDS */
+.insight-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .2s;}
+.insight-card:hover{border-color:var(--border2);}
+.insight-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.insight-label{font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
+.insight-value{font-size:13px;font-weight:700;color:var(--text1);line-height:1.3;}
+.insight-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+
+/* CALENDAR HEATMAP */
+.cal-wrap{overflow-x:auto;padding-bottom:4px;}
+.cal-grid{display:inline-flex;gap:3px;align-items:flex-end;}
+.cal-col{display:flex;flex-direction:column;gap:3px;}
+.cal-cell{width:11px;height:11px;border-radius:2px;cursor:pointer;transition:transform .15s;}
+.cal-cell:hover{transform:scale(1.4);}
+.cal-cell.lv0{background:var(--bg3);}
+.cal-cell.lv1{background:rgba(59,126,248,.3);}
+.cal-cell.lv2{background:rgba(59,126,248,.55);}
+.cal-cell.lv3{background:rgba(59,126,248,.8);}
+.cal-cell.lv4{background:#3b7ef8;}
+.cal-day-label{font-size:8px;color:var(--text3);text-align:center;height:11px;line-height:11px;}
+.cal-month-labels{display:flex;gap:3px;margin-bottom:3px;}
+.cal-month-label{font-size:8px;color:var(--text3);white-space:nowrap;}
+
 /* TABS */
 .mode-tabs{display:flex;gap:3px;background:var(--bg2);padding:3px;border-radius:var(--radius);border:1px solid var(--border);}
-.mode-tab{padding:5px 13px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:7px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
+.mode-tab{padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;border-radius:7px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
 .mode-tab.active{background:var(--blue);color:#fff;box-shadow:0 2px 10px rgba(59,126,248,.3);}
 .sub-tabs{display:flex;gap:2px;background:var(--bg2);padding:3px;border-radius:8px;border:1px solid var(--border);}
-.sub-tab{padding:4px 11px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
+.sub-tab{padding:4px 10px;font-size:10px;font-weight:700;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
 .sub-tab.active{background:var(--bg3);color:var(--text1);}
-.map-tab{padding:5px 12px;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:1px solid var(--border);background:var(--bg2);font-family:inherit;}
+.map-tab{padding:5px 11px;font-size:10px;font-weight:700;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:1px solid var(--border);background:var(--bg2);font-family:inherit;}
 .map-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 
 /* FILTERS */
 .filter-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;overflow:visible;}
-.filter-wrap{position:relative;z-index:1;}
-.filter-wrap:focus-within{z-index:9998;}
+.filter-wrap{position:relative;z-index:1;}.filter-wrap:focus-within{z-index:9998;}
 .filter-label{font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;display:block;}
 .filter-trigger{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 32px 8px 11px;font-size:12px;font-weight:500;color:var(--text1);cursor:pointer;transition:border-color .2s;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit;}
-.filter-trigger:hover{border-color:var(--border2);}
-.filter-trigger.open{border-color:var(--blue);}
+.filter-trigger:hover{border-color:var(--border2);}.filter-trigger.open{border-color:var(--blue);}
 .filter-chevron{position:absolute;right:9px;top:50%;transform:translateY(calc(-50% + 10px));pointer-events:none;color:var(--text3);}
 .filter-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:0 24px 60px rgba(0,0,0,.55);display:none;max-height:280px;overflow:hidden;flex-direction:column;min-width:200px;}
 .filter-dropdown.open{display:flex;}
@@ -142,7 +160,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .data-table tbody tr:hover td{background:var(--bg2);}
 .data-table tbody tr.crit-row td:first-child{box-shadow:inset 3px 0 0 var(--amber);}
 .data-table .eq-cell{color:var(--blue);font-weight:600;}
-.table-wrap{overflow-x:auto;overflow-y:auto;max-height:500px;}
+.table-wrap{overflow-x:auto;overflow-y:auto;max-height:480px;}
 .table-wrap::-webkit-scrollbar{width:4px;height:4px;}
 .table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
@@ -156,11 +174,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .badge-ai{background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(59,126,248,.15));color:#a78bfa;border:1px solid rgba(167,139,250,.2);}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--radius);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .18s;border:none;font-family:inherit;letter-spacing:.2px;}
-.btn-primary{background:var(--blue);color:#fff;}
-.btn-primary:hover{background:var(--blue2);transform:translateY(-1px);}
-.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
-.btn-ghost:hover{background:var(--bg2);color:var(--text1);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--radius);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .18s;border:none;font-family:inherit;}
+.btn-primary{background:var(--blue);color:#fff;}.btn-primary:hover{background:var(--blue2);transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}.btn-ghost:hover{background:var(--bg2);color:var(--text1);}
 
 /* PROGRESS */
 #topProgress{position:fixed;top:0;left:0;right:0;z-index:999;height:2px;display:none;}
@@ -173,12 +189,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .modal-box{background:var(--bg1);border:1px solid var(--border2);border-radius:var(--radius-xl);width:100%;max-width:840px;max-height:90vh;overflow-y:auto;}
 
 /* NOTIFICATIONS */
-.notif-stack{position:fixed;top:70px;right:18px;z-index:800;display:flex;flex-direction:column;gap:8px;width:330px;}
+.notif-stack{position:fixed;top:70px;right:18px;z-index:800;display:flex;flex-direction:column;gap:8px;width:320px;}
 .notif{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;animation:slideIn .25s ease;box-shadow:0 10px 30px rgba(0,0,0,.3);}
 @keyframes slideIn{from{transform:translateX(360px);opacity:0}to{transform:translateX(0);opacity:1}}
-.notif.critical{border-left:3px solid var(--rose);}
-.notif.warning{border-left:3px solid var(--amber);}
-.notif.info{border-left:3px solid var(--blue);}
+.notif.critical{border-left:3px solid var(--rose);}.notif.warning{border-left:3px solid var(--amber);}.notif.info{border-left:3px solid var(--blue);}
 .notif-title{font-size:11.5px;font-weight:700;color:var(--text1);margin-bottom:2px;}
 .notif-msg{font-size:10.5px;color:var(--text2);}
 
@@ -202,8 +216,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .a-kpi-value{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--text1);}
 .a-kpi-unit{font-size:10.5px;color:var(--text3);}
 .task-row{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;font-size:12px;transition:background .12s;}
-.task-row:last-child{border-bottom:none;}
-.task-row:hover{background:var(--bg2);}
+.task-row:last-child{border-bottom:none;}.task-row:hover{background:var(--bg2);}
 .pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .chg{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .chg.up{background:rgba(244,63,94,.1);color:var(--rose);}
@@ -218,37 +231,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* RESPONSIVE */
 @media(max-width:1100px){:root{--sidebar:0px;}.sidebar{transform:translateX(-100%);--sidebar:242px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.mobile-btn{display:flex!important;}}
-@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:12px 12px 24px;}.topbar{padding:0 12px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}.anal-chart-grid{grid-template-columns:1fr!important;}}
+@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:10px 10px 24px;}.topbar{padding:0 12px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}}
 .mobile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;display:none;backdrop-filter:blur(2px);}
 .sidebar-overlay.open{display:block;}
 
-/* ---- KPI TREND BADGE ---- */
-.kpi-trend{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:12px;margin-top:5px;}
-.kpi-trend.bad{background:rgba(244,63,94,.1);color:var(--rose);}
-.kpi-trend.good{background:rgba(16,185,129,.1);color:var(--emerald);}
-.kpi-trend.neu{background:rgba(140,150,165,.08);color:var(--text3);}
-
-/* ---- INSIGHT CARDS ---- */
-.insight-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 15px;display:flex;align-items:flex-start;gap:11px;transition:all .2s;}
-.insight-card:hover{border-color:var(--border2);transform:translateY(-1px);}
-.insight-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.insight-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
-.insight-val{font-size:13px;font-weight:700;color:var(--text1);line-height:1.3;}
-.insight-sub{font-size:10px;color:var(--text3);margin-top:2px;}
-
-/* ---- CALENDAR HEATMAP ---- */
-.cal-wrap{overflow-x:auto;padding-bottom:4px;}
-.cal-grid{display:inline-flex;gap:3px;}
-.cal-col{display:flex;flex-direction:column;gap:3px;}
-.cal-cell{width:12px;height:12px;border-radius:2px;cursor:pointer;transition:transform .15s;}
-.cal-cell:hover{transform:scale(1.4);}
-.cal-cell.lv0{background:var(--bg3);}
-.cal-cell.lv1{background:rgba(59,126,248,.25);}
-.cal-cell.lv2{background:rgba(59,126,248,.5);}
-.cal-cell.lv3{background:rgba(59,126,248,.75);}
-.cal-cell.lv4{background:#3b7ef8;}
-.cal-tooltip{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text1);pointer-events:none;z-index:9999;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+/* TOOLTIP */
+.cal-tooltip{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--text1);pointer-events:none;z-index:9999;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.divider{height:1px;background:var(--border);margin:2px 0;}
 </style>
 </head>
 <body data-theme="dark" data-lang="th">
@@ -258,12 +248,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="cal-tooltip" id="calTooltip"></div>
 
-<!-- ===== SIDEBAR ===== -->
+<!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-mark">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    </div>
+    <div class="logo-mark"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
     <div>
       <div class="logo-text font-display" data-i="logo_title">Distribution Analytics</div>
       <div class="logo-sub" data-i="logo_sub">PEA กฟต.2 · ระบบวิเคราะห์</div>
@@ -294,14 +282,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="status-dot online" id="statusDot"></div>
       <span id="sidebarStatus" style="font-size:11px;font-weight:600;color:var(--text2);">กำลังเชื่อมต่อ...</span>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
       <span style="font-size:10.5px;color:var(--text3);" data-i="dark_mode">โหมดมืด</span>
       <div class="toggle on" id="themeToggle" onclick="toggleTheme()"><div class="toggle-ball"></div></div>
     </div>
   </div>
 </nav>
 
-<!-- ===== MAIN ===== -->
+<!-- MAIN -->
 <main class="main">
   <div class="topbar">
     <div class="topbar-left">
@@ -310,11 +298,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <div class="page-title font-display" id="pageTitle">Dashboard</div>
       <span class="badge badge-blue" id="modeBadge">MV</span>
-      <!-- แสดงว่าข้อมูลมาจากไหน -->
-      <span class="source-badge" id="sourceBadge" style="display:none;">
-        <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="sourceText">—</span>
-      </span>
+      <span class="source-badge" id="sourceBadge" style="display:none;"><span id="sourceText">—</span></span>
     </div>
     <div class="topbar-right">
       <div class="lang-toggle">
@@ -322,15 +306,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
       </div>
       <div style="text-align:right;display:none;" id="lastUpdateWrap">
-        <div style="font-size:9px;color:var(--text3);letter-spacing:.4px;" data-i="last_sync">อัปเดตล่าสุด</div>
+        <div style="font-size:9px;color:var(--text3);" data-i="last_sync">อัปเดตล่าสุด</div>
         <div style="font-size:11px;font-weight:600;color:var(--blue);" id="lastUpdateText">—</div>
       </div>
       <button class="btn btn-ghost" onclick="exportToExcel()" style="font-size:11px;">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span data-i="btn_export">Export</span>
       </button>
-      <button class="btn btn-primary" onclick="startLoad()" style="font-size:11px;" id="syncBtn">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" id="syncIcon"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      <button class="btn btn-primary" onclick="startLoad()" style="font-size:11px;">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
         <span data-i="btn_sync">ซิงค์ข้อมูล</span>
       </button>
     </div>
@@ -338,8 +322,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <div class="content">
 
-    <!-- DASHBOARD VIEW -->
+    <!-- ======= DASHBOARD ======= -->
     <div class="view active" id="view-dashboard">
+
+      <!-- Filters -->
       <div class="card" style="margin-bottom:14px;overflow:visible;">
         <div class="card-header">
           <span class="card-title" data-i="filter_title">ตัวกรองข้อมูล</span>
@@ -393,133 +379,193 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
 
+      <!-- KPI Grid with trends -->
       <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px;">
-        <div class="kpi-card k-saifi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--rose)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="kpi-label" data-i="kpi_saifi_label">SAIFI</div><div class="kpi-value" id="kpi-saifi">—</div><div class="kpi-sub" data-i="kpi_saifi_sub">ครั้ง/ผู้ใช้ไฟ</div><div class="kpi-trend neu" id="trend-saifi">—</div></div>
-        <div class="kpi-card k-saidi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="kpi-label" data-i="kpi_saidi_label">SAIDI</div><div class="kpi-value" id="kpi-saidi">—</div><div class="kpi-sub" data-i="kpi_saidi_sub">นาที/ผู้ใช้ไฟ</div><div class="kpi-trend neu" id="trend-saidi">—</div></div>
-        <div class="kpi-card k-con"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="kpi-label" data-i="kpi_total_label">ผู้ใช้ไฟรวม</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" data-i="kpi_total_sub">ราย</div></div>
-        <div class="kpi-card k-aff"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><div class="kpi-label" data-i="kpi_aff_label">ผู้ได้รับผลกระทบ</div><div class="kpi-value" id="kpi-affected">—</div><div class="kpi-sub" data-i="kpi_aff_sub">ราย</div><div class="kpi-trend neu" id="trend-affected">—</div></div>
-        <div class="kpi-card k-dur"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="kpi-label" data-i="kpi_dur_label">ระยะเวลาไฟดับรวม</div><div class="kpi-value" id="kpi-dur">—</div><div class="kpi-sub" data-i="kpi_dur_sub">นาที</div><div class="kpi-trend neu" id="trend-dur">—</div></div>
-        <div class="kpi-card k-node"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div class="kpi-label" data-i="kpi_node_label">จำนวนเหตุการณ์</div><div class="kpi-value" id="kpi-nodes">—</div><div class="kpi-sub" data-i="kpi_node_sub">รายการ</div><div class="kpi-trend neu" id="trend-nodes">—</div></div>
+        <div class="kpi-card k-saifi">
+          <div class="kpi-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--rose)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div class="kpi-label">SAIFI</div>
+          <div class="kpi-value" id="kpi-saifi">—</div>
+          <div class="kpi-sub" data-i="kpi_saifi_sub">ครั้ง/ผู้ใช้ไฟ</div>
+          <div class="kpi-trend flat" id="trend-saifi">— vs เดือนก่อน</div>
+        </div>
+        <div class="kpi-card k-saidi">
+          <div class="kpi-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="kpi-label">SAIDI</div>
+          <div class="kpi-value" id="kpi-saidi">—</div>
+          <div class="kpi-sub" data-i="kpi_saidi_sub">นาที/ผู้ใช้ไฟ</div>
+          <div class="kpi-trend flat" id="trend-saidi">— vs เดือนก่อน</div>
+        </div>
+        <div class="kpi-card k-con">
+          <div class="kpi-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="kpi-label" data-i="kpi_total_label">ผู้ใช้ไฟรวม</div>
+          <div class="kpi-value" id="kpi-total">—</div>
+          <div class="kpi-sub">ราย</div>
+        </div>
+        <div class="kpi-card k-aff">
+          <div class="kpi-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+          <div class="kpi-label" data-i="kpi_aff_label">ผู้ได้รับผลกระทบ</div>
+          <div class="kpi-value" id="kpi-affected">—</div>
+          <div class="kpi-sub">ราย</div>
+          <div class="kpi-trend flat" id="trend-affected">— vs เดือนก่อน</div>
+        </div>
+        <div class="kpi-card k-dur">
+          <div class="kpi-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="kpi-label" data-i="kpi_dur_label">ระยะเวลาไฟดับรวม</div>
+          <div class="kpi-value" id="kpi-dur">—</div>
+          <div class="kpi-sub">นาที</div>
+          <div class="kpi-trend flat" id="trend-dur">— vs เดือนก่อน</div>
+        </div>
+        <div class="kpi-card k-node">
+          <div class="kpi-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg></div>
+          <div class="kpi-label" data-i="kpi_node_label">จำนวนเหตุการณ์</div>
+          <div class="kpi-value" id="kpi-nodes">—</div>
+          <div class="kpi-sub">รายการ</div>
+          <div class="kpi-trend flat" id="trend-nodes">— vs เดือนก่อน</div>
+        </div>
       </div>
 
       <!-- Insight Cards -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;" id="insightGrid">
         <div class="insight-card">
           <div class="insight-icon" style="background:rgba(244,63,94,.1);">🔴</div>
-          <div style="min-width:0;">
-            <div class="insight-lbl" data-i="insight_top_eq">อุปกรณ์เสียบ่อยสุด</div>
-            <div class="insight-val" id="insight-top-eq">—</div>
-            <div class="insight-sub" id="insight-top-count">—</div>
+          <div>
+            <div class="insight-label" data-i="insight_top_label">อุปกรณ์เสียบ่อยสุด</div>
+            <div class="insight-value" id="insight-top-eq">—</div>
+            <div class="insight-sub" id="insight-top-count">— ครั้ง</div>
           </div>
         </div>
         <div class="insight-card">
           <div class="insight-icon" style="background:rgba(245,158,11,.1);">⏱️</div>
-          <div style="min-width:0;">
-            <div class="insight-lbl" data-i="insight_avg_dur">ระยะเวลาเฉลี่ย/ครั้ง</div>
-            <div class="insight-val" id="insight-avg-dur">—</div>
+          <div>
+            <div class="insight-label" data-i="insight_avg_dur_label">ระยะเวลาเฉลี่ย/ครั้ง</div>
+            <div class="insight-value" id="insight-avg-dur">—</div>
             <div class="insight-sub" data-i="insight_avg_dur_sub">นาทีต่อเหตุการณ์</div>
           </div>
         </div>
         <div class="insight-card">
           <div class="insight-icon" style="background:rgba(167,139,250,.1);">📍</div>
-          <div style="min-width:0;">
-            <div class="insight-lbl" data-i="insight_top_area">พื้นที่เสี่ยงสูงสุด</div>
-            <div class="insight-val" id="insight-top-area">—</div>
-            <div class="insight-sub" id="insight-area-count">—</div>
+          <div>
+            <div class="insight-label" data-i="insight_top_area_label">พื้นที่เสี่ยงสูงสุด</div>
+            <div class="insight-value" id="insight-top-area">—</div>
+            <div class="insight-sub" id="insight-area-count">— เหตุการณ์</div>
           </div>
         </div>
         <div class="insight-card">
-          <div class="insight-icon" style="background:rgba(34,211,238,.1);">📊</div>
-          <div style="min-width:0;">
-            <div class="insight-lbl" data-i="insight_top_cause">สาเหตุหลัก</div>
-            <div class="insight-val" id="insight-top-cause">—</div>
-            <div class="insight-sub" id="insight-cause-pct">—</div>
+          <div class="insight-icon" style="background:rgba(16,185,129,.1);">🔍</div>
+          <div>
+            <div class="insight-label" data-i="insight_top_cause_label">สาเหตุหลัก</div>
+            <div class="insight-value" id="insight-top-cause">—</div>
+            <div class="insight-sub" id="insight-cause-pct">— % ของทั้งหมด</div>
           </div>
         </div>
       </div>
 
-      <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
+      <!-- Charts Row 1: Trend Line + Horizontal Bar + Donut -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+        <!-- Trend Line -->
         <div class="card">
-          <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
-          <div class="card-body"><div class="chart-wrap" style="height:300px;"><canvas id="trendChart"></canvas></div></div>
+          <div class="card-header">
+            <span class="card-title" data-i="chart_trend_title">แนวโน้มเหตุการณ์ 30 วัน</span>
+            <span class="badge badge-blue" id="recordCountBadge">0</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:200px;"><canvas id="trendChart"></canvas></div>
+          </div>
         </div>
+        <!-- Horizontal Bar Top 5 -->
         <div class="card">
-          <div class="card-header"><span class="card-title" data-i="chart_dist_title">การกระจายการดำเนินงาน</span></div>
-          <div class="card-body"><div id="distLegend" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div><div class="chart-wrap" style="height:260px;"><canvas id="distChart"></canvas></div></div>
+          <div class="card-header"><span class="card-title" data-i="chart_top_title">Top 5 อุปกรณ์</span></div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:200px;"><canvas id="topEqChart"></canvas></div>
+          </div>
+        </div>
+        <!-- Donut cause -->
+        <div class="card">
+          <div class="card-header"><span class="card-title" data-i="chart_cause_title">สาเหตุการเสีย</span></div>
+          <div class="card-body">
+            <div id="causeLegend" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
+            <div class="chart-wrap" style="height:160px;"><canvas id="causeChart"></canvas></div>
+          </div>
         </div>
       </div>
 
       <!-- Calendar Heatmap -->
-      <div class="card" style="margin-bottom:14px;">
+      <div class="card" style="margin-bottom:12px;">
         <div class="card-header">
-          <span class="card-title" data-i="cal_title">ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)</span>
+          <span class="card-title" data-i="chart_cal_title">ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)</span>
           <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3);">
             <span data-i="cal_less">น้อย</span>
             <div style="display:flex;gap:2px;">
               <div style="width:10px;height:10px;border-radius:2px;background:var(--bg3);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.25);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.5);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.75);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.3);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.55);"></div>
+              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.8);"></div>
               <div style="width:10px;height:10px;border-radius:2px;background:#3b7ef8;"></div>
             </div>
             <span data-i="cal_more">มาก</span>
           </div>
         </div>
-        <div class="card-body"><div class="cal-wrap" id="calendarWrap"></div></div>
+        <div class="card-body">
+          <div class="cal-wrap" id="calendarWrap"></div>
+        </div>
       </div>
 
+      <!-- Data Table -->
       <div class="card">
         <div class="card-header">
-          <div style="display:flex;align-items:center;gap:9px;"><span class="card-title" data-i="table_title">ข้อมูลเหตุการณ์</span><span class="badge badge-emerald" id="rowBadge">0</span></div>
+          <div style="display:flex;align-items:center;gap:9px;">
+            <span class="card-title" data-i="table_title">ข้อมูลเหตุการณ์</span>
+            <span class="badge badge-emerald" id="rowBadge">0</span>
+          </div>
           <span style="font-size:10px;color:var(--text3);" data-i="table_hint">คลิกแถวเพื่อดูรายละเอียด · แสดง 100 รายการแรก</span>
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr id="tableHead"><th data-i="table_wait">รอการซิงค์...</th></tr></thead>
-            <tbody id="tableBody"><tr><td colspan="20" style="text-align:center;padding:36px;color:var(--text3);font-size:12px;" data-i="table_empty">ยังไม่มีข้อมูล</td></tr></tbody>
+            <thead><tr id="tableHead"><th>รอการซิงค์...</th></tr></thead>
+            <tbody id="tableBody"><tr><td colspan="20" style="text-align:center;padding:36px;color:var(--text3);font-size:12px;">ยังไม่มีข้อมูล</td></tr></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ANALYSIS VIEW -->
+    <!-- ======= ANALYSIS ======= -->
     <div class="view" id="view-analysis">
       <div class="anal-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
-        <div class="a-kpi"><div class="a-kpi-label" data-i="a_mttr_label">MTTR</div><div style="display:flex;align-items:baseline;gap:5px;"><div class="a-kpi-value" id="a-mttr">—</div><div class="a-kpi-unit" data-i="a_mttr_unit">นาที</div></div><div style="font-size:10px;color:var(--text3);margin-top:4px;" data-i="a_mttr_sub">เวลาเฉลี่ยในการแก้ไข</div></div>
-        <div class="a-kpi"><div class="a-kpi-label" data-i="a_mtbf_label">MTBF</div><div style="display:flex;align-items:baseline;gap:5px;"><div class="a-kpi-value" id="a-mtbf">—</div><div class="a-kpi-unit" data-i="a_mtbf_unit">วัน</div></div><div style="font-size:10px;color:var(--text3);margin-top:4px;" data-i="a_mtbf_sub">เวลาเฉลี่ยระหว่างความผิดปกติ</div></div>
-        <div class="a-kpi"><div class="a-kpi-label" data-i="a_risk_label">อุปกรณ์ความเสี่ยงสูง</div><div class="a-kpi-value" id="a-risk" style="font-size:16px;margin-top:2px;">—</div><div style="font-size:10px;color:var(--text3);margin-top:4px;" data-i="a_risk_sub">ความผิดปกติบ่อยที่สุด</div></div>
-        <div class="a-kpi" style="border-left:3px solid var(--purple);"><div class="a-kpi-label" data-i="a_rel_label">ดัชนีความเชื่อถือได้</div><div class="a-kpi-value" id="a-rel" style="color:var(--purple);">—%</div><div style="font-size:10px;color:var(--text3);margin-top:4px;" data-i="a_rel_sub">ค่าประมาณการระบบ</div></div>
+        <div class="a-kpi"><div class="a-kpi-label">MTTR</div><div style="display:flex;align-items:baseline;gap:5px;"><div class="a-kpi-value" id="a-mttr">—</div><div class="a-kpi-unit">นาที</div></div><div style="font-size:10px;color:var(--text3);margin-top:4px;">เวลาเฉลี่ยในการแก้ไข</div></div>
+        <div class="a-kpi"><div class="a-kpi-label">MTBF</div><div style="display:flex;align-items:baseline;gap:5px;"><div class="a-kpi-value" id="a-mtbf">—</div><div class="a-kpi-unit">วัน</div></div><div style="font-size:10px;color:var(--text3);margin-top:4px;">เวลาเฉลี่ยระหว่างความผิดปกติ</div></div>
+        <div class="a-kpi"><div class="a-kpi-label">อุปกรณ์ความเสี่ยงสูง</div><div class="a-kpi-value" id="a-risk" style="font-size:16px;margin-top:2px;">—</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">ความผิดปกติบ่อยที่สุด</div></div>
+        <div class="a-kpi" style="border-left:3px solid var(--purple);"><div class="a-kpi-label">ดัชนีความเชื่อถือได้</div><div class="a-kpi-value" id="a-rel" style="color:var(--purple);">—%</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">ค่าประมาณการระบบ</div></div>
       </div>
-      <div class="anal-chart-grid" style="display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px;">
-        <div class="card"><div class="card-header"><span class="card-title" data-i="a_forecast_title">แนวโน้มพยากรณ์ 30 วัน</span><span class="badge badge-ai" data-i="a_ai_badge">AI Forecast</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="forecastChart"></canvas></div></div></div>
-        <div class="card"><div class="card-header"><span class="card-title" data-i="a_rc_title">วิเคราะห์สาเหตุ</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="rcChart"></canvas></div></div></div>
+      <div style="display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px;">
+        <div class="card"><div class="card-header"><span class="card-title">แนวโน้มพยากรณ์ 30 วัน</span><span class="badge badge-ai">AI Forecast</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="forecastChart"></canvas></div></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">วิเคราะห์สาเหตุ</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="rcChart"></canvas></div></div></div>
       </div>
       <div style="display:grid;grid-template-columns:3fr 2fr;gap:14px;">
-        <div class="card"><div class="card-header"><span class="card-title" data-i="a_task_title">ติดตามงานปฏิบัติการ</span><button class="btn btn-primary" style="font-size:10px;padding:5px 11px;" data-i="a_new_task">+ งานใหม่</button></div><div id="taskList"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title" data-i="a_mitigation_title">กลยุทธ์ลดความเสี่ยง</span></div><div class="card-body" id="mitigationList" style="display:flex;flex-direction:column;gap:9px;"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">ติดตามงานปฏิบัติการ</span><button class="btn btn-primary" style="font-size:10px;padding:5px 11px;">+ งานใหม่</button></div><div id="taskList"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">กลยุทธ์ลดความเสี่ยง</span></div><div class="card-body" id="mitigationList" style="display:flex;flex-direction:column;gap:9px;"></div></div>
       </div>
     </div>
 
-    <!-- COMPARISON VIEW -->
+    <!-- ======= COMPARISON ======= -->
     <div class="view" id="view-comparison">
-      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title" data-i="comp_setup_title">กำหนดช่วงเวลาเปรียบเทียบ</span></div>
-        <div class="card-body"><div class="comp-grid" style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;">
-          <div><div style="font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span><span data-i="comp_period_a">ช่วง A</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;" data-i="comp_from">จาก</label><input type="date" id="dA1" class="date-input" onchange="runComparison()"></div><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;" data-i="comp_to">ถึง</label><input type="date" id="dA2" class="date-input" onchange="runComparison()"></div></div></div>
+      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">กำหนดช่วงเวลาเปรียบเทียบ</span></div>
+        <div class="card-body"><div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;">
+          <div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>ช่วง A</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;">จาก</label><input type="date" id="dA1" class="date-input" onchange="runComparison()"></div><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;">ถึง</label><input type="date" id="dA2" class="date-input" onchange="runComparison()"></div></div></div>
           <div style="display:flex;align-items:center;padding-bottom:4px;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--text3)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-          <div><div style="font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;background:var(--emerald);border-radius:2px;display:inline-block;"></span><span data-i="comp_period_b">ช่วง B</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;" data-i="comp_from">จาก</label><input type="date" id="dB1" class="date-input" onchange="runComparison()"></div><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;" data-i="comp_to">ถึง</label><input type="date" id="dB2" class="date-input" onchange="runComparison()"></div></div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;background:var(--emerald);border-radius:2px;display:inline-block;"></span>ช่วง B</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;">จาก</label><input type="date" id="dB1" class="date-input" onchange="runComparison()"></div><div><label style="font-size:9.5px;color:var(--text3);display:block;margin-bottom:4px;">ถึง</label><input type="date" id="dB2" class="date-input" onchange="runComparison()"></div></div></div>
         </div></div>
       </div>
-      <div class="comp-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-        <div class="card"><div class="card-header" style="border-left:3px solid var(--blue);"><span class="card-title" style="color:var(--blue);" data-i="comp_a_stats">สถิติช่วง A</span></div><div class="card-body"><div class="stat-row"><span class="stat-row-label" data-i="comp_incidents">จำนวนเหตุการณ์</span><span class="stat-row-value" id="cA-incidents">0</span></div><div class="stat-row"><span class="stat-row-label">SAIFI</span><span class="stat-row-value" id="cA-saifi">0.000</span></div><div class="stat-row"><span class="stat-row-label">SAIDI</span><span class="stat-row-value" id="cA-saidi">0.000</span></div><div class="stat-row"><span class="stat-row-label" data-i="comp_avg_dur">ระยะเวลาเฉลี่ย</span><span class="stat-row-value" id="cA-dur">0</span></div></div></div>
-        <div class="card"><div class="card-header" style="border-left:3px solid var(--emerald);"><span class="card-title" style="color:var(--emerald);" data-i="comp_b_stats">สถิติช่วง B</span></div><div class="card-body"><div class="stat-row"><span class="stat-row-label" data-i="comp_incidents">จำนวนเหตุการณ์</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-incidents">0</span><span class="chg neu" id="chg-incidents">—</span></div></div><div class="stat-row"><span class="stat-row-label">SAIFI</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-saifi">0.000</span><span class="chg neu" id="chg-saifi">—</span></div></div><div class="stat-row"><span class="stat-row-label">SAIDI</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-saidi">0.000</span><span class="chg neu" id="chg-saidi">—</span></div></div><div class="stat-row"><span class="stat-row-label" data-i="comp_avg_dur">ระยะเวลาเฉลี่ย</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-dur">0</span><span class="chg neu" id="chg-dur">—</span></div></div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card"><div class="card-header" style="border-left:3px solid var(--blue);"><span class="card-title" style="color:var(--blue);">สถิติช่วง A</span></div><div class="card-body"><div class="stat-row"><span class="stat-row-label">จำนวนเหตุการณ์</span><span class="stat-row-value" id="cA-incidents">0</span></div><div class="stat-row"><span class="stat-row-label">SAIFI</span><span class="stat-row-value" id="cA-saifi">0.000</span></div><div class="stat-row"><span class="stat-row-label">SAIDI</span><span class="stat-row-value" id="cA-saidi">0.000</span></div><div class="stat-row"><span class="stat-row-label">ระยะเวลาเฉลี่ย</span><span class="stat-row-value" id="cA-dur">0</span></div></div></div>
+        <div class="card"><div class="card-header" style="border-left:3px solid var(--emerald);"><span class="card-title" style="color:var(--emerald);">สถิติช่วง B</span></div><div class="card-body"><div class="stat-row"><span class="stat-row-label">จำนวนเหตุการณ์</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-incidents">0</span><span class="chg neu" id="chg-incidents">—</span></div></div><div class="stat-row"><span class="stat-row-label">SAIFI</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-saifi">0.000</span><span class="chg neu" id="chg-saifi">—</span></div></div><div class="stat-row"><span class="stat-row-label">SAIDI</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-saidi">0.000</span><span class="chg neu" id="chg-saidi">—</span></div></div><div class="stat-row"><span class="stat-row-label">ระยะเวลาเฉลี่ย</span><div style="display:flex;align-items:center;gap:7px;"><span class="stat-row-value" id="cB-dur">0</span><span class="chg neu" id="chg-dur">—</span></div></div></div></div>
       </div>
-      <div class="card"><div class="card-header"><span class="card-title" data-i="comp_chart_title">กราฟเปรียบเทียบ</span></div><div class="card-body"><div class="chart-wrap" style="height:320px;"><canvas id="compChart"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">กราฟเปรียบเทียบ</span></div><div class="card-body"><div class="chart-wrap" style="height:320px;"><canvas id="compChart"></canvas></div></div></div>
     </div>
 
-    <!-- MAP VIEW -->
+    <!-- ======= MAP ======= -->
     <div class="view" id="view-map">
-      <div class="card"><div class="card-header"><span class="card-title" data-i="map_title">แผนที่ความเสี่ยง (Heatmap)</span><div style="display:flex;gap:5px;"><button class="map-tab active" id="ml-incidents" onclick="setMapLayer('incidents')" data-i="map_incidents">เหตุการณ์</button><button class="map-tab" id="ml-duration" onclick="setMapLayer('duration')" data-i="map_duration">ระยะเวลา</button><button class="map-tab" id="ml-customers" onclick="setMapLayer('customers')" data-i="map_customers">ผู้ใช้ไฟ</button></div></div>
-        <div style="padding:14px;"><div id="mapEl"></div><div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:11px;color:var(--text2);flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#2563eb;border-radius:2px;display:inline-block;"></span><span data-i="map_low">ความเสี่ยงต่ำ</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#f59e0b;border-radius:2px;display:inline-block;"></span><span data-i="map_med">ความเสี่ยงปานกลาง</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#ef4444;border-radius:2px;display:inline-block;"></span><span data-i="map_high">ความเสี่ยงสูง</span></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">แผนที่ความเสี่ยง (Heatmap)</span><div style="display:flex;gap:5px;"><button class="map-tab active" id="ml-incidents" onclick="setMapLayer('incidents')">เหตุการณ์</button><button class="map-tab" id="ml-duration" onclick="setMapLayer('duration')">ระยะเวลา</button><button class="map-tab" id="ml-customers" onclick="setMapLayer('customers')">ผู้ใช้ไฟ</button></div></div>
+        <div style="padding:14px;"><div id="mapEl"></div><div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:11px;color:var(--text2);flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#2563eb;border-radius:2px;display:inline-block;"></span>ความเสี่ยงต่ำ</div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#f59e0b;border-radius:2px;display:inline-block;"></span>ความเสี่ยงปานกลาง</div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#ef4444;border-radius:2px;display:inline-block;"></span>ความเสี่ยงสูง</div></div></div>
       </div>
     </div>
 
@@ -530,12 +576,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="modal-bg" id="detailModal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-      <div><div class="font-display" style="font-size:16px;margin-bottom:2px;" data-i="modal_title">รายละเอียดเหตุการณ์</div><div style="font-size:11px;color:var(--text3);" data-i="modal_sub">ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์</div></div>
+      <div><div class="font-display" style="font-size:16px;margin-bottom:2px;">รายละเอียดเหตุการณ์</div><div style="font-size:11px;color:var(--text3);">ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์</div></div>
       <button onclick="closeModal()" style="width:30px;height:30px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--text2)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div style="padding:18px 22px;">
-      <div style="margin-bottom:14px;"><div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;" data-i="modal_benchmark">เปรียบเทียบค่าเฉลี่ย</div><div class="chart-wrap" style="height:200px;"><canvas id="detailChart"></canvas></div></div>
-      <div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;" data-i="modal_all_fields">ข้อมูลทั้งหมด</div>
+      <div style="margin-bottom:14px;"><div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">เปรียบเทียบค่าเฉลี่ย</div><div class="chart-wrap" style="height:200px;"><canvas id="detailChart"></canvas></div></div>
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">ข้อมูลทั้งหมด</div>
       <div id="modalGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px;"></div>
     </div>
   </div>
@@ -543,74 +589,52 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <script>
 // ================================================================
-// ⚙️  GITHUB CONFIG — แก้ค่าตรงนี้หลังสร้าง repo แล้ว
+// ⚙️  GITHUB CONFIG
 // ================================================================
 const GH = {
-  OWNER: 'your-username',
+  OWNER: 'aloofpea-aul',
   REPO:  'pea-analytics-data',
   BRANCH: 'main',
-
-  // ชื่อไฟล์ JSON ใน repo → key ใน dataStore
   FILES: {
     'data/hv-mv.json': 'Dashboard-HV-MV',
     'data/lv.json':    'Dashboard-LV',
     'data/area.json':  'รายงานแยกตามพื้นที่',
   },
-
-  // URL สำเร็จรูป (ไม่ต้องแก้)
   raw(path){ return `https://raw.githubusercontent.com/${this.OWNER}/${this.REPO}/${this.BRANCH}/${path}`; },
-  meta(){    return this.raw('data/meta.json'); },
+  meta(){ return this.raw('data/meta.json'); },
 };
-// ================================================================
 
 // ================================================================
-// TRANSLATION DICTIONARY
+// LANGUAGE
 // ================================================================
 const LANG = {
   th:{
     logo_title:'Distribution Analytics',logo_sub:'PEA กฟต.2 · ระบบวิเคราะห์',
     nav_overview:'ภาพรวม',nav_dashboard:'แดชบอร์ด',nav_analysis:'วิเคราะห์เชิงลึก',
     nav_tools:'เครื่องมือ',nav_comparison:'เปรียบเทียบช่วงเวลา',nav_map:'แผนที่ความเสี่ยง',
-    status_connecting:'กำลังเชื่อมต่อ...',status_online:'ออนไลน์',status_syncing:'กำลังโหลด...',status_error:'ไม่สามารถโหลดได้',
+    status_connecting:'กำลังเชื่อมต่อ...',status_online:'ออนไลน์',status_syncing:'กำลังโหลด...',
     dark_mode:'โหมดมืด',last_sync:'อัปเดตล่าสุด',
     btn_export:'Export',btn_sync:'ซิงค์ข้อมูล',btn_reset:'รีเซ็ต',
     filter_title:'ตัวกรองข้อมูล',filter_sub:'สถานีไฟฟ้า',filter_pea:'รหัส กฟส.',filter_eq:'ประเภทอุปกรณ์',
     filter_sub_default:'เลือกสถานี...',filter_pea_default:'เลือก กฟส....',filter_eq_default:'เลือกอุปกรณ์...',
-    filter_selected:'เลือกแล้ว',
-    sub_all:'ทั้งหมด',sub_main:'สายหลัก',sub_branch:'สายแยก',
-    kpi_saifi_label:'SAIFI',kpi_saifi_sub:'ครั้ง/ผู้ใช้ไฟ',
-    kpi_saidi_label:'SAIDI',kpi_saidi_sub:'นาที/ผู้ใช้ไฟ',
-    kpi_total_label:'ผู้ใช้ไฟรวม',kpi_total_sub:'ราย',
-    kpi_aff_label:'ผู้ได้รับผลกระทบ',kpi_aff_sub:'ราย',
-    kpi_dur_label:'ระยะเวลาไฟดับรวม',kpi_dur_sub:'นาที',
-    kpi_node_label:'จำนวนเหตุการณ์',kpi_node_sub:'รายการ',
-    chart_equip_title:'ความถี่ความผิดปกติรายอุปกรณ์',chart_dist_title:'การกระจายการดำเนินงาน',
+    filter_selected:'เลือกแล้ว',sub_all:'ทั้งหมด',sub_main:'สายหลัก',sub_branch:'สายแยก',
+    kpi_saifi_sub:'ครั้ง/ผู้ใช้ไฟ',kpi_saidi_sub:'นาที/ผู้ใช้ไฟ',
+    kpi_total_label:'ผู้ใช้ไฟรวม',kpi_aff_label:'ผู้ได้รับผลกระทบ',
+    kpi_dur_label:'ระยะเวลาไฟดับรวม',kpi_node_label:'จำนวนเหตุการณ์',
+    chart_trend_title:'แนวโน้มเหตุการณ์ 30 วัน',
+    chart_top_title:'Top 5 อุปกรณ์',chart_cause_title:'สาเหตุการเสีย',
+    chart_cal_title:'ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)',
+    cal_less:'น้อย',cal_more:'มาก',
     table_title:'ข้อมูลเหตุการณ์',table_hint:'คลิกแถวเพื่อดูรายละเอียด · แสดง 100 รายการแรก',
-    table_wait:'รอการซิงค์...',table_empty:'ยังไม่มีข้อมูล',
-    a_mttr_label:'MTTR',a_mttr_unit:'นาที',a_mttr_sub:'เวลาเฉลี่ยในการแก้ไข',
-    a_mtbf_label:'MTBF',a_mtbf_unit:'วัน',a_mtbf_sub:'เวลาเฉลี่ยระหว่างความผิดปกติ',
-    a_risk_label:'อุปกรณ์ความเสี่ยงสูง',a_risk_sub:'ความผิดปกติบ่อยที่สุด',
-    a_rel_label:'ดัชนีความเชื่อถือได้',a_rel_sub:'ค่าประมาณการระบบ',
-    a_forecast_title:'แนวโน้มพยากรณ์ 30 วัน',a_ai_badge:'AI Forecast',a_rc_title:'วิเคราะห์สาเหตุ',
-    a_task_title:'ติดตามงานปฏิบัติการ',a_new_task:'+ งานใหม่',a_mitigation_title:'กลยุทธ์ลดความเสี่ยง',
-    comp_setup_title:'กำหนดช่วงเวลาเปรียบเทียบ',comp_period_a:'ช่วง A',comp_period_b:'ช่วง B',
-    comp_from:'จาก',comp_to:'ถึง',comp_a_stats:'สถิติช่วง A',comp_b_stats:'สถิติช่วง B',
-    comp_incidents:'จำนวนเหตุการณ์',comp_avg_dur:'ระยะเวลาเฉลี่ย',comp_chart_title:'กราฟเปรียบเทียบ',
-    map_title:'แผนที่ความเสี่ยง (Heatmap)',map_incidents:'เหตุการณ์',map_duration:'ระยะเวลา',
-    map_customers:'ผู้ใช้ไฟ',map_low:'ความเสี่ยงต่ำ',map_med:'ความเสี่ยงปานกลาง',map_high:'ความเสี่ยงสูง',
-    modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
-    modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
+    insight_top_label:'อุปกรณ์เสียบ่อยสุด',insight_avg_dur_label:'ระยะเวลาเฉลี่ย/ครั้ง',
+    insight_avg_dur_sub:'นาทีต่อเหตุการณ์',insight_top_area_label:'พื้นที่เสี่ยงสูงสุด',
+    insight_top_cause_label:'สาเหตุหลัก',
     notif_gh_ok:'โหลดข้อมูลสำเร็จ',notif_gh_ok_msg:'ข้อมูลจาก GitHub โหลดเรียบร้อย',
     notif_gh_err:'ไม่สามารถโหลดจาก GitHub ได้',notif_gh_err_msg:'ใช้ข้อมูลจำลองแทน',
     notif_demo:'โหมดสาธิต',notif_demo_msg:'ใช้ข้อมูลจำลองเพื่อสาธิตระบบ',
     notif_filter_reset:'รีเซ็ตตัวกรองแล้ว',notif_filter_reset_msg:'ล้างตัวกรองทั้งหมดแล้ว',
     notif_filter_applied:'ใช้ตัวกรองแล้ว',notif_export_ok:'Export สำเร็จ',notif_export_fail:'ไม่มีข้อมูล',
-    notif_dur_alert:'แจ้งเตือนระยะเวลาสูง',notif_cust_alert:'แจ้งเตือนผลกระทบสูง',
-    notif_affected:'ราย',dur_unit:'นาที',records_unit:'รายการ',
-    vs_prev:'vs เดือนก่อน',trend_up:'↑',trend_down:'↓',
-    cal_title:'ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)',cal_less:'น้อย',cal_more:'มาก',cal_events:'เหตุการณ์',
-    insight_top_eq:'อุปกรณ์เสียบ่อยสุด',insight_avg_dur:'ระยะเวลาเฉลี่ย/ครั้ง',
-    insight_avg_dur_sub:'นาทีต่อเหตุการณ์',insight_top_area:'พื้นที่เสี่ยงสูงสุด',insight_top_cause:'สาเหตุหลัก',
+    dur_unit:'นาที',records_unit:'รายการ',vs_prev:'vs เดือนก่อน',
     task_status_progress:'กำลังดำเนินการ',task_status_pending:'รอดำเนินการ',task_status_done:'เสร็จสิ้น',
     task_prio_critical:'วิกฤต',task_prio_high:'สูง',task_prio_normal:'ปกติ',
     mit_pm_title:'บำรุงรักษาเชิงป้องกัน',mit_pm_text:'ต้องการ PM เร่งด่วนสำหรับอุปกรณ์ความเสี่ยงสูง ภายใน 14 วัน',
@@ -625,51 +649,36 @@ const LANG = {
     detail_dur:'ระยะเวลา (นาที)',detail_cust:'ผู้ใช้ไฟที่ได้รับผลกระทบ',
     date_locale:'th-TH',date_options_short:{year:'numeric',month:'short',day:'numeric'},
     source_github:'GitHub (Live)',source_demo:'ข้อมูลสาธิต',source_error:'โหลดผิดพลาด',
+    trend_up:'↑',trend_down:'↓',trend_flat:'→',
+    cal_events:'เหตุการณ์',
   },
   en:{
     logo_title:'Distribution Analytics',logo_sub:'PEA Region 2 · Analytics',
     nav_overview:'Overview',nav_dashboard:'Dashboard',nav_analysis:'Advanced Analysis',
     nav_tools:'Tools',nav_comparison:'Period Compare',nav_map:'Risk Heatmap',
-    status_connecting:'Connecting...',status_online:'Online',status_syncing:'Loading...',status_error:'Load Failed',
+    status_connecting:'Connecting...',status_online:'Online',status_syncing:'Loading...',
     dark_mode:'Dark Mode',last_sync:'Last Updated',
     btn_export:'Export',btn_sync:'Sync Data',btn_reset:'Reset',
     filter_title:'Data Filters',filter_sub:'Substation',filter_pea:'PEA Code / Area',filter_eq:'Equipment Category',
     filter_sub_default:'All substations',filter_pea_default:'All areas',filter_eq_default:'All equipment',
-    filter_selected:'Selected',
-    sub_all:'All',sub_main:'Main Line',sub_branch:'Branch',
-    kpi_saifi_label:'SAIFI',kpi_saifi_sub:'Interruptions / consumer',
-    kpi_saidi_label:'SAIDI',kpi_saidi_sub:'Minutes / consumer',
-    kpi_total_label:'Total Consumers',kpi_total_sub:'Registered users',
-    kpi_aff_label:'Affected Consumers',kpi_aff_sub:'Interrupted users',
-    kpi_dur_label:'Total Outage Duration',kpi_dur_sub:'Minutes',
-    kpi_node_label:'Fault Nodes',kpi_node_sub:'Incident records',
-    chart_equip_title:'Equipment Fault Frequency',chart_dist_title:'Operate Type Distribution',
+    filter_selected:'Selected',sub_all:'All',sub_main:'Main Line',sub_branch:'Branch',
+    kpi_saifi_sub:'Interruptions / consumer',kpi_saidi_sub:'Minutes / consumer',
+    kpi_total_label:'Total Consumers',kpi_aff_label:'Affected Consumers',
+    kpi_dur_label:'Total Outage Duration',kpi_node_label:'Fault Nodes',
+    chart_trend_title:'30-Day Incident Trend',
+    chart_top_title:'Top 5 Equipment',chart_cause_title:'Failure Cause',
+    chart_cal_title:'Daily Incident Frequency (Last 30 Days)',
+    cal_less:'Less',cal_more:'More',
     table_title:'Incident Records',table_hint:'Click row for details · Showing first 100',
-    table_wait:'Waiting for sync...',table_empty:'No data loaded yet',
-    a_mttr_label:'MTTR',a_mttr_unit:'min avg',a_mttr_sub:'Mean time to restore',
-    a_mtbf_label:'MTBF',a_mtbf_unit:'days',a_mtbf_sub:'Mean time between failures',
-    a_risk_label:'Highest Risk Equipment',a_risk_sub:'Most frequent fault source',
-    a_rel_label:'Reliability Index',a_rel_sub:'Estimated system reliability',
-    a_forecast_title:'30-Day Predictive Trend',a_ai_badge:'AI Forecast',a_rc_title:'Root Cause Analysis',
-    a_task_title:'Operation Follow-up Tracker',a_new_task:'+ New Task',a_mitigation_title:'Mitigation Strategy',
-    comp_setup_title:'Period Comparison Setup',comp_period_a:'Period A',comp_period_b:'Period B',
-    comp_from:'From',comp_to:'To',comp_a_stats:'Period A — Statistics',comp_b_stats:'Period B — Statistics',
-    comp_incidents:'Total Incidents',comp_avg_dur:'Avg Duration',comp_chart_title:'Visual Comparison',
-    map_title:'Risk Area Heatmap',map_incidents:'Incidents',map_duration:'Duration',
-    map_customers:'Customers',map_low:'Low Risk',map_med:'Medium Risk',map_high:'High Risk',
-    modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
-    modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
+    insight_top_label:'Most Frequent Equipment',insight_avg_dur_label:'Avg Duration / Event',
+    insight_avg_dur_sub:'Minutes per incident',insight_top_area_label:'Highest Risk Area',
+    insight_top_cause_label:'Top Cause',
     notif_gh_ok:'Data Loaded',notif_gh_ok_msg:'GitHub data loaded successfully',
     notif_gh_err:'GitHub Load Failed',notif_gh_err_msg:'Using demo data instead',
-    notif_demo:'Demo Mode',notif_demo_msg:'Using simulated data for demonstration',
+    notif_demo:'Demo Mode',notif_demo_msg:'Using simulated data',
     notif_filter_reset:'Filters Reset',notif_filter_reset_msg:'All filters cleared',
     notif_filter_applied:'Filter Applied',notif_export_ok:'Export Complete',notif_export_fail:'No Data',
-    notif_dur_alert:'High Duration Alert',notif_cust_alert:'High Impact Alert',
-    notif_affected:'affected',dur_unit:'min',records_unit:'records',
-    vs_prev:'vs prev month',trend_up:'↑',trend_down:'↓',
-    cal_title:'Daily Incident Frequency (Last 30 Days)',cal_less:'Less',cal_more:'More',cal_events:'events',
-    insight_top_eq:'Most Frequent Equipment',insight_avg_dur:'Avg Duration / Event',
-    insight_avg_dur_sub:'Minutes per incident',insight_top_area:'Highest Risk Area',insight_top_cause:'Top Cause',
+    dur_unit:'min',records_unit:'records',vs_prev:'vs prev month',
     task_status_progress:'In Progress',task_status_pending:'Pending',task_status_done:'Completed',
     task_prio_critical:'Critical',task_prio_high:'High',task_prio_normal:'Normal',
     mit_pm_title:'Preventive Maintenance',mit_pm_text:'Urgent PM needed for high-risk units within 14 days.',
@@ -684,19 +693,20 @@ const LANG = {
     detail_dur:'Duration (min)',detail_cust:'Affected Consumers',
     date_locale:'en-GB',date_options_short:{year:'numeric',month:'short',day:'numeric'},
     source_github:'GitHub (Live)',source_demo:'Demo Data',source_error:'Load Error',
+    trend_up:'↑',trend_down:'↓',trend_flat:'→',
+    cal_events:'events',
   },
 };
 
 // ================================================================
 // STATE
 // ================================================================
-let currentLang='th', currentView='dashboard', currentMode='MV', subFilter='All';
-let filters={sub:[],pea:[],eq:[]}, searchQ={sub:'',pea:'',eq:''};
+let currentLang='th',currentView='dashboard',currentMode='MV',subFilter='All';
+let filters={sub:[],pea:[],eq:[]},searchQ={sub:'',pea:'',eq:''};
 let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแยกตามพื้นที่':[]};
-let metaStore={}, filteredData=[], currentTableData=[];
-let charts={}, mapInst=null, heatLayer=null, mapLayerType='incidents';
-let isLoading=false, isDark=true;
-let dataSource='demo'; // 'github' | 'demo' | 'error'
+let metaStore={},filteredData=[],currentTableData=[];
+let charts={},mapInst=null,heatLayer=null,mapLayerType='incidents';
+let isLoading=false,isDark=true,dataSource='demo';
 
 const COLORS=['#3b7ef8','#10b981','#f59e0b','#f43f5e','#a78bfa','#22d3ee','#fb923c','#84cc16','#ec4899','#60a5fa'];
 const gridColor=()=>isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.05)';
@@ -706,72 +716,54 @@ const fmt=(n,d=0)=>(+n||0).toLocaleString(undefined,{maximumFractionDigits:d});
 // ================================================================
 // LANGUAGE
 // ================================================================
-function t(key){ return LANG[currentLang][key]??LANG.en[key]??key; }
-
+function t(key){return LANG[currentLang][key]??LANG.en[key]??key;}
 function applyLang(){
-  document.documentElement.setAttribute('data-lang', currentLang);
-  document.querySelector('html').setAttribute('lang', currentLang);
+  document.documentElement.setAttribute('data-lang',currentLang);
+  document.querySelector('html').setAttribute('lang',currentLang);
   document.querySelectorAll('[data-i]').forEach(el=>el.textContent=t(el.getAttribute('data-i')));
   document.getElementById('lang-th').classList.toggle('active',currentLang==='th');
   document.getElementById('lang-en').classList.toggle('active',currentLang==='en');
   ['sub','pea','eq'].forEach(k=>{
     const map={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default'};
     const tr=document.getElementById('f-'+k+'-trigger');
-    if(tr&&filters[k].length===0) tr.textContent=t(map[k]);
+    if(tr&&filters[k].length===0)tr.textContent=t(map[k]);
   });
   document.getElementById('fs-sub').placeholder=t('filter_sub')+'...';
   document.getElementById('fs-pea').placeholder=t('filter_pea')+'...';
   document.getElementById('fs-eq').placeholder=t('filter_eq')+'...';
   updateSourceBadge();
-  const stEl=document.getElementById('sidebarStatus');
-  if(stEl) stEl.textContent=isLoading?t('status_syncing'):t('status_online');
-  if(currentView==='analysis'&&filteredData.length) renderAnalysis();
+  const st=document.getElementById('sidebarStatus');
+  if(st)st.textContent=isLoading?t('status_syncing'):t('status_online');
+  if(currentView==='analysis'&&filteredData.length)renderAnalysis();
   recolorCharts();
 }
-function setLang(lang){ currentLang=lang; applyLang(); }
+function setLang(lang){currentLang=lang;applyLang();}
 
 // ================================================================
 // NOTIFICATIONS
 // ================================================================
 function notify(title,msg,type='info',dur=4000){
-  const id='n'+Date.now();
-  const col={info:COLORS[0],warning:'#f59e0b',critical:'#f43f5e'}[type];
+  const id='n'+Date.now(),col={info:COLORS[0],warning:'#f59e0b',critical:'#f43f5e'}[type];
   const el=document.createElement('div');
-  el.id=id; el.className=`notif ${type}`;
+  el.id=id;el.className=`notif ${type}`;
   el.innerHTML=`<div style="width:6px;height:6px;border-radius:50%;background:${col};flex-shrink:0;margin-top:4px;"></div>
     <div style="flex:1;min-width:0;"><div class="notif-title">${title}</div><div class="notif-msg">${msg}</div></div>
     <button onclick="document.getElementById('${id}').remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;font-size:13px;">✕</button>`;
   document.getElementById('notifStack').appendChild(el);
-  if(dur>0) setTimeout(()=>{el&&el.remove();},dur);
+  if(dur>0)setTimeout(()=>{el&&el.remove();},dur);
 }
 
 // ================================================================
-// SOURCE BADGE
+// SOURCE / THEME / SIDEBAR / VIEW
 // ================================================================
 function updateSourceBadge(){
-  const badge=document.getElementById('sourceBadge');
-  const text=document.getElementById('sourceText');
-  if(!badge||!text)return;
-  badge.style.display='inline-flex';
-  badge.className='source-badge '+(dataSource==='github'?'github':dataSource==='error'?'error':'demo');
-  text.textContent=t('source_'+dataSource);
+  const b=document.getElementById('sourceBadge'),tx=document.getElementById('sourceText');
+  if(!b||!tx)return;b.style.display='inline-flex';
+  b.className='source-badge '+(dataSource==='github'?'github':dataSource==='error'?'error':'demo');
+  tx.textContent=t('source_'+dataSource);
 }
-
-function setStatusDot(state){
-  const dot=document.getElementById('statusDot');
-  if(!dot)return;
-  dot.className='status-dot '+state;
-}
-
-// ================================================================
-// THEME / SIDEBAR / VIEW
-// ================================================================
-function toggleTheme(){
-  isDark=!isDark;
-  document.body.setAttribute('data-theme',isDark?'dark':'light');
-  document.getElementById('themeToggle').className='toggle'+(isDark?' on':'');
-  recolorCharts();
-}
+function setStatusDot(s){const d=document.getElementById('statusDot');if(d)d.className='status-dot '+s;}
+function toggleTheme(){isDark=!isDark;document.body.setAttribute('data-theme',isDark?'dark':'light');document.getElementById('themeToggle').className='toggle'+(isDark?' on':'');recolorCharts();}
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
 
@@ -783,9 +775,9 @@ function switchView(v){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('nav-'+v)?.classList.add('active');
   document.getElementById('pageTitle').textContent=t(viewTitleKey[v]);
-  if(v==='analysis') renderAnalysis();
-  if(v==='map') setTimeout(initMap,80);
-  if(v==='comparison') setTimeout(runComparison,100);
+  if(v==='analysis')renderAnalysis();
+  if(v==='map')setTimeout(initMap,80);
+  if(v==='comparison')setTimeout(runComparison,100);
   closeSidebar();
 }
 
@@ -794,31 +786,23 @@ function switchView(v){
 // ================================================================
 function toggleDD(type,e){
   e.stopPropagation();
-  const dd=document.getElementById('dd-'+type);
-  const wasOpen=dd.classList.contains('open');
+  const dd=document.getElementById('dd-'+type),wasOpen=dd.classList.contains('open');
   closeAllDD();
   if(!wasOpen){dd.classList.add('open');document.getElementById('f-'+type+'-trigger').classList.add('open');}
 }
-function closeAllDD(){
-  ['sub','pea','eq'].forEach(k=>{
-    document.getElementById('dd-'+k)?.classList.remove('open');
-    document.getElementById('f-'+k+'-trigger')?.classList.remove('open');
-  });
-}
-window.addEventListener('click',(e)=>{ if(!e.target.closest('.filter-wrap')) closeAllDD(); });
+function closeAllDD(){['sub','pea','eq'].forEach(k=>{document.getElementById('dd-'+k)?.classList.remove('open');document.getElementById('f-'+k+'-trigger')?.classList.remove('open');});}
+window.addEventListener('click',(e)=>{if(!e.target.closest('.filter-wrap'))closeAllDD();});
 
 function filterOpts(type,val){searchQ[type]=val.toLowerCase();renderDDList(type);}
-
 function renderDDList(type){
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const raw=dataStore[sName], h=metaStore[sName]?.headers||[];
-  const subC=h.find(n=>n.includes('SubstationName'));
-  const peaC=h.find(n=>n.includes('PEA_Code'));
+  const raw=dataStore[sName],h=metaStore[sName]?.headers||[];
+  const subC=h.find(n=>n.includes('SubstationName')),peaC=h.find(n=>n.includes('PEA_Code'));
   const eqC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   let vals=[];
-  if(type==='sub') vals=[...new Set(raw.map(r=>String(r[subC]||'').trim()))].filter(v=>v);
-  else if(type==='pea'){ const b=filters.sub.length?raw.filter(r=>filters.sub.includes(String(r[subC]||'').trim())):raw; vals=[...new Set(b.map(r=>String(r[peaC]||'').trim()))].filter(v=>v);}
-  else{ const b=raw.filter(r=>(!filters.sub.length||filters.sub.includes(String(r[subC]||'').trim()))&&(!filters.pea.length||filters.pea.includes(String(r[peaC]||'').trim()))); vals=[...new Set(b.map(r=>String(r[eqC]||'').trim()))].filter(v=>v);}
+  if(type==='sub')vals=[...new Set(raw.map(r=>String(r[subC]||'').trim()))].filter(v=>v);
+  else if(type==='pea'){const b=filters.sub.length?raw.filter(r=>filters.sub.includes(String(r[subC]||'').trim())):raw;vals=[...new Set(b.map(r=>String(r[peaC]||'').trim()))].filter(v=>v);}
+  else{const b=raw.filter(r=>(!filters.sub.length||filters.sub.includes(String(r[subC]||'').trim()))&&(!filters.pea.length||filters.pea.includes(String(r[peaC]||'').trim())));vals=[...new Set(b.map(r=>String(r[eqC]||'').trim()))].filter(v=>v);}
   vals=vals.sort().filter(v=>v.toLowerCase().includes(searchQ[type]));
   const sel=filters[type];
   document.getElementById('fl-'+type).innerHTML=vals.map(v=>{
@@ -829,25 +813,23 @@ function renderDDList(type){
   }).join('');
 }
 function updateAllDD(){['sub','pea','eq'].forEach(renderDDList);}
-
 function toggleSel(type,val,e){
   e.stopPropagation();
-  if(filters[type].includes(val)) filters[type]=filters[type].filter(v=>v!==val);
-  else filters[type].push(val);
-  updateTriggers(); updateAllDD(); applyFilter(true);
+  if(filters[type].includes(val))filters[type]=filters[type].filter(v=>v!==val);else filters[type].push(val);
+  updateTriggers();updateAllDD();applyFilter(true);
 }
 function updateTriggers(){
   const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default'};
   ['sub','pea','eq'].forEach(k=>{
-    const el=document.getElementById('f-'+k+'-trigger'); if(!el)return;
+    const el=document.getElementById('f-'+k+'-trigger');if(!el)return;
     const sel=filters[k];
     el.textContent=sel.length===0?t(def[k]):sel.length===1?sel[0]:`${t('filter_selected')} (${sel.length})`;
   });
 }
 function resetFilters(){
-  filters={sub:[],pea:[],eq:[]}; searchQ={sub:'',pea:'',eq:''};
+  filters={sub:[],pea:[],eq:[]};searchQ={sub:'',pea:'',eq:''};
   ['fs-sub','fs-pea','fs-eq'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  updateTriggers(); updateAllDD(); applyFilter(true);
+  updateTriggers();updateAllDD();applyFilter(true);
   notify(t('notif_filter_reset'),t('notif_filter_reset_msg'),'info',2500);
 }
 
@@ -859,7 +841,7 @@ function switchMode(mode){
   ['HV','MV','LV'].forEach(m=>document.getElementById('tab-'+m)?.classList.toggle('active',m===mode));
   document.getElementById('mvSubTabs').style.display=mode==='MV'?'flex':'none';
   document.getElementById('modeBadge').textContent=mode;
-  filters.eq=[]; updateTriggers(); updateAllDD(); applyFilter(true);
+  filters.eq=[];updateTriggers();updateAllDD();applyFilter(true);
 }
 function setSubFilter(f){
   subFilter=f;
@@ -868,94 +850,51 @@ function setSubFilter(f){
 }
 
 // ================================================================
-// 🔄  DATA LOADING — GitHub first, fallback to demo
+// DATA LOADING
 // ================================================================
-function setProgress(p){
-  document.getElementById('topProgress').style.display=p>0&&p<100?'block':'none';
-  document.getElementById('topProgressBar').style.width=p+'%';
-}
-function setSidebarStatus(key){
-  const el=document.getElementById('sidebarStatus');
-  if(el) el.textContent=t(key);
-}
-
-/**
- * แปลง JSON format {headers, rows} → array of objects
- */
-function jsonToObjects(json){
-  if(!json||!json.headers||!json.rows) return [];
-  return json.rows.map(row=>{
-    const obj={};
-    json.headers.forEach((h,i)=>{ obj[h]=row[i]??''; });
-    return obj;
-  });
-}
+function setProgress(p){document.getElementById('topProgress').style.display=p>0&&p<100?'block':'none';document.getElementById('topProgressBar').style.width=p+'%';}
+function setSidebarStatus(key){const el=document.getElementById('sidebarStatus');if(el)el.textContent=t(key);}
+function jsonToObjects(json){if(!json||!json.headers||!json.rows)return[];return json.rows.map(row=>{const obj={};json.headers.forEach((h,i)=>{obj[h]=row[i]??'';});return obj;});}
 
 async function startLoad(){
-  if(isLoading) return;
-  isLoading=true;
+  if(isLoading)return;isLoading=true;
   Object.keys(dataStore).forEach(k=>dataStore[k]=[]);
-  setProgress(5); setSidebarStatus('status_connecting'); setStatusDot('loading');
-
-  // ตรวจว่า config ยังเป็นค่า default อยู่ไหม
+  setProgress(5);setSidebarStatus('status_connecting');setStatusDot('loading');
   if(GH.OWNER==='your-username'){
     notify(t('notif_demo'),t('notif_demo_msg'),'warning',0);
-    dataSource='demo'; updateSourceBadge();
-    simulateLoad(); return;
+    dataSource='demo';updateSourceBadge();simulateLoad();return;
   }
-
-  try {
-    // ดึง meta.json ก่อนเพื่อตรวจว่า repo ถูกต้อง
-    const metaRes = await fetch(GH.meta(), {cache:'no-store'});
-    if(!metaRes.ok) throw new Error(`meta.json: HTTP ${metaRes.status}`);
-
-    const files = Object.entries(GH.FILES);
-    let done=0;
-
-    await Promise.all(files.map(async ([path, storeName])=>{
-      try {
-        const res = await fetch(GH.raw(path), {cache:'no-store'});
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-
-        // แปลงและเก็บ
-        dataStore[storeName] = jsonToObjects(json);
-
-        // สร้าง metaStore จาก JSON
-        metaStore[storeName] = { headers: json.headers||[], totalRows: json.total||0 };
-
-        done++;
-        setProgress(Math.round(done/files.length*90)+5);
-      } catch(e){
-        console.warn(`Failed to load ${path}:`, e.message);
-      }
+  try{
+    const metaRes=await fetch(GH.meta(),{cache:'no-store'});
+    if(!metaRes.ok)throw new Error(`meta: HTTP ${metaRes.status}`);
+    const files=Object.entries(GH.FILES);let done=0;
+    await Promise.all(files.map(async([path,storeName])=>{
+      try{
+        const res=await fetch(GH.raw(path),{cache:'no-store'});
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        const json=await res.json();
+        dataStore[storeName]=jsonToObjects(json);
+        metaStore[storeName]={headers:json.headers||[],totalRows:json.total||0};
+        done++;setProgress(Math.round(done/files.length*90)+5);
+      }catch(e){console.warn(`Failed ${path}:`,e.message);}
     }));
-
-    dataSource='github';
-    finalizeLoad();
-
-  } catch(err){
-    console.error('GitHub load error:', err);
+    dataSource='github';finalizeLoad();
+  }catch(err){
+    console.error('GitHub error:',err);
     notify(t('notif_gh_err'),t('notif_gh_err_msg'),'warning',6000);
-    dataSource='error'; updateSourceBadge(); setStatusDot('error');
-    simulateLoad();
+    dataSource='error';updateSourceBadge();setStatusDot('error');simulateLoad();
   }
 }
 
 function finalizeLoad(){
-  isLoading=false;
-  setSidebarStatus('status_online'); setStatusDot('online');
-  setProgress(100); setTimeout(()=>setProgress(0),800);
-  updateSourceBadge(); updateAllDD(); applyFilter(true); updateLastSync();
-  setTimeout(()=>{
-    checkAlerts();
-    if(dataSource==='github') notify(t('notif_gh_ok'),t('notif_gh_ok_msg'),'info',3000);
-  },400);
+  isLoading=false;setSidebarStatus('status_online');setStatusDot('online');
+  setProgress(100);setTimeout(()=>setProgress(0),800);
+  updateSourceBadge();updateAllDD();applyFilter(true);updateLastSync();
+  setTimeout(()=>{if(dataSource==='github')notify(t('notif_gh_ok'),t('notif_gh_ok_msg'),'info',3000);},400);
 }
 
 function updateLastSync(){
-  const all=[...dataStore['Dashboard-HV-MV'],...dataStore['Dashboard-LV']];
-  if(!all.length)return;
+  const all=[...dataStore['Dashboard-HV-MV'],...dataStore['Dashboard-LV']];if(!all.length)return;
   let latest=null;
   all.forEach(r=>{const d=new Date(r['Date-Time']||r['Date']);if(!isNaN(d)&&(!latest||d>latest))latest=d;});
   if(latest){
@@ -965,23 +904,23 @@ function updateLastSync(){
   }
 }
 
-// Demo data fallback
 function simulateLoad(){
-  const h=['Date-Time','SubstationName','PEA_Code','Equipment','Duration','EquipmentType','Customer','Operate'];
-  metaStore={
-    'Dashboard-HV-MV':{headers:h,totalRows:90},'Dashboard-LV':{headers:h,totalRows:60},
-    'รายงานแยกตามพื้นที่':{headers:['กฟส','PEA_Code','ผู้ใช้ไฟทั้งหมดรวม','เขต'],totalRows:4},
-  };
+  const h=['Date-Time','SubstationName','PEA_Code','Equipment','Duration','EquipmentType','Customer','Operate','CauseData'];
+  metaStore={'Dashboard-HV-MV':{headers:h,totalRows:90},'Dashboard-LV':{headers:h,totalRows:60},'รายงานแยกตามพื้นที่':{headers:['กฟส','PEA_Code','ผู้ใช้ไฟทั้งหมดรวม','เขต'],totalRows:4}};
   const subs=['ALA','KRT','PTL','PKR','NKS'],peas=['A01','K02','P03','P04','N05'];
   const equips=['CB-1','CB-2','CB-3','RC-1','RC-2','F-01','F-02','VB-1'];
   const types=['Breaker','Recloser','Fuse','VB','Circuit','Drop out'];
   const ops=['T/R Op','T/L Op','Auto T/R','Recloser Op','Manual Op'];
-  const mk=(n,i)=>({'Date-Time':`2025-${String(Math.ceil((i+1)/(n/12))).padStart(2,'0')}-${String((i%28)+1).padStart(2,'0')}`,'SubstationName':subs[i%subs.length],'PEA_Code':peas[i%peas.length],'Equipment':equips[i%equips.length],'Duration':String(15+((i*7)%130)),'EquipmentType':i%5===0?'115 kV':types[i%types.length],'Customer':String(200+((i*31)%900)),'Operate':ops[i%ops.length]});
+  const causes=['ต้นไม้โค่น','ฟ้าผ่า','สัตว์','อุปกรณ์ชำรุด','ไม่ทราบสาเหตุ','สภาพอากาศ'];
+  const today=new Date();
+  const mk=(n,i)=>{
+    const d=new Date(today);d.setDate(d.getDate()-(i%60));
+    return{'Date-Time':d.toISOString().split('T')[0],'SubstationName':subs[i%subs.length],'PEA_Code':peas[i%peas.length],'Equipment':equips[i%equips.length],'Duration':String(15+((i*7)%130)),'EquipmentType':i%5===0?'115 kV':types[i%types.length],'Customer':String(200+((i*31)%900)),'Operate':ops[i%ops.length],'CauseData':causes[i%causes.length]};
+  };
   dataStore['Dashboard-HV-MV']=Array.from({length:90},(_,i)=>mk(90,i));
   dataStore['Dashboard-LV']=Array.from({length:60},(_,i)=>mk(60,i));
   dataStore['รายงานแยกตามพื้นที่']=[{กฟส:'ALA',PEA_Code:'A01',ผู้ใช้ไฟทั้งหมดรวม:'55000',เขต:'กฟต.2'},{กฟส:'KRT',PEA_Code:'K02',ผู้ใช้ไฟทั้งหมดรวม:'72000',เขต:'กฟต.2'},{กฟส:'PTL',PEA_Code:'P03',ผู้ใช้ไฟทั้งหมดรวม:'38000',เขต:'กฟต.2'},{กฟส:'NKS',PEA_Code:'N05',ผู้ใช้ไฟทั้งหมดรวม:'28000',เขต:'กฟต.2'}];
-  let p=5;
-  const iv=setInterval(()=>{p=Math.min(p+18,95);setProgress(p);if(p>=95){clearInterval(iv);finalizeLoad();}},120);
+  let p=5;const iv=setInterval(()=>{p=Math.min(p+18,95);setProgress(p);if(p>=95){clearInterval(iv);finalizeLoad();}},120);
 }
 
 // ================================================================
@@ -997,170 +936,120 @@ function getTotalCustomers(){
 
 function applyFilter(full=true){
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const raw=dataStore[sName]; if(!raw.length)return;
+  const raw=dataStore[sName];if(!raw.length)return;
   const h=metaStore[sName].headers;
   const tC=h.find(n=>n.toLowerCase().includes('equipmenttype'));
-  const sC=h.find(n=>n.includes('SubstationName'));
-  const pC=h.find(n=>n.includes('PEA_Code'));
+  const sC=h.find(n=>n.includes('SubstationName')),pC=h.find(n=>n.includes('PEA_Code'));
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const dC=h.find(n=>n.includes('Date'));
   let res=currentMode==='HV'?raw.filter(r=>String(r[tC]).match(/115 kV|Incomming/)):currentMode==='MV'?raw.filter(r=>!String(r[tC]).match(/115 kV|Incomming/)):raw;
-  if(filters.sub.length) res=res.filter(r=>filters.sub.includes(String(r[sC]||'').trim()));
-  if(filters.pea.length) res=res.filter(r=>filters.pea.includes(String(r[pC]||'').trim()));
-  if(filters.eq.length)  res=res.filter(r=>filters.eq.includes(String(r[eC]||'').trim()));
-  if(currentMode==='MV'&&subFilter!=='All') res=res.filter(r=>subFilter==='Main'?String(r[tC]).match(/Breaker|Recloser|VB|OC|CB|Circuit/i):String(r[tC]).match(/Fuse|D\/F|Drop out|Cutout/i));
-  if(dC) res.sort((a,b)=>new Date(b[dC])-new Date(a[dC]));
-  filteredData=res; processRender(sName,full);
+  if(filters.sub.length)res=res.filter(r=>filters.sub.includes(String(r[sC]||'').trim()));
+  if(filters.pea.length)res=res.filter(r=>filters.pea.includes(String(r[pC]||'').trim()));
+  if(filters.eq.length)res=res.filter(r=>filters.eq.includes(String(r[eC]||'').trim()));
+  if(currentMode==='MV'&&subFilter!=='All')res=res.filter(r=>subFilter==='Main'?String(r[tC]).match(/Breaker|Recloser|VB|OC|CB|Circuit/i):String(r[tC]).match(/Fuse|D\/F|Drop out|Cutout/i));
+  if(dC)res.sort((a,b)=>new Date(b[dC])-new Date(a[dC]));
+  filteredData=res;processRender(sName,full);
 }
 
 function processRender(sName,full){
   const h=metaStore[sName].headers;
-  const dC=h.find(n=>n.toLowerCase()==='duration');
-  const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
-  const dtC=h.find(n=>n==='Date-Time')||h.find(n=>n.includes('Date'));
+  const dC=h.find(n=>n.toLowerCase()==='duration'),cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
+  const dtC=h.find(n=>n==='Date-Time'||n==='Date');
   let durSum=0,affSum=0,custMin=0;
   filteredData.forEach(r=>{
-    const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
-    const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
+    const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
     if(d>1){durSum+=d;affSum+=c;custMin+=d*c;}
   });
   const tot=getTotalCustomers();
+
+  // คำนวณเดือนนี้ vs เดือนก่อน
+  const now=new Date();
+  const thisMonthStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const prevMonthStart=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const prevMonthEnd=new Date(now.getFullYear(),now.getMonth(),0);
+  const thisMonth=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=thisMonthStart;});
+  const prevMonth=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=prevMonthStart&&d<=prevMonthEnd;});
+
+  // SAIFI/SAIDI เดือนนี้
+  let thisAff=0,thisCM=0,prevAff=0,prevCM=0,thisDur=0,prevDur=0;
+  thisMonth.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){thisAff+=c;thisCM+=d*c;thisDur+=d;}});
+  prevMonth.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){prevAff+=c;prevCM+=d*c;prevDur+=d;}});
+
+  const thisSAIFI=tot?thisAff/tot:0,prevSAIFI=tot?prevAff/tot:0;
+  const thisSAIDI=tot?thisCM/tot:0,prevSAIDI=tot?prevCM/tot:0;
+
   document.getElementById('kpi-saifi').textContent=tot?(affSum/tot).toFixed(3):'—';
   document.getElementById('kpi-saidi').textContent=tot?(custMin/tot).toFixed(3):'—';
   document.getElementById('kpi-total').textContent=fmt(tot);
   document.getElementById('kpi-affected').textContent=fmt(affSum);
   document.getElementById('kpi-dur').textContent=fmt(durSum,1);
   document.getElementById('kpi-nodes').textContent=fmt(filteredData.length);
+
+  // Trend badges
+  setTrend('trend-saifi',thisSAIFI,prevSAIFI,true);
+  setTrend('trend-saidi',thisSAIDI,prevSAIDI,true);
+  setTrend('trend-affected',thisAff,prevAff,true);
+  setTrend('trend-dur',thisDur,prevDur,true);
+  setTrend('trend-nodes',thisMonth.length,prevMonth.length,true);
+
   currentTableData=filteredData;
   document.getElementById('rowBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   document.getElementById('recordCountBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
 
-  // --- KPI TREND vs เดือนก่อน ---
-  if(dtC){
-    const now=new Date();
-    const tmS=new Date(now.getFullYear(),now.getMonth(),1);
-    const pmS=new Date(now.getFullYear(),now.getMonth()-1,1);
-    const pmE=new Date(now.getFullYear(),now.getMonth(),0);
-    const thisM=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=tmS;});
-    const prevM=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=pmS&&d<=pmE;});
-    let tAff=0,tCM=0,tDur=0,pAff=0,pCM=0,pDur=0;
-    thisM.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){tAff+=c;tCM+=d*c;tDur+=d;}});
-    prevM.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){pAff+=c;pCM+=d*c;pDur+=d;}});
-    setTrendBadge('trend-saifi',tot?tAff/tot:0,tot?pAff/tot:0,true);
-    setTrendBadge('trend-saidi',tot?tCM/tot:0,tot?pCM/tot:0,true);
-    setTrendBadge('trend-affected',tAff,pAff,true);
-    setTrendBadge('trend-dur',tDur,pDur,true);
-    setTrendBadge('trend-nodes',thisM.length,prevM.length,true);
-  }
-
-  // --- INSIGHTS ---
+  // Insights
   renderInsights(h);
 
   requestAnimationFrame(()=>{
     renderTable(h);
-    if(full){renderCharts(h);renderCalendar(h);}
+    if(full){renderCharts(h);renderCalendar();}
     if(currentView==='analysis')renderAnalysis();
   });
 }
 
-function setTrendBadge(id,curr,prev,invertBad=false){
+function setTrend(id,curr,prev,invertBad=false){
   const el=document.getElementById(id);if(!el)return;
-  if(!prev||prev===0){el.textContent='— '+t('vs_prev');el.className='kpi-trend neu';return;}
-  const diff=curr-prev,pct=Math.abs(diff/prev*100).toFixed(1);
+  if(!prev){el.textContent=`— ${t('vs_prev')}`;el.className='kpi-trend flat';return;}
+  const diff=curr-prev,pct=Math.abs(((diff/prev)*100)).toFixed(1);
   const isUp=diff>0,isBad=invertBad?isUp:!isUp;
   el.textContent=`${isUp?t('trend_up'):t('trend_down')} ${pct}% ${t('vs_prev')}`;
-  el.className='kpi-trend '+(isBad?'bad':'good');
+  el.className=`kpi-trend ${isBad?'up':'down'}`;
 }
 
+// ================================================================
+// INSIGHTS
+// ================================================================
 function renderInsights(h){
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const peaC=h.find(n=>n.includes('PEA_Code'));
-  const causeC=h.find(n=>n==='CauseData')||h.find(n=>n.toLowerCase().includes('cause'));
+  const causeC=h.find(n=>n==='CauseData');
   const dC=h.find(n=>n.toLowerCase()==='duration');
 
   // Top equipment
   const ec={};filteredData.forEach(r=>{const e=String(r[eC]||'—');ec[e]=(ec[e]||0)+1;});
   const mx=Object.entries(ec).sort((a,b)=>b[1]-a[1])[0];
-  const topEqEl=document.getElementById('insight-top-eq');
-  const topCntEl=document.getElementById('insight-top-count');
-  if(topEqEl)topEqEl.textContent=mx?mx[0]:'—';
-  if(topCntEl)topCntEl.textContent=mx?`${mx[1]} ${t('cal_events')}`:'—';
+  document.getElementById('insight-top-eq').textContent=mx?mx[0]:'—';
+  document.getElementById('insight-top-count').textContent=mx?`${mx[1]} ${t('cal_events')}`:'—';
 
   // Avg duration
   const totalDur=filteredData.reduce((s,r)=>s+(parseFloat(String(r[dC]||'').replace(/,/g,''))||0),0);
-  const avgDurEl=document.getElementById('insight-avg-dur');
-  if(avgDurEl)avgDurEl.textContent=filteredData.length?`${Math.round(totalDur/filteredData.length)} ${t('dur_unit')}`:'—';
+  const avgDur=filteredData.length?Math.round(totalDur/filteredData.length):0;
+  document.getElementById('insight-avg-dur').textContent=`${avgDur} ${t('dur_unit')}`;
 
   // Top area
   const ac={};filteredData.forEach(r=>{const a=String(r[peaC]||'—');ac[a]=(ac[a]||0)+1;});
   const ma=Object.entries(ac).sort((a,b)=>b[1]-a[1])[0];
-  const topAreaEl=document.getElementById('insight-top-area');
-  const areaCntEl=document.getElementById('insight-area-count');
-  if(topAreaEl)topAreaEl.textContent=ma?ma[0]:'—';
-  if(areaCntEl)areaCntEl.textContent=ma?`${ma[1]} ${t('cal_events')}`:'—';
+  document.getElementById('insight-top-area').textContent=ma?ma[0]:'—';
+  document.getElementById('insight-area-count').textContent=ma?`${ma[1]} ${t('cal_events')}`:'—';
 
   // Top cause
-  const causeEl=document.getElementById('insight-top-cause');
-  const causePctEl=document.getElementById('insight-cause-pct');
-  if(causeC&&causeEl){
-    const cc={};filteredData.forEach(r=>{const c=String(r[causeC]||'').trim();if(c)cc[c]=(cc[c]||0)+1;});
+  if(causeC){
+    const cc={};filteredData.forEach(r=>{const c=String(r[causeC]||'—').trim();if(c&&c!=='—')cc[c]=(cc[c]||0)+1;});
     const mc=Object.entries(cc).sort((a,b)=>b[1]-a[1])[0];
-    causeEl.textContent=mc?mc[0]:'—';
-    if(causePctEl)causePctEl.textContent=mc?`${Math.round(mc[1]/filteredData.length*100)}% ของทั้งหมด`:'—';
-  } else {
-    if(causeEl)causeEl.textContent='—';
-    if(causePctEl)causePctEl.textContent='ไม่มีข้อมูลสาเหตุ';
+    document.getElementById('insight-top-cause').textContent=mc?mc[0]:'—';
+    const pct=mc&&filteredData.length?Math.round(mc[1]/filteredData.length*100):0;
+    document.getElementById('insight-cause-pct').textContent=mc?`${pct}% ของทั้งหมด`:'—';
   }
 }
-
-// ================================================================
-// CALENDAR HEATMAP
-// ================================================================
-function renderCalendar(h){
-  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const headers=h||metaStore[sName]?.headers||[];
-  const dtC=headers.find(n=>n==='Date-Time')||headers.find(n=>n.includes('Date'));
-  if(!dtC)return;
-
-  const today=new Date();
-  const days={};
-  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days[d.toISOString().split('T')[0]]=0;}
-  filteredData.forEach(r=>{const k=String(r[dtC]||'').substring(0,10);if(days.hasOwnProperty(k))days[k]++;});
-
-  const counts=Object.values(days);
-  const maxCount=Math.max(...counts,1);
-  const getLevel=n=>{if(n===0)return 0;const r=n/maxCount;return r<.25?1:r<.5?2:r<.75?3:4;};
-
-  const entries=Object.entries(days);
-  // แบ่งเป็น columns ทีละ 7 วัน
-  const cols=[];let col=[];
-  entries.forEach(([date,count],i)=>{
-    col.push({date,count});
-    if(col.length===7||i===entries.length-1){cols.push([...col]);col=[];}
-  });
-
-  const wrap=document.getElementById('calendarWrap');
-  if(!wrap)return;
-  wrap.innerHTML=`<div class="cal-grid">${cols.map(c=>`
-    <div class="cal-col">${c.map(({date,count})=>`
-      <div class="cal-cell lv${getLevel(count)}"
-        onmouseenter="showCalTip(event,'${date}',${count})"
-        onmouseleave="hideCalTip()"></div>`).join('')}
-    </div>`).join('')}
-  </div>`;
-}
-
-function showCalTip(e,date,count){
-  const tp=document.getElementById('calTooltip');if(!tp)return;
-  const d=new Date(date);
-  const locale=currentLang==='th'?'th-TH':'en-GB';
-  tp.innerHTML=`<div style="font-weight:700;margin-bottom:2px;">${d.toLocaleDateString(locale,{weekday:'short',day:'numeric',month:'short'})}</div>
-    <div style="color:var(--blue);font-weight:700;">${count} ${t('cal_events')}</div>`;
-  tp.style.display='block';
-  tp.style.left=(e.clientX+14)+'px';
-  tp.style.top=(e.clientY-10)+'px';
-}
-function hideCalTip(){const tp=document.getElementById('calTooltip');if(tp)tp.style.display='none';}
 
 // ================================================================
 // TABLE
@@ -1178,61 +1067,149 @@ function renderTable(h){
 }
 
 // ================================================================
-// CHARTS
+// CHARTS — Trend Line, Horizontal Bar, Donut Cause
 // ================================================================
 function destroyChart(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
 
 function renderCharts(h){
-  destroyChart('trend'); destroyChart('dist');
+  destroyChart('trend');destroyChart('topEq');destroyChart('cause');
+
+  const dtC=h.find(n=>n==='Date-Time'||n==='Date-Month'||n.includes('Date'));
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
-  const opC=h.find(n=>n.toLowerCase()==='operate');
-  const counts={};
-  filteredData.forEach(r=>{const n=String(r[eC]||'—');if(!counts[n])counts[n]=0;counts[n]++;});
-  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const labels=top.map(f=>f[0]); if(!labels.length)return;
+  const causeC=h.find(n=>n==='CauseData');
 
-  charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
-    type:'bar',data:{labels,datasets:[{label:t('chart_equip_title'),data:top.map(f=>f[1]),backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]+'bb'),borderColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,onClick:(_,els)=>{if(els.length){filters.eq=[labels[els[0].index]];updateTriggers();updateAllDD();applyFilter(true);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
-    plugins:[ChartDataLabels]});
+  // --- Trend Line (30 วันย้อนหลัง) ---
+  const today=new Date();
+  const days30=[];const dayLabels=[];const dayCounts={};
+  for(let i=29;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    days30.push(key);
+    dayLabels.push(i%5===0||i===0?`${d.getDate()}/${d.getMonth()+1}`:'');
+    dayCounts[key]=0;
+  }
+  filteredData.forEach(r=>{
+    const dateStr=String(r[dtC]||'').substring(0,10);
+    if(dayCounts.hasOwnProperty(dateStr))dayCounts[dateStr]++;
+  });
+  const trendData=days30.map(k=>dayCounts[k]);
 
-  const dm={};filteredData.forEach(r=>{const v=String(r[opC]||'Unknown');dm[v]=(dm[v]||0)+1;});
-  const dL=Object.keys(dm),dV=Object.values(dm),dTot=dV.reduce((a,b)=>a+b,0);
-  document.getElementById('distLegend').innerHTML=dL.map((l,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);"><span style="width:8px;height:8px;border-radius:2px;background:${COLORS[i%COLORS.length]};display:inline-block;flex-shrink:0;"></span>${l} (${Math.round(dV[i]/dTot*100)}%)</span>`).join('');
-  charts.dist=new Chart(document.getElementById('distChart').getContext('2d'),{
-    type:'doughnut',data:{labels:dL,datasets:[{data:dV,backgroundColor:COLORS.map(c=>c+'bb'),borderColor:COLORS,borderWidth:1}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v:''}}},
-    plugins:[ChartDataLabels]});
+  // Moving average 3 วัน
+  const maData=trendData.map((_,i)=>{
+    const sl=trendData.slice(Math.max(0,i-2),i+1);
+    return Math.round(sl.reduce((a,b)=>a+b,0)/sl.length*10)/10;
+  });
+
+  const tCtx=document.getElementById('trendChart').getContext('2d');
+  charts.trend=new Chart(tCtx,{
+    type:'line',
+    data:{labels:dayLabels,datasets:[
+      {label:'เหตุการณ์',data:trendData,borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.08)',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.4,fill:true},
+      {label:'MA 3 วัน',data:maData,borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},datalabels:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9}}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}}
+  });
+
+  // --- Horizontal Bar Top 5 อุปกรณ์ ---
+  const ec={};filteredData.forEach(r=>{const n=String(r[eC]||'—');ec[n]=(ec[n]||0)+1;});
+  const top5=Object.entries(ec).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const hbCtx=document.getElementById('topEqChart').getContext('2d');
+  charts.topEq=new Chart(hbCtx,{
+    type:'bar',
+    data:{labels:top5.map(f=>f[0]),datasets:[{data:top5.map(f=>f[1]),backgroundColor:top5.map((_,i)=>COLORS[i%COLORS.length]+'cc'),borderColor:top5.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,onClick:(_,els)=>{if(els.length){filters.eq=[top5[els[0].index][0]];updateTriggers();updateAllDD();applyFilter(true);notify(t('notif_filter_applied'),top5[els[0].index][0],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},anchor:'end',align:'start',formatter:v=>v}},scales:{x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true},y:{grid:{display:false},ticks:{color:tickColor(),font:{size:9}}}}},
+    plugins:[ChartDataLabels]
+  });
+
+  // --- Donut Cause ---
+  if(causeC){
+    const cc={};filteredData.forEach(r=>{const c=String(r[causeC]||'ไม่ระบุ').trim()||'ไม่ระบุ';cc[c]=(cc[c]||0)+1;});
+    const cL=Object.keys(cc),cV=Object.values(cc),cTot=cV.reduce((a,b)=>a+b,0);
+    document.getElementById('causeLegend').innerHTML=cL.map((l,i)=>`<span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:var(--text2);"><span style="width:7px;height:7px;border-radius:1px;background:${COLORS[i%COLORS.length]};display:inline-block;"></span>${l}</span>`).join('');
+    const cCtx=document.getElementById('causeChart').getContext('2d');
+    charts.cause=new Chart(cCtx,{
+      type:'doughnut',
+      data:{labels:cL,datasets:[{data:cV,backgroundColor:COLORS.map(c=>c+'cc'),borderColor:COLORS,borderWidth:1}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/cTot*100)}%)`}},datalabels:{display:false}}},
+    });
+  }
 }
 
 function recolorCharts(){
   Object.values(charts).forEach(c=>{
     if(!c?.options)return;
-    if(c.options.scales) Object.values(c.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridColor();if(s.ticks)s.ticks.color=tickColor();});
+    if(c.options.scales)Object.values(c.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridColor();if(s.ticks)s.ticks.color=tickColor();});
     c.update('none');
   });
 }
 
 // ================================================================
+// CALENDAR HEATMAP
+// ================================================================
+function renderCalendar(){
+  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
+  const h=metaStore[sName]?.headers||[];
+  const dtC=h.find(n=>n==='Date-Time'||n.includes('Date'));
+  if(!dtC)return;
+
+  const today=new Date();
+  const days={};
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days[d.toISOString().split('T')[0]]=0;}
+  filteredData.forEach(r=>{const k=String(r[dtC]||'').substring(0,10);if(days.hasOwnProperty(k))days[k]++;});
+
+  const counts=Object.values(days);
+  const maxCount=Math.max(...counts,1);
+  const getLevel=n=>{if(n===0)return 0;const r=n/maxCount;return r<.25?1:r<.5?2:r<.75?3:4;};
+
+  const wrap=document.getElementById('calendarWrap');
+  const tooltip=document.getElementById('calTooltip');
+
+  // Group by week columns
+  const entries=Object.entries(days);
+  const cols=[];let col=[];
+  entries.forEach(([date,count],i)=>{
+    col.push({date,count});
+    if(col.length===7||i===entries.length-1){cols.push([...col]);col=[];}
+  });
+
+  wrap.innerHTML=`<div class="cal-grid">${cols.map(col=>`
+    <div class="cal-col">${col.map(({date,count})=>{
+      const d=new Date(date);
+      const dayNames=['อา','จ','อ','พ','พฤ','ศ','ส'];
+      return`<div class="cal-cell lv${getLevel(count)}" title="${date}: ${count} เหตุการณ์"
+        onmouseenter="showCalTooltip(event,'${date}',${count})"
+        onmouseleave="hideCalTooltip()"></div>`;
+    }).join('')}</div>`).join('')}
+  </div>`;
+}
+
+function showCalTooltip(e,date,count){
+  const tp=document.getElementById('calTooltip');
+  const d=new Date(date);
+  tp.innerHTML=`<div style="font-weight:700;margin-bottom:2px;">${d.toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'})}</div><div style="color:var(--blue);font-weight:700;">${count} ${t('cal_events')}</div>`;
+  tp.style.display='block';
+  tp.style.left=(e.clientX+12)+'px';
+  tp.style.top=(e.clientY-10)+'px';
+}
+function hideCalTooltip(){document.getElementById('calTooltip').style.display='none';}
+
+// ================================================================
 // MODAL
 // ================================================================
 function showDetail(i){
-  const row=currentTableData[i]; if(!row)return;
+  const row=currentTableData[i];if(!row)return;
   document.getElementById('detailModal').classList.add('open');
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
   const h=metaStore[sName].headers;
-  const subC=h.find(n=>n.includes('SubstationName'));
-  const dC=h.find(n=>n.toLowerCase()==='duration');
+  const subC=h.find(n=>n.includes('SubstationName')),dC=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const peers=dataStore[sName].filter(r=>r[subC]===row[subC]);
   const avgD=peers.reduce((s,r)=>s+(parseFloat(String(r[dC]||'').replace(/,/g,''))||0),0)/(peers.length||1);
   const avgC=peers.reduce((s,r)=>s+(parseFloat(String(r[cC]||'').replace(/,/g,''))||0),0)/(peers.length||1);
-  const thisD=parseFloat(String(row[dC]||'').replace(/,/g,''))||0;
-  const thisC=parseFloat(String(row[cC]||'').replace(/,/g,''))||0;
   destroyChart('detail');
   charts.detail=new Chart(document.getElementById('detailChart').getContext('2d'),{
     type:'bar',
-    data:{labels:[t('detail_dur'),t('detail_cust')],datasets:[{label:t('detail_this'),data:[thisD,thisC],backgroundColor:'#3b7ef8bb',borderColor:'#3b7ef8',borderWidth:1,borderRadius:4},{label:t('detail_avg'),data:[avgD,avgC],backgroundColor:'#8fa3c033',borderColor:'#8fa3c0',borderWidth:1,borderRadius:4}]},
+    data:{labels:[t('detail_dur'),t('detail_cust')],datasets:[{label:t('detail_this'),data:[parseFloat(String(row[dC]||'').replace(/,/g,''))||0,parseFloat(String(row[cC]||'').replace(/,/g,''))||0],backgroundColor:'#3b7ef8bb',borderColor:'#3b7ef8',borderWidth:1,borderRadius:4},{label:t('detail_avg'),data:[avgD,avgC],backgroundColor:'#8fa3c033',borderColor:'#8fa3c0',borderWidth:1,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:tickColor(),font:{size:10}}},datalabels:{color:'#fff',font:{weight:'bold',size:9},formatter:v=>fmt(v,1)}},scales:{x:{grid:{display:false},ticks:{color:tickColor()}},y:{grid:{color:gridColor()},ticks:{color:tickColor()},beginAtZero:true}}},
     plugins:[ChartDataLabels]});
   document.getElementById('modalGrid').innerHTML=Object.entries(row).map(([k,v])=>`<div class="info-chip"><div class="info-chip-key">${k}</div><div class="info-chip-val">${v||'—'}</div></div>`).join('');
@@ -1244,8 +1221,7 @@ function closeModal(){document.getElementById('detailModal').classList.remove('o
 // ================================================================
 function exportToExcel(){
   if(!currentTableData.length){notify(t('notif_export_fail'),'','warning');return;}
-  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const h=metaStore[sName].headers;
+  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV',h=metaStore[sName].headers;
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h,...currentTableData.map(r=>h.map(k=>r[k]||''))]),'Data');
   XLSX.writeFile(wb,`Energy_${currentMode}_${new Date().toISOString().split('T')[0]}.xlsx`);
@@ -1253,34 +1229,12 @@ function exportToExcel(){
 }
 
 // ================================================================
-// ALERTS
-// ================================================================
-function checkAlerts(){
-  if(!filteredData.length)return;
-  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const h=metaStore[sName].headers;
-  const dC=h.find(n=>n.toLowerCase()==='duration');
-  const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
-  const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
-  let cnt=0;
-  filteredData.forEach(r=>{
-    if(cnt>=2)return;
-    const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
-    const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    if(d>120){notify(t('notif_dur_alert'),`${r[eC]} · ${d} ${t('dur_unit')}`,'warning',0);cnt++;}
-    else if(c>1000&&cnt<2){notify(t('notif_cust_alert'),`${r[eC]} · ${fmt(c)} ${t('notif_affected')}`,'critical',0);cnt++;}
-  });
-}
-
-// ================================================================
 // ANALYSIS
 // ================================================================
 function renderAnalysis(){
   if(!filteredData.length)return;
-  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const h=metaStore[sName].headers;
-  const dC=h.find(n=>n.toLowerCase()==='duration');
-  const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV',h=metaStore[sName].headers;
+  const dC=h.find(n=>n.toLowerCase()==='duration'),eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const totalDur=filteredData.reduce((s,r)=>s+(parseFloat(String(r[dC]||'').replace(/,/g,''))||0),0);
   document.getElementById('a-mttr').textContent=Math.round(totalDur/filteredData.length)||0;
   document.getElementById('a-mtbf').textContent=filteredData.length>5?Math.round(30/(filteredData.length/10)):45;
@@ -1290,7 +1244,7 @@ function renderAnalysis(){
   document.getElementById('a-rel').textContent='94.2';
   destroyChart('forecast');
   const wk=Math.ceil(filteredData.length/4),hist=[wk,Math.round(wk*.9),Math.round(wk*1.1),wk];
-  const tr=(hist[3]-hist[0])/3, fData=[...hist,Math.round(hist[3]+tr),Math.round(hist[3]+tr*2)];
+  const tr=(hist[3]-hist[0])/3,fData=[...hist,Math.round(hist[3]+tr),Math.round(hist[3]+tr*2)];
   charts.forecast=new Chart(document.getElementById('forecastChart').getContext('2d'),{
     type:'line',data:{labels:t('forecast_labels'),datasets:[{label:t('forecast_actual'),data:[...hist,null,null],borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.07)',borderWidth:2,tension:.4,fill:true,pointBackgroundColor:'#3b7ef8',pointRadius:4},{label:t('forecast_predicted'),data:[null,null,null,hist[3],...fData.slice(4)],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.06)',borderWidth:2,borderDash:[5,4],tension:.4,fill:true,pointBackgroundColor:'#a78bfa',pointRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tickColor(),font:{size:10}}},datalabels:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tickColor()}},y:{grid:{color:gridColor()},ticks:{color:tickColor()},beginAtZero:true}}}});
@@ -1298,9 +1252,9 @@ function renderAnalysis(){
   charts.rc=new Chart(document.getElementById('rcChart').getContext('2d'),{
     type:'radar',data:{labels:t('rc_labels'),datasets:[{label:'%',data:[85,40,65,30,20,45],borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.13)',pointBackgroundColor:'#3b7ef8',borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false}},scales:{r:{angleLines:{color:gridColor()},grid:{color:gridColor()},pointLabels:{color:tickColor(),font:{size:9}},ticks:{display:false}}}}});
-  const tasks=[{desc_th:'ตัดต้นไม้ในเขตสายจ่ายไฟ MV สายแยก',desc_en:'Vegetation clearing - Branch MV lines',area:'ALA, KRT, PTL',prio_key:'task_prio_high',status_key:'task_status_progress',date:'2026-03-01',pcolor:'#f59e0b'},{desc_th:'เปลี่ยน Lightning Arrester CB-1',desc_en:'Lightning arrester replacement CB-1',area:'KRT Substation',prio_key:'task_prio_critical',status_key:'task_status_pending',date:'2026-03-05',pcolor:'#f43f5e'},{desc_th:'ตรวจสอบการตั้งค่า Relay สาย MV',desc_en:'Relay setting verification - MV feeders',area:'ALA Substation',prio_key:'task_prio_normal',status_key:'task_status_done',date:'2026-02-25',pcolor:'#10b981'}];
+  const tasks=[{desc_th:'ตัดต้นไม้ในเขตสายจ่ายไฟ MV สายแยก',desc_en:'Vegetation clearing - Branch MV lines',area:'ALA, KRT, PTL',pk:'task_prio_high',sk:'task_status_progress',date:'2026-03-01',pc:'#f59e0b'},{desc_th:'เปลี่ยน Lightning Arrester CB-1',desc_en:'Lightning arrester replacement CB-1',area:'KRT Substation',pk:'task_prio_critical',sk:'task_status_pending',date:'2026-03-05',pc:'#f43f5e'},{desc_th:'ตรวจสอบการตั้งค่า Relay สาย MV',desc_en:'Relay setting verification',area:'ALA Substation',pk:'task_prio_normal',sk:'task_status_done',date:'2026-02-25',pc:'#10b981'}];
   const sc={task_status_progress:'badge-amber',task_status_pending:'badge-rose',task_status_done:'badge-emerald'};
-  document.getElementById('taskList').innerHTML=tasks.map(task=>`<div class="task-row"><div class="pdot" style="background:${task.pcolor};"></div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text1);margin-bottom:2px;">${currentLang==='th'?task.desc_th:task.desc_en}</div><div style="font-size:10px;color:var(--text3);">${task.area} · ${task.date}</div></div><div style="display:flex;gap:7px;align-items:center;flex-shrink:0;"><span style="font-size:10px;font-weight:700;color:${task.pcolor};">${t(task.prio_key)}</span><span class="badge ${sc[task.status_key]}">${t(task.status_key)}</span></div></div>`).join('');
+  document.getElementById('taskList').innerHTML=tasks.map(tk=>`<div class="task-row"><div class="pdot" style="background:${tk.pc};"></div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text1);margin-bottom:2px;">${currentLang==='th'?tk.desc_th:tk.desc_en}</div><div style="font-size:10px;color:var(--text3);">${tk.area} · ${tk.date}</div></div><div style="display:flex;gap:7px;align-items:center;flex-shrink:0;"><span style="font-size:10px;font-weight:700;color:${tk.pc};">${t(tk.pk)}</span><span class="badge ${sc[tk.sk]}">${t(tk.sk)}</span></div></div>`).join('');
   document.getElementById('mitigationList').innerHTML=[{icon:'🛡️',tk:'mit_pm_title',mk:'mit_pm_text'},{icon:'📡',tk:'mit_mon_title',mk:'mit_mon_text'},{icon:'✂️',tk:'mit_veg_title',mk:'mit_veg_text'}].map(m=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start;"><div style="font-size:17px;flex-shrink:0;">${m.icon}</div><div><div style="font-size:12px;font-weight:700;color:var(--text1);margin-bottom:3px;">${t(m.tk)}</div><div style="font-size:11px;color:var(--text2);line-height:1.5;">${t(m.mk)}</div></div></div>`).join('');
 }
 
@@ -1319,9 +1273,8 @@ function runComparison(){
   const dB1=document.getElementById('dB1').value,dB2=document.getElementById('dB2').value;
   if(!dA1||!dA2||!dB1||!dB2)return;
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const raw=dataStore[sName],h=metaStore[sName]?.headers||[];
-  if(!raw.length)return;
-  const dC=h.find(n=>n.includes('Date')); if(!dC)return;
+  const raw=dataStore[sName],h=metaStore[sName]?.headers||[];if(!raw.length)return;
+  const dC=h.find(n=>n.includes('Date'));if(!dC)return;
   const inR=(r,f,to)=>{const d=new Date(r[dC]);return d>=new Date(f)&&d<=new Date(to);};
   const sA=calcStats(raw.filter(r=>inR(r,dA1,dA2)),h),sB=calcStats(raw.filter(r=>inR(r,dB1,dB2)),h);
   const sv=(id,v)=>{document.getElementById(id).textContent=v;};
@@ -1350,17 +1303,13 @@ function setMapLayer(type){
   renderHeatmap();
 }
 function renderHeatmap(){
-  if(!mapInst)return;
-  if(heatLayer){mapInst.removeLayer(heatLayer);heatLayer=null;}
-  if(!filteredData.length)return;
-  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
-  const h=metaStore[sName]?.headers||[];
+  if(!mapInst)return;if(heatLayer){mapInst.removeLayer(heatLayer);heatLayer=null;}if(!filteredData.length)return;
+  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV',h=metaStore[sName]?.headers||[];
   const dC=h.find(n=>n.toLowerCase()==='duration'),cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const pts=filteredData.slice(0,200).map(r=>{
     const lat=8.0863+(Math.random()-.5)*.6,lng=98.9063+(Math.random()-.5)*.7;
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    const intens=mapLayerType==='incidents'?.8:mapLayerType==='duration'?Math.min(d/80,1):Math.min(c/800,1);
-    return[lat,lng,intens];
+    return[lat,lng,mapLayerType==='incidents'?.8:mapLayerType==='duration'?Math.min(d/80,1):Math.min(c/800,1)];
   });
   heatLayer=L.heatLayer(pts,{radius:22,blur:14,gradient:{0:'#2563eb',.5:'#f59e0b',1:'#ef4444'}}).addTo(mapInst);
 }
@@ -1369,8 +1318,7 @@ function renderHeatmap(){
 // INIT
 // ================================================================
 window.addEventListener('DOMContentLoaded',()=>{
-  const today=new Date();
-  const fmt2=d=>d.toISOString().split('T')[0];
+  const today=new Date(),fmt2=d=>d.toISOString().split('T')[0];
   document.getElementById('dA1').value=fmt2(new Date(today.getFullYear(),today.getMonth()-1,1));
   document.getElementById('dA2').value=fmt2(new Date(today.getFullYear(),today.getMonth(),0));
   document.getElementById('dB1').value=fmt2(new Date(today.getFullYear(),today.getMonth(),1));
@@ -1379,8 +1327,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   Chart.defaults.font.family="'Space Grotesk','Sarabun',sans-serif";
   Chart.defaults.font.size=11;
   Chart.defaults.animation.duration=600;
-  applyLang();
-  startLoad();
+  applyLang();startLoad();
 });
 </script>
 </body>
