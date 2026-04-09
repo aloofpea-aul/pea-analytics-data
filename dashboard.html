@@ -1041,8 +1041,8 @@ function processRender(sName,full){
     const tmS=new Date(now.getFullYear(),now.getMonth(),1);
     const pmS=new Date(now.getFullYear(),now.getMonth()-1,1);
     const pmE=new Date(now.getFullYear(),now.getMonth(),0);
-    const thisM=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=tmS;});
-    const prevM=filteredData.filter(r=>{const d=new Date(r[dtC]);return d>=pmS&&d<=pmE;});
+    const thisM=filteredData.filter(r=>{const d=parseDateBE(r[dtC]);return d>=tmS;});
+    const prevM=filteredData.filter(r=>{const d=parseDateBE(r[dtC]);return d>=pmS&&d<=pmE;});
     let tAff=0,tCM=0,tDur=0,pAff=0,pCM=0,pDur=0;
     thisM.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){tAff+=c;tCM+=d*c;tDur+=d;}});
     prevM.forEach(r=>{const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;if(d>1){pAff+=c;pCM+=d*c;pDur+=d;}});
@@ -1116,6 +1116,30 @@ function renderInsights(h){
 // ================================================================
 // CALENDAR HEATMAP
 // ================================================================
+// CALENDAR HEATMAP
+// ================================================================
+
+// แปลงวันที่ พ.ศ. → ค.ศ. อัตโนมัติ
+function parseDateBE(str){
+  if(!str)return new Date('invalid');
+  const s=String(str).trim();
+  // รูปแบบ: 2569-01-01 หรือ 2569-01-01 06:00
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m){
+    let y=parseInt(m[1]);
+    if(y>2400)y=y-543; // พ.ศ. → ค.ศ.
+    return new Date(`${y}-${m[2]}-${m[3]}`);
+  }
+  return new Date(s);
+}
+
+// แปลง Date-Time string เป็น key YYYY-MM-DD (ค.ศ.)
+function dateKey(str){
+  const d=parseDateBE(str);
+  if(isNaN(d))return '';
+  return d.toISOString().split('T')[0];
+}
+
 function renderCalendar(h){
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
   const headers=h||metaStore[sName]?.headers||[];
@@ -1124,15 +1148,20 @@ function renderCalendar(h){
 
   const today=new Date();
   const days={};
-  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days[d.toISOString().split('T')[0]]=0;}
-  filteredData.forEach(r=>{const k=String(r[dtC]||'').substring(0,10);if(days.hasOwnProperty(k))days[k]++;});
+  for(let i=29;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    days[d.toISOString().split('T')[0]]=0;
+  }
+  filteredData.forEach(r=>{
+    const k=dateKey(r[dtC]);
+    if(days.hasOwnProperty(k))days[k]++;
+  });
 
   const counts=Object.values(days);
   const maxCount=Math.max(...counts,1);
   const getLevel=n=>{if(n===0)return 0;const r=n/maxCount;return r<.25?1:r<.5?2:r<.75?3:4;};
 
   const entries=Object.entries(days);
-  // แบ่งเป็น columns ทีละ 7 วัน
   const cols=[];let col=[];
   entries.forEach(([date,count],i)=>{
     col.push({date,count});
