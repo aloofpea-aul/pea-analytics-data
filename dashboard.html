@@ -556,7 +556,19 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button onclick="closeModal()" style="width:30px;height:30px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--text2)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div style="padding:18px 22px;">
-      <div style="margin-bottom:14px;"><div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;" data-i="modal_benchmark">เปรียบเทียบค่าเฉลี่ย</div><div class="chart-wrap" style="height:240px;"><canvas id="detailChart"></canvas></div></div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;" data-i="modal_benchmark">เปรียบเทียบค่าเฉลี่ย</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:700;color:#3b7ef8;text-align:center;margin-bottom:6px;" data-i="detail_dur">ระยะเวลา (นาที)</div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="detailChartDur"></canvas></div>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;color:#a78bfa;text-align:center;margin-bottom:6px;" data-i="detail_cust">ผู้ใช้ไฟที่ได้รับผลกระทบ</div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="detailChartCust"></canvas></div>
+          </div>
+        </div>
+      </div>
       <div style="font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;" data-i="modal_all_fields">ข้อมูลทั้งหมด</div>
       <div id="modalGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px;"></div>
     </div>
@@ -1438,7 +1450,6 @@ function recolorCharts(){
     c.update('none');
   });
 }
-
 // ================================================================
 // MODAL
 // ================================================================
@@ -1456,94 +1467,59 @@ function showDetail(i){
   const thisD=parseFloat(String(row[dC]||'').replace(/,/g,''))||0;
   const thisC=parseFloat(String(row[cC]||'').replace(/,/g,''))||0;
 
-  destroyChart('detail');
-  charts.detail=new Chart(document.getElementById('detailChart').getContext('2d'),{
+  destroyChart('detailDur');
+  destroyChart('detailCust');
+
+  const barOpts=(color,unit)=>({
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      datalabels:{
+        color:'#fff',font:{weight:'bold',size:10},
+        anchor:'end',align:'start',
+        formatter:v=>`${fmt(v,0)} ${unit}`
+      },
+      tooltip:{callbacks:{label:ctx=>`${fmt(ctx.raw,0)} ${unit}`}}
+    },
+    scales:{
+      x:{grid:{display:false},ticks:{color:tickColor(),font:{size:10}}},
+      y:{beginAtZero:true,grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}}}
+    }
+  });
+
+  // กราฟซ้าย — ระยะเวลา
+  charts.detailDur=new Chart(document.getElementById('detailChartDur').getContext('2d'),{
     type:'bar',
     data:{
-      labels:[t('detail_this'), t('detail_avg')],
-      datasets:[
-        {
-          // แกน Y ซ้าย — ระยะเวลา (นาที)
-          label: t('detail_dur'),
-          data: [thisD, avgD],
-          backgroundColor: '#3b7ef8bb',
-          borderColor: '#3b7ef8',
-          borderWidth: 1,
-          borderRadius: 4,
-          yAxisID: 'yDur',
-          order: 1,
-        },
-        {
-          // แกน Y ขวา — ผู้ใช้ไฟ (ราย)
-          label: t('detail_cust'),
-          data: [thisC, avgC],
-          backgroundColor: '#a78fbabb',
-          borderColor: '#a78bfa',
-          borderWidth: 1,
-          borderRadius: 4,
-          yAxisID: 'yCust',
-          order: 2,
-        },
-      ]
+      labels:[t('detail_this'),t('detail_avg')],
+      datasets:[{
+        data:[thisD,avgD],
+        backgroundColor:['#3b7ef8bb','#3b7ef833'],
+        borderColor:['#3b7ef8','#3b7ef866'],
+        borderWidth:1,borderRadius:6,
+      }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{
-        legend:{
-          position:'top',
-          labels:{color:tickColor(),font:{size:10},boxWidth:12,padding:12}
-        },
-        datalabels:{
-          color:'#fff',
-          font:{weight:'bold',size:9},
-          formatter:v=>fmt(v,0),
-          anchor:'end',align:'start',
-        },
-        tooltip:{
-          callbacks:{
-            label:ctx=>{
-              const unit=ctx.datasetIndex===0?` ${t('dur_unit')}`:` ${t('kpi_total_sub')||'ราย'}`;
-              return`${ctx.dataset.label}: ${fmt(ctx.raw,0)}${unit}`;
-            }
-          }
-        }
-      },
-      scales:{
-        x:{
-          grid:{display:false},
-          ticks:{color:tickColor(),font:{size:11}}
-        },
-        yDur:{
-          type:'linear',
-          position:'left',
-          beginAtZero:true,
-          grid:{color:gridColor()},
-          ticks:{color:'#3b7ef8',font:{size:9}},
-          title:{
-            display:true,
-            text:t('detail_dur'),
-            color:'#3b7ef8',
-            font:{size:9,weight:'bold'}
-          }
-        },
-        yCust:{
-          type:'linear',
-          position:'right',
-          beginAtZero:true,
-          grid:{display:false},
-          ticks:{color:'#a78bfa',font:{size:9}},
-          title:{
-            display:true,
-            text:t('detail_cust'),
-            color:'#a78bfa',
-            font:{size:9,weight:'bold'}
-          }
-        }
-      }
-    },
+    options:barOpts('#3b7ef8',t('dur_unit')),
     plugins:[ChartDataLabels]
   });
+
+  // กราฟขวา — ผู้ใช้ไฟ
+  charts.detailCust=new Chart(document.getElementById('detailChartCust').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:[t('detail_this'),t('detail_avg')],
+      datasets:[{
+        data:[thisC,avgC],
+        backgroundColor:['#a78fbabb','#a78bfa33'],
+        borderColor:['#a78bfa','#a78bfa66'],
+        borderWidth:1,borderRadius:6,
+      }]
+    },
+    options:barOpts('#a78bfa','ราย'),
+    plugins:[ChartDataLabels]
+  });
+
   document.getElementById('modalGrid').innerHTML=Object.entries(row).map(([k,v])=>`<div class="info-chip"><div class="info-chip-key">${k}</div><div class="info-chip-val">${v||'—'}</div></div>`).join('');
 }
 function closeModal(){document.getElementById('detailModal').classList.remove('open');}
