@@ -438,34 +438,56 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
 
-      <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
+      <!-- 4 Charts in one row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <!-- 1: Trend Line 30 วัน -->
         <div class="card">
-          <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
-          <div class="card-body"><div class="chart-wrap" style="height:300px;"><canvas id="trendChart"></canvas></div></div>
+          <div class="card-header">
+            <span class="card-title" data-i="chart_equip_title">แนวโน้ม 30 วัน</span>
+            <span class="badge badge-blue" id="recordCountBadge">0</span>
+          </div>
+          <div class="card-body"><div class="chart-wrap" style="height:160px;"><canvas id="trendChart"></canvas></div></div>
         </div>
+        <!-- 2: Top 5 Equipment horizontal bar -->
         <div class="card">
-          <div class="card-header"><span class="card-title" data-i="chart_dist_title">การกระจายการดำเนินงาน</span></div>
-          <div class="card-body"><div id="distLegend" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div><div class="chart-wrap" style="height:260px;"><canvas id="distChart"></canvas></div></div>
+          <div class="card-header"><span class="card-title">Top 5 อุปกรณ์</span></div>
+          <div class="card-body"><div class="chart-wrap" style="height:160px;"><canvas id="topEqChart"></canvas></div></div>
+        </div>
+        <!-- 3: Donut Operate -->
+        <div class="card">
+          <div class="card-header"><span class="card-title" data-i="chart_dist_title">การดำเนินงาน</span></div>
+          <div class="card-body">
+            <div id="distLegend" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;"></div>
+            <div class="chart-wrap" style="height:130px;"><canvas id="distChart"></canvas></div>
+          </div>
+        </div>
+        <!-- 4: Area Line Chart (ใหม่) -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" data-i="chart_area_title">เปรียบเทียบรายพื้นที่</span>
+            <span class="badge badge-purple" id="areaLegendBadge" style="font-size:9px;">Top 5</span>
+          </div>
+          <div class="card-body"><div class="chart-wrap" style="height:160px;"><canvas id="areaChart"></canvas></div></div>
         </div>
       </div>
 
-      <!-- Calendar Heatmap -->
-      <div class="card" style="margin-bottom:14px;">
+      <!-- Calendar Heatmap (compact) -->
+      <div class="card" style="margin-bottom:12px;">
         <div class="card-header">
           <span class="card-title" data-i="cal_title">ความถี่เหตุการณ์รายวัน (30 วันย้อนหลัง)</span>
           <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3);">
             <span data-i="cal_less">น้อย</span>
             <div style="display:flex;gap:2px;">
-              <div style="width:10px;height:10px;border-radius:2px;background:var(--bg3);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.25);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.5);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:rgba(59,126,248,.75);"></div>
-              <div style="width:10px;height:10px;border-radius:2px;background:#3b7ef8;"></div>
+              <div style="width:9px;height:9px;border-radius:2px;background:var(--bg3);"></div>
+              <div style="width:9px;height:9px;border-radius:2px;background:rgba(59,126,248,.25);"></div>
+              <div style="width:9px;height:9px;border-radius:2px;background:rgba(59,126,248,.5);"></div>
+              <div style="width:9px;height:9px;border-radius:2px;background:rgba(59,126,248,.75);"></div>
+              <div style="width:9px;height:9px;border-radius:2px;background:#3b7ef8;"></div>
             </div>
             <span data-i="cal_more">มาก</span>
           </div>
         </div>
-        <div class="card-body"><div class="cal-wrap" id="calendarWrap"></div></div>
+        <div style="padding:10px 14px;"><div class="cal-wrap" id="calendarWrap"></div></div>
       </div>
 
       <div class="card">
@@ -585,6 +607,7 @@ const LANG = {
     kpi_dur_label:'ระยะเวลาไฟดับรวม',kpi_dur_sub:'นาที',
     kpi_node_label:'จำนวนเหตุการณ์',kpi_node_sub:'รายการ',
     chart_equip_title:'ความถี่ความผิดปกติรายอุปกรณ์',chart_dist_title:'การกระจายการดำเนินงาน',
+    chart_area_title:'เปรียบเทียบรายพื้นที่',
     table_title:'ข้อมูลเหตุการณ์',table_hint:'คลิกแถวเพื่อดูรายละเอียด · แสดง 100 รายการแรก',
     table_wait:'รอการซิงค์...',table_empty:'ยังไม่มีข้อมูล',
     a_mttr_label:'MTTR',a_mttr_unit:'นาที',a_mttr_sub:'เวลาเฉลี่ยในการแก้ไข',
@@ -644,6 +667,7 @@ const LANG = {
     kpi_dur_label:'Total Outage Duration',kpi_dur_sub:'Minutes',
     kpi_node_label:'Fault Nodes',kpi_node_sub:'Incident records',
     chart_equip_title:'Equipment Fault Frequency',chart_dist_title:'Operate Type Distribution',
+    chart_area_title:'Area Comparison',
     table_title:'Incident Records',table_hint:'Click row for details · Showing first 100',
     table_wait:'Waiting for sync...',table_empty:'No data loaded yet',
     a_mttr_label:'MTTR',a_mttr_unit:'min avg',a_mttr_sub:'Mean time to restore',
@@ -1212,26 +1236,115 @@ function renderTable(h){
 function destroyChart(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
 
 function renderCharts(h){
-  destroyChart('trend'); destroyChart('dist');
+  destroyChart('trend');destroyChart('topEq');destroyChart('dist');destroyChart('area');
+
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const opC=h.find(n=>n.toLowerCase()==='operate');
-  const counts={};
-  filteredData.forEach(r=>{const n=String(r[eC]||'—');if(!counts[n])counts[n]=0;counts[n]++;});
-  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const labels=top.map(f=>f[0]); if(!labels.length)return;
+  const peaC=h.find(n=>n.includes('PEA_Code'));
+  const dtC=h.find(n=>n==='Date-Time')||h.find(n=>n.includes('Date'));
+
+  // --- 1. Trend Line 30 วัน ---
+  const today=new Date();
+  const days30=[];const dayLabels=[];const dayCounts={};
+  for(let i=29;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    days30.push(key);
+    dayLabels.push(i%5===0||i===0?`${d.getDate()}/${d.getMonth()+1}`:'');
+    dayCounts[key]=0;
+  }
+  if(dtC) filteredData.forEach(r=>{const k=dateKey(r[dtC]);if(dayCounts.hasOwnProperty(k))dayCounts[k]++;});
+  const trendData=days30.map(k=>dayCounts[k]);
+  const maData=trendData.map((_,i)=>{const sl=trendData.slice(Math.max(0,i-2),i+1);return Math.round(sl.reduce((a,b)=>a+b,0)/sl.length*10)/10;});
 
   charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
-    type:'bar',data:{labels,datasets:[{label:t('chart_equip_title'),data:top.map(f=>f[1]),backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]+'bb'),borderColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,onClick:(_,els)=>{if(els.length){filters.eq=[labels[els[0].index]];updateTriggers();updateAllDD();applyFilter(true);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
-    plugins:[ChartDataLabels]});
+    type:'line',
+    data:{labels:dayLabels,datasets:[
+      {label:'เหตุการณ์',data:trendData,borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.08)',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.4,fill:true},
+      {label:'MA 3 วัน',data:maData,borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},datalabels:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8}}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:8}},beginAtZero:true}}}
+  });
 
+  // --- 2. Top 5 Horizontal Bar ---
+  const ec={};filteredData.forEach(r=>{const n=String(r[eC]||'—');ec[n]=(ec[n]||0)+1;});
+  const top5=Object.entries(ec).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(top5.length){
+    charts.topEq=new Chart(document.getElementById('topEqChart').getContext('2d'),{
+      type:'bar',
+      data:{labels:top5.map(f=>f[0]),datasets:[{data:top5.map(f=>f[1]),backgroundColor:top5.map((_,i)=>COLORS[i%COLORS.length]+'cc'),borderColor:top5.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4,borderSkipped:false}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        onClick:(_,els)=>{if(els.length){filters.eq=[top5[els[0].index][0]];updateTriggers();updateAllDD();applyFilter(true);notify(t('notif_filter_applied'),top5[els[0].index][0],'info',2500);}},
+        plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},anchor:'end',align:'start',formatter:v=>v}},
+        scales:{x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:8}},beginAtZero:true},y:{grid:{display:false},ticks:{color:tickColor(),font:{size:8}}}}},
+      plugins:[ChartDataLabels]});
+  }
+
+  // --- 3. Donut Operate ---
   const dm={};filteredData.forEach(r=>{const v=String(r[opC]||'Unknown');dm[v]=(dm[v]||0)+1;});
   const dL=Object.keys(dm),dV=Object.values(dm),dTot=dV.reduce((a,b)=>a+b,0);
-  document.getElementById('distLegend').innerHTML=dL.map((l,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);"><span style="width:8px;height:8px;border-radius:2px;background:${COLORS[i%COLORS.length]};display:inline-block;flex-shrink:0;"></span>${l} (${Math.round(dV[i]/dTot*100)}%)</span>`).join('');
+  document.getElementById('distLegend').innerHTML=dL.map((l,i)=>`<span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:var(--text2);"><span style="width:7px;height:7px;border-radius:1px;background:${COLORS[i%COLORS.length]};display:inline-block;flex-shrink:0;"></span>${l} (${Math.round(dV[i]/dTot*100)}%)</span>`).join('');
   charts.dist=new Chart(document.getElementById('distChart').getContext('2d'),{
     type:'doughnut',data:{labels:dL,datasets:[{data:dV,backgroundColor:COLORS.map(c=>c+'bb'),borderColor:COLORS,borderWidth:1}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v:''}}},
-    plugins:[ChartDataLabels]});
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},datalabels:{display:false}}}
+  });
+
+  // --- 4. Area Line Chart (Top 5 PEA Code รายวัน 30 วัน) ---
+  renderAreaChart(h,days30,dayLabels,peaC,dtC);
+}
+
+function renderAreaChart(h,days30,dayLabels,peaC,dtC){
+  if(!peaC||!dtC)return;
+
+  // หา Top 5 PEA Code
+  const ac={};filteredData.forEach(r=>{const a=String(r[peaC]||'');if(a)ac[a]=(ac[a]||0)+1;});
+  const top5areas=Object.entries(ac).sort((a,b)=>b[1]-a[1]).slice(0,5).map(f=>f[0]);
+  if(!top5areas.length)return;
+
+  // นับรายวันแยกตาม PEA Code
+  const areaData={};
+  top5areas.forEach(area=>{
+    areaData[area]={};
+    days30.forEach(d=>{areaData[area][d]=0;});
+  });
+  filteredData.forEach(r=>{
+    const area=String(r[peaC]||'');
+    const k=dateKey(r[dtC]);
+    if(areaData[area]&&areaData[area].hasOwnProperty(k))areaData[area][k]++;
+  });
+
+  const datasets=top5areas.map((area,i)=>({
+    label:area,
+    data:days30.map(d=>areaData[area][d]),
+    borderColor:COLORS[i%COLORS.length],
+    backgroundColor:'transparent',
+    borderWidth:1.5,
+    pointRadius:0,
+    pointHoverRadius:4,
+    tension:.4,
+  }));
+
+  destroyChart('area');
+  charts.area=new Chart(document.getElementById('areaChart').getContext('2d'),{
+    type:'line',
+    data:{labels:dayLabels,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          display:true,
+          position:'bottom',
+          labels:{color:tickColor(),font:{size:8},boxWidth:10,padding:8}
+        },
+        datalabels:{display:false}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8}}},
+        y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:8}},beginAtZero:true}
+      }
+    }
+  });
 }
 
 function recolorCharts(){
