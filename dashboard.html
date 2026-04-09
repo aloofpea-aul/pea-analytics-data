@@ -1552,8 +1552,8 @@ function checkAlerts(){
     if(cnt>=2)return;
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
     const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    if(d>120){notify(t('notif_dur_alert'),`${r[eC]} · ${d} ${t('dur_unit')}`,'warning',0);cnt++;}
-    else if(c>1000&&cnt<2){notify(t('notif_cust_alert'),`${r[eC]} · ${fmt(c)} ${t('notif_affected')}`,'critical',0);cnt++;}
+    if(d>120){notify(t('notif_dur_alert'),`${r[eC]} · ${d} ${t('dur_unit')}`,'warning',15000);cnt++;}
+    else if(c>1000&&cnt<2){notify(t('notif_cust_alert'),`${r[eC]} · ${fmt(c)} ${t('notif_affected')}`,'critical',15000);cnt++;}
   });
 }
 
