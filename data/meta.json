@@ -1,17 +1,17 @@
 {
-  "last_updated": "2026-04-11T18:25:04.409Z",
+  "last_updated": "2026-04-12T18:25:04.384Z",
   "sheets": [
     {
       "sheet": "Dashboard-HV-MV",
       "file": "data/hv-mv.json",
       "status": "ok",
-      "rows": 8472
+      "rows": 8569
     },
     {
       "sheet": "Dashboard-LV",
       "file": "data/lv.json",
       "status": "ok",
-      "rows": 7114
+      "rows": 7250
     },
     {
       "sheet": "รายงานแยกตามพื้นที่",
