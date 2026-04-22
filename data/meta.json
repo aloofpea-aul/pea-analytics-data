@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-21T18:25:08.656Z",
+  "last_updated": "2026-04-22T18:25:05.852Z",
   "sheets": [
     {
       "sheet": "Dashboard-HV-MV",
@@ -11,7 +11,7 @@
       "sheet": "Dashboard-LV",
       "file": "data/lv.json",
       "status": "ok",
-      "rows": 8164
+      "rows": 8249
     },
     {
       "sheet": "รายงานแยกตามพื้นที่",
