@@ -1,15 +1,17 @@
 {
-  "last_updated": "2026-08-17T18:25:01.359Z",
+  "last_updated": "2026-08-18T18:24:37.434Z",
   "sheets": [
     {
       "sheet": "Dashboard-HV-MV",
-      "status": "error",
-      "reason": "GitHub API error 503: {\"message\": \"No server is currently available to service your request. Sorry about that. Please try resubmitting your request and contact us if the problem persists.\"}\r\n"
+      "file": "data/hv-mv.json",
+      "status": "ok",
+      "rows": 0
     },
     {
       "sheet": "Dashboard-LV",
-      "status": "error",
-      "reason": "GitHub API error 503: {\"message\": \"No server is currently available to service your request. Sorry about that. Please try resubmitting your request and contact us if the problem persists.\"}\r\n"
+      "file": "data/lv.json",
+      "status": "ok",
+      "rows": 0
     },
     {
       "sheet": "รายงานแยกตามพื้นที่",
