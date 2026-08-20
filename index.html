@@ -17,7 +17,7 @@
   --bg0:#07090f;--bg1:#0d1117;--bg2:#111827;--bg3:#1a2235;
   --panel:rgba(13,17,23,0.98);
   --border:#1e2d45;--border2:#263350;
-  --text1:#e8edf5;--text2:#8fa3c0;--text3:#546070;
+  --text1:#f5f8ff;--text2:#b8c6dc;--text3:#8494ab;
   --blue:#3b7ef8;--blue2:#1a56db;--blue-glow:rgba(59,126,248,0.16);
   --cyan:#22d3ee;--amber:#f59e0b;--rose:#f43f5e;
   --emerald:#10b981;--purple:#a78bfa;
@@ -27,7 +27,7 @@
 [data-theme="light"]{
   --bg0:#f0f4fb;--bg1:#ffffff;--bg2:#f5f8ff;--bg3:#eaf0fb;
   --panel:rgba(255,255,255,0.98);--border:#d4dff0;--border2:#c1d0e8;
-  --text1:#0f1923;--text2:#4a5f78;--text3:#8fa3bc;
+  --text1:#0a0f16;--text2:#33465c;--text3:#5a6b82;
   --blue-glow:rgba(59,126,248,0.08);
 }
 [data-lang="th"] body{font-family:'Sarabun',sans-serif;}
@@ -115,10 +115,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .map-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 
 /* FILTERS */
-.filter-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;overflow:visible;}
+.filter-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;overflow:visible;}
 .filter-wrap{position:relative;z-index:1;}
 .filter-wrap:focus-within{z-index:9998;}
-.filter-label{font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;display:block;}
+.filter-label{font-size:8.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:2px;display:block;}
 .filter-trigger{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 32px 8px 11px;font-size:12px;font-weight:500;color:var(--text1);cursor:pointer;transition:border-color .2s;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit;}
 .filter-trigger:hover{border-color:var(--border2);}
 .filter-trigger.open{border-color:var(--blue);}
@@ -383,6 +383,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="kpi-card k-node"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div class="kpi-label" data-i="kpi_node_label">จำนวนเหตุการณ์</div><div class="kpi-value" id="kpi-nodes">—</div><div class="kpi-sub" data-i="kpi_node_sub">รายการ</div></div>
       </div>
 
+      
+      <div class="card" style="margin-bottom:14px;padding:14px 16px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div>
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
         <div class="card">
           <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
@@ -394,7 +396,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
 
-      <div class="card">
+      
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-header"><span class="card-title">สาเหตุการเกิดเหตุขัดข้อง</span><span class="badge badge-blue" id="causeCountBadge">0</span></div>
+        <div style="position:relative;height:220px;"><canvas id="causeChart"></canvas></div>
+      </div>
+<div class="card">
         <div class="card-header">
           <div style="display:flex;align-items:center;gap:9px;"><span class="card-title" data-i="table_title">ข้อมูลเหตุการณ์</span><span class="badge badge-emerald" id="rowBadge">0</span></div>
           <span style="font-size:10px;color:var(--text3);" data-i="table_hint">คลิกแถวเพื่อดูรายละเอียด · แสดง 100 รายการแรก</span>
@@ -754,7 +761,7 @@ function toggleSel(type,val,e){
   e.stopPropagation();
   if(filters[type].includes(val)) filters[type]=filters[type].filter(v=>v!==val);
   else filters[type].push(val);
-  updateTriggers(); updateAllDD(); applyFilter(true);
+  updateTriggers(); updateAllDD(); applyFilter(true); closeAllDD();
 }
 function updateTriggers(){
   const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default'};
@@ -779,7 +786,7 @@ function switchMode(mode){
   ['HV','MV','LV'].forEach(m=>document.getElementById('tab-'+m)?.classList.toggle('active',m===mode));
   document.getElementById('mvSubTabs').style.display=mode==='MV'?'flex':'none';
   document.getElementById('modeBadge').textContent=mode;
-  filters.eq=[]; updateTriggers(); updateAllDD(); applyFilter(true);
+  filters.eq=[]; updateTriggers(); updateAllDD(); applyFilter(true); closeAllDD();
 }
 function setSubFilter(f){
   subFilter=f;
@@ -951,6 +958,8 @@ function processRender(sName,full){
   const tot=getTotalCustomers();
   document.getElementById('kpi-saifi').textContent=tot?(affSum/tot).toFixed(3):'—';
   document.getElementById('kpi-saidi').textContent=tot?(custMin/tot).toFixed(3):'—';
+  renderGauges(tot?affSum/tot:null, tot?custMin/tot:null);
+
   document.getElementById('kpi-total').textContent=fmt(tot);
   document.getElementById('kpi-affected').textContent=fmt(affSum);
   document.getElementById('kpi-dur').textContent=fmt(durSum,1);
@@ -1002,7 +1011,67 @@ function renderCharts(h){
     type:'doughnut',data:{labels:dL,datasets:[{data:dV,backgroundColor:COLORS.map(c=>c+'bb'),borderColor:COLORS,borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v:''}}},
     plugins:[ChartDataLabels]});
+
+  renderCauseChart(h);
 }
+
+function renderCauseChart(h){
+  const cC=h.find(n=>n.includes('CauseType'));
+  const canvas=document.getElementById('causeChart');
+  if(!cC||!canvas){return;}
+  const counts={};
+  filteredData.forEach(function(r){
+    const v=String(r[cC]||'').trim()||'ไม่ระบุ';
+    counts[v]=(counts[v]||0)+1;
+  });
+  const entries=Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  const labels=entries.map(function(e){return e[0];});
+  const data=entries.map(function(e){return e[1];});
+  const badge=document.getElementById('causeCountBadge');
+  if(badge) badge.textContent=String(filteredData.length);
+  if(window.__causeChartInst){window.__causeChartInst.destroy();}
+  window.__causeChartInst=new Chart(canvas.getContext('2d'),{
+    type:'bar',
+    data:{labels:labels,datasets:[{data:data,backgroundColor:labels.map(function(_,idx){return COLORS[idx%COLORS.length];}),borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:function(v){return v>0?v:'';}}},scales:{x:{ticks:{color:'var(--text3)'},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'var(--text2)',font:{size:10}},grid:{display:false}}}},
+    plugins:[ChartDataLabels]
+  });
+}
+const KPI_TARGETS={saifi:[4.994,4.738,4.482,4.226,3.97],saidi:[227.53,213.892,200.255,186.618,172.98]};
+function buildGaugeHtml(label,value,levels,unit){
+  if(value==null||isNaN(value)){return '<div style="font-size:11px;color:var(--text3);">'+label+': ไม่มีข้อมูลเพียงพอสำหรับการคำนวณ</div>';}
+  const maxV=Math.max(levels[0],value)*1.08;
+  const segs=[levels[0]].concat(levels.slice(1).map(function(v,idx){return v;}));
+  const bounds=[0,levels[4],levels[3],levels[2],levels[1],levels[0]];
+  const colors=['#10b981','#3b7ef8','#f59e0b','#f2994a','#f43f5e'];
+  let segHtml='';
+  for(let i=0;i<5;i++){
+    const segStart=bounds[i], segEnd=bounds[i+1];
+    const widthPct=((segEnd-segStart)/maxV*100).toFixed(2);
+    segHtml+='<div style="width:'+widthPct+'%;background:'+colors[4-i]+';height:100%;"></div>';
+  }
+  const markerPct=Math.min(100,(value/maxV*100)).toFixed(2);
+  return ''+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">'+
+    '<span style="font-size:11px;font-weight:700;color:var(--text2);">'+label+'</span>'+
+    '<span style="font-size:13px;font-weight:800;color:var(--text1);">'+value.toFixed(3)+' <span style="font-size:9px;color:var(--text3);font-weight:400;">'+unit+'</span></span>'+
+    '</div>'+
+    '<div style="position:relative;height:14px;border-radius:7px;overflow:hidden;display:flex;background:rgba(255,255,255,.06);">'+
+    segHtml+
+    '<div style="position:absolute;left:'+markerPct+'%;top:-3px;width:2px;height:20px;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);"></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:8.5px;color:var(--text3);">'+
+    '<span>0</span><span>ระดับ 1: '+levels[0].toFixed(2)+'</span><span>ระดับ 5: '+levels[4].toFixed(2)+'</span>'+
+    '</div>';
+}
+function renderGauges(saifiVal,saidiVal){
+  const wS=document.getElementById('gaugeSaifiWrap');
+  const wD=document.getElementById('gaugeSaidiWrap');
+  if(wS) wS.innerHTML=buildGaugeHtml('SAIFI (ครั้ง/ผู้ใช้ไฟ)',saifiVal,KPI_TARGETS.saifi,'');
+  if(wD) wD.innerHTML=buildGaugeHtml('SAIDI (นาที/ผู้ใช้ไฟ)',saidiVal,KPI_TARGETS.saidi,'');
+}
+
+
 
 function recolorCharts(){
   Object.values(charts).forEach(c=>{
