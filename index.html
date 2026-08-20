@@ -898,7 +898,7 @@ function simulateLoad(){
 // ================================================================
 function getTotalCustomers(){
   const area=dataStore['รายงานแยกตามพื้นที่'],aH=metaStore['รายงานแยกตามพื้นที่']?.headers||[];
-  const gfC=aH.find(n=>n.includes('กฟฟ.')),cC=aH.find(n=>n.includes('ผู้ใช้ไฟทั้งหมดรวม')),zC=aH.find(n=>n.includes('เขต'));
+  const gfC=aH.find(n=>n==='กฟฟ.'),cC=aH.find(n=>n.includes('ผู้ใช้ไฟทั้งหมดรวม')),zC=aH.find(n=>n.includes('เขต'));
   if(!area.length||!cC)return 0;
   const stripCode=s=>String(s||'').replace(/^\d+\./,'').trim();
   const selNames=filters.pea.map(stripCode);
