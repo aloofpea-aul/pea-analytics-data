@@ -384,7 +384,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       
-      <div class="card" style="margin-bottom:14px;padding:14px 16px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div>
+      <div class="card" style="margin-bottom:12px;padding:10px 14px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div>
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
         <div class="card">
           <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
@@ -399,7 +399,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       
       <div class="card" style="margin-bottom:14px;">
         <div class="card-header"><span class="card-title">สาเหตุการเกิดเหตุขัดข้อง</span><span class="badge badge-blue" id="causeCountBadge">0</span></div>
-        <div style="position:relative;height:220px;"><canvas id="causeChart"></canvas></div>
+        <div style="position:relative;height:150px;"><canvas id="causeChart"></canvas></div>
       </div>
 <div class="card">
         <div class="card-header">
@@ -725,7 +725,7 @@ function toggleDD(type,e){
   if(!wasOpen){dd.classList.add('open');document.getElementById('f-'+type+'-trigger').classList.add('open');}
 }
 function closeAllDD(){
-  ['sub','pea','eq'].forEach(k=>{
+  ['sub','pea','eq','month'].forEach(k=>{
     document.getElementById('dd-'+k)?.classList.remove('open');
     document.getElementById('f-'+k+'-trigger')?.classList.remove('open');
   });
@@ -1052,13 +1052,13 @@ function buildGaugeHtml(label,value,levels,unit){
   }
   const markerPct=Math.min(100,(value/maxV*100)).toFixed(2);
   return ''+
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">'+
     '<span style="font-size:11px;font-weight:700;color:var(--text2);">'+label+'</span>'+
-    '<span style="font-size:13px;font-weight:800;color:var(--text1);">'+value.toFixed(3)+' <span style="font-size:9px;color:var(--text3);font-weight:400;">'+unit+'</span></span>'+
+    '<span style="font-size:11px;font-weight:800;color:var(--text1);">'+value.toFixed(3)+' <span style="font-size:9px;color:var(--text3);font-weight:400;">'+unit+'</span></span>'+
     '</div>'+
-    '<div style="position:relative;height:14px;border-radius:7px;overflow:hidden;display:flex;background:rgba(255,255,255,.06);">'+
+    '<div style="position:relative;height:10px;border-radius:5px;overflow:hidden;display:flex;background:rgba(255,255,255,.06);">'+
     segHtml+
-    '<div style="position:absolute;left:'+markerPct+'%;top:-3px;width:2px;height:20px;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);"></div>'+
+    '<div style="position:absolute;left:'+markerPct+'%;top:-2px;width:2px;height:14px;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);"></div>'+
     '</div>'+
     '<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:8.5px;color:var(--text3);">'+
     '<span>0</span><span>ระดับ 1: '+levels[0].toFixed(2)+'</span><span>ระดับ 5: '+levels[4].toFixed(2)+'</span>'+
