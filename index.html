@@ -361,6 +361,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
                 <div class="filter-list" id="fl-eq"></div>
               </div>
             </div>
+            <div class="filter-wrap">
+              <span class="filter-label" data-i="filter_month">เดือน</span>
+              <button class="filter-trigger" id="f-month-trigger" onclick="toggleDD('month',event)">เลือกเดือน...</button>
+              <svg class="filter-chevron" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              <div class="filter-dropdown" id="dd-month">
+                <div class="filter-search"><input type="text" oninput="filterOpts('month',this.value)" onclick="event.stopPropagation()" id="fs-eq" placeholder="ค้นหาอุปกรณ์..." autocomplete="off"></div>
+                <div class="filter-list" id="fl-month"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -600,7 +609,7 @@ const LANG = {
 // STATE
 // ================================================================
 let currentLang='th', currentView='dashboard', currentMode='MV', subFilter='All';
-let filters={sub:[],pea:[],eq:[]}, searchQ={sub:'',pea:'',eq:''};
+let filters={sub:[],pea:[],eq:[],month:[]}, searchQ={sub:'',pea:'',eq:'',month:''};
 let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแยกตามพื้นที่':[]};
 let metaStore={}, filteredData=[], currentTableData=[];
 let charts={}, mapInst=null, heatLayer=null, mapLayerType='incidents';
@@ -624,7 +633,7 @@ function applyLang(){
   document.getElementById('lang-th').classList.toggle('active',currentLang==='th');
   document.getElementById('lang-en').classList.toggle('active',currentLang==='en');
   ['sub','pea','eq'].forEach(k=>{
-    const map={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default'};
+    const map={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default'};
     const tr=document.getElementById('f-'+k+'-trigger');
     if(tr&&filters[k].length===0) tr.textContent=t(map[k]);
   });
@@ -724,8 +733,10 @@ function renderDDList(type){
   const subC=h.find(n=>n.includes('SubstationName'));
   const peaC=h.find(n=>n.includes('PEA_Code'));
   const eqC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const dC=h.find(n=>n.includes('Date'));
   let vals=[];
-  if(type==='sub') vals=[...new Set(raw.map(r=>String(r[subC]||'').trim()))].filter(v=>v);
+  if(type==='month'){vals=[...new Set(raw.map(r=>String(r[dC]||'').slice(0,7)))].filter(v=>v).sort();}
+  else if(type==='sub') vals=[...new Set(raw.map(r=>String(r[subC]||'').trim()))].filter(v=>v);
   else if(type==='pea'){ const b=filters.sub.length?raw.filter(r=>filters.sub.includes(String(r[subC]||'').trim())):raw; vals=[...new Set(b.map(r=>String(r[peaC]||'').trim()))].filter(v=>v);}
   else{ const b=raw.filter(r=>(!filters.sub.length||filters.sub.includes(String(r[subC]||'').trim()))&&(!filters.pea.length||filters.pea.includes(String(r[peaC]||'').trim()))); vals=[...new Set(b.map(r=>String(r[eqC]||'').trim()))].filter(v=>v);}
   vals=vals.sort().filter(v=>v.toLowerCase().includes(searchQ[type]));
@@ -737,7 +748,7 @@ function renderDDList(type){
       <span>${v}</span></div>`;
   }).join('');
 }
-function updateAllDD(){['sub','pea','eq'].forEach(renderDDList);}
+function updateAllDD(){['sub','pea','eq','month'].forEach(renderDDList);}
 
 function toggleSel(type,val,e){
   e.stopPropagation();
@@ -746,7 +757,7 @@ function toggleSel(type,val,e){
   updateTriggers(); updateAllDD(); applyFilter(true);
 }
 function updateTriggers(){
-  const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default'};
+  const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default'};
   ['sub','pea','eq'].forEach(k=>{
     const el=document.getElementById('f-'+k+'-trigger'); if(!el)return;
     const sel=filters[k];
@@ -754,7 +765,7 @@ function updateTriggers(){
   });
 }
 function resetFilters(){
-  filters={sub:[],pea:[],eq:[]}; searchQ={sub:'',pea:'',eq:''};
+  filters={sub:[],pea:[],eq:[]}; searchQ={sub:'',pea:'',eq:'',month:''};
   ['fs-sub','fs-pea','fs-eq'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateTriggers(); updateAllDD(); applyFilter(true);
   notify(t('notif_filter_reset'),t('notif_filter_reset_msg'),'info',2500);
@@ -920,7 +931,8 @@ function applyFilter(full=true){
   let res=currentMode==='HV'?raw.filter(r=>String(r[tC]).match(/115 kV|Incomming/)):currentMode==='MV'?raw.filter(r=>!String(r[tC]).match(/115 kV|Incomming/)):raw;
   if(filters.sub.length) res=res.filter(r=>filters.sub.includes(String(r[sC]||'').trim()));
   if(filters.pea.length) res=res.filter(r=>filters.pea.includes(String(r[pC]||'').trim()));
-  if(filters.eq.length)  res=res.filter(r=>filters.eq.includes(String(r[eC]||'').trim()));
+  if(filters.eq.length)  res=res.filter(r=>filters.eq.includes(String(r[eC]||'').trim()))
+  if(filters.month.length) res=res.filter(r=>filters.month.includes(String(r[dC]||'').slice(0,7)));;
   if(currentMode==='MV'&&subFilter!=='All') res=res.filter(r=>subFilter==='Main'?String(r[tC]).match(/Breaker|Recloser|VB|OC|CB|Circuit/i):String(r[tC]).match(/Fuse|D\/F|Drop out|Cutout/i));
   if(dC) res.sort((a,b)=>new Date(b[dC])-new Date(a[dC]));
   filteredData=res; processRender(sName,full);
