@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-08-20T18:26:26.848Z",
+  "last_updated": "2026-08-21T04:04:48.413Z",
   "sheets": [
     {
       "sheet": "Dashboard-HV-MV",
       "file": "data/hv-mv.json",
       "status": "ok",
-      "rows": 25470
+      "rows": 25499
     },
     {
       "sheet": "Dashboard-LV",
