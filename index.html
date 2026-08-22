@@ -366,7 +366,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               <button class="filter-trigger" id="f-month-trigger" onclick="toggleDD('month',event)">เลือกเดือน...</button>
               <svg class="filter-chevron" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
               <div class="filter-dropdown" id="dd-month">
-                <div class="filter-search"><input type="text" oninput="filterOpts('month',this.value)" onclick="event.stopPropagation()" id="fs-eq" placeholder="ค้นหาอุปกรณ์..." autocomplete="off"></div>
+                <div class="filter-search"><input type="text" oninput="filterOpts('month',this.value)" onclick="event.stopPropagation()" id="fs-month" placeholder="ค้นหาเดือน..." autocomplete="off"></div>
                 <div class="filter-list" id="fl-month"></div>
               </div>
             </div>
@@ -622,7 +622,7 @@ const LANG = {
 // STATE
 // ================================================================
 let currentLang='th', currentView='dashboard', currentMode='MV', subFilter='All';
-let filters={sub:[],pea:[],eq:[],month:[]}, searchQ={sub:'',pea:'',eq:'',month:''};
+let filters={sub:[],pea:[],eq:[],month:[]}, searchQ={sub:'',pea:'',eq:'',month:''}, ddVals={};
 let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแยกตามพื้นที่':[]};
 let metaStore={}, filteredData=[], currentTableData=[];
 let charts={}, mapInst=null, heatLayer=null, mapLayerType='incidents';
@@ -753,23 +753,39 @@ function renderDDList(type){
   else if(type==='pea'){ const b=filters.sub.length?raw.filter(r=>filters.sub.includes(String(r[subC]||'').trim())):raw; vals=[...new Set(b.map(r=>String(r[peaC]||'').trim()))].filter(v=>v);}
   else{ const b=raw.filter(r=>(!filters.sub.length||filters.sub.includes(String(r[subC]||'').trim()))&&(!filters.pea.length||filters.pea.includes(String(r[peaC]||'').trim()))); vals=[...new Set(b.map(r=>String(r[eqC]||'').trim()))].filter(v=>v);}
   vals=vals.sort().filter(v=>v.toLowerCase().includes(searchQ[type]));
+  ddVals[type]=vals;
   const sel=filters[type];
   const listEl=document.getElementById('fl-'+type);
-  listEl.innerHTML=vals.map(function(v,i){
+  const allSelected=vals.length>0&&vals.every(function(v){return sel.includes(v);});
+  let html='';
+  if(vals.length>0){
+    html+='<div class="filter-opt filter-opt-all'+(allSelected?' selected':'')+'" style="font-weight:700;border-bottom:1px solid var(--border);">'
+      +'<div class="fcheck">'+(allSelected?'<svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+      +'<span>เลือกทั้งหมด ('+vals.length+')</span></div>';
+  }
+  html+=vals.map(function(v,i){
     const on=sel.includes(v);
     return'<div class="filter-opt'+(on?' selected':'')+'" data-idx="'+i+'">'
       +'<div class="fcheck">'+(on?'<svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
       +'<span></span></div>';
   }).join('');
+  listEl.innerHTML=html;
   // ผูก event ด้วย addEventListener แทน inline onclick (เสถียรกว่า ใช้ได้ในทุกเบราว์เซอร์)
   // และใส่ข้อความผ่าน textContent เพื่อความปลอดภัย
-  Array.prototype.forEach.call(listEl.querySelectorAll('.filter-opt'), function(el, i){
+  Array.prototype.forEach.call(listEl.querySelectorAll('.filter-opt:not(.filter-opt-all)'), function(el, i){
     el.querySelector('span').textContent=vals[i];
     el.addEventListener('click', function(e){
       e.stopPropagation();
       toggleSel(type, vals[i], e);
     });
   });
+  const allEl=listEl.querySelector('.filter-opt-all');
+  if(allEl){
+    allEl.addEventListener('click', function(e){
+      e.stopPropagation();
+      toggleSelectAll(type);
+    });
+  }
 }
 function updateAllDD(){['sub','pea','eq','month'].forEach(renderDDList);}
 
@@ -777,7 +793,20 @@ function toggleSel(type,val,e){
   e.stopPropagation();
   if(filters[type].includes(val)) filters[type]=filters[type].filter(v=>v!==val);
   else filters[type].push(val);
-  updateTriggers(); updateAllDD(); applyFilter(true); closeAllDD();
+  updateTriggers(); updateAllDD(); applyFilter(true);
+}
+function toggleSelectAll(type){
+  const vals=ddVals[type]||[];
+  const sel=filters[type];
+  const allSelected=vals.length>0&&vals.every(v=>sel.includes(v));
+  if(allSelected){
+    filters[type]=sel.filter(v=>!vals.includes(v));
+  } else {
+    const set=new Set(sel);
+    vals.forEach(v=>set.add(v));
+    filters[type]=Array.from(set);
+  }
+  updateTriggers(); updateAllDD(); applyFilter(true);
 }
 function updateTriggers(){
   const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default'};
