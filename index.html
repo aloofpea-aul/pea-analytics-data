@@ -371,6 +371,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
             </div>
           </div>
+          <div id="activeFilterChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
         </div>
       </div>
 
@@ -815,15 +816,41 @@ function toggleSelectAll(type){
 }
 function updateTriggers(){
   const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default'};
-  ['sub','pea','eq'].forEach(k=>{
+  ['sub','pea','eq','month'].forEach(k=>{
     const el=document.getElementById('f-'+k+'-trigger'); if(!el)return;
     const sel=filters[k];
     el.textContent=sel.length===0?t(def[k]):sel.length===1?sel[0]:`${t('filter_selected')} (${sel.length})`;
   });
+  renderActiveChips();
+}
+function removeChip(type,val){
+  filters[type]=filters[type].filter(v=>v!==val);
+  updateTriggers(); updateAllDD(); applyFilter(true);
+}
+function renderActiveChips(){
+  const wrap=document.getElementById('activeFilterChips');
+  if(!wrap)return;
+  const labelMap={sub:t('filter_sub'),pea:t('filter_pea'),eq:t('filter_eq'),month:t('filter_month')};
+  let html='';
+  ['sub','pea','eq','month'].forEach(type=>{
+    filters[type].forEach(val=>{
+      html+='<span style="display:inline-flex;align-items:center;gap:5px;background:var(--blue-glow);border:1px solid var(--blue);color:var(--blue);border-radius:20px;padding:3px 6px 3px 10px;font-size:10.5px;font-weight:600;">'
+        +'<span style="color:var(--text3);font-weight:400;">'+labelMap[type]+':</span> '+val
+        +'<span data-remove-type="'+type+'" data-remove-val="'+val.replace(/"/g,'&quot;')+'" style="cursor:pointer;width:15px;height:15px;border-radius:50%;background:rgba(59,126,248,.18);display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1;">✕</span>'
+        +'</span>';
+    });
+  });
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('[data-remove-type]').forEach(el=>{
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      removeChip(el.getAttribute('data-remove-type'), el.getAttribute('data-remove-val'));
+    });
+  });
 }
 function resetFilters(){
-  filters={sub:[],pea:[],eq:[]}; searchQ={sub:'',pea:'',eq:'',month:''};
-  ['fs-sub','fs-pea','fs-eq'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  filters={sub:[],pea:[],eq:[],month:[]}; searchQ={sub:'',pea:'',eq:'',month:''};
+  ['fs-sub','fs-pea','fs-eq','fs-month'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateTriggers(); updateAllDD(); applyFilter(true);
   notify(t('notif_filter_reset'),t('notif_filter_reset_msg'),'info',2500);
 }
