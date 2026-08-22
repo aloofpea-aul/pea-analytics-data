@@ -1140,16 +1140,17 @@ const KPI_TARGETS={saifi:[4.994,4.738,4.482,4.226,3.97],saidi:[227.53,213.892,20
 function buildGaugeHtml(label,value,levels,unit){
   if(value==null||isNaN(value)){return '<div style="font-size:11px;color:var(--text3);">'+label+': ไม่มีข้อมูลเพียงพอสำหรับการคำนวณ</div>';}
   const maxV=Math.max(levels[0],value)*1.08;
-  const segs=[levels[0]].concat(levels.slice(1).map(function(v,idx){return v;}));
   const bounds=[0,levels[4],levels[3],levels[2],levels[1],levels[0]];
   const colors=['#10b981','#3b7ef8','#f59e0b','#f2994a','#f43f5e'];
   let segHtml='';
   for(let i=0;i<5;i++){
     const segStart=bounds[i], segEnd=bounds[i+1];
     const widthPct=((segEnd-segStart)/maxV*100).toFixed(2);
-    segHtml+='<div style="width:'+widthPct+'%;background:'+colors[4-i]+';height:100%;"></div>';
+    segHtml+='<div style="width:'+widthPct+'%;background:'+colors[i]+';height:100%;"></div>';
   }
   const markerPct=Math.min(100,(value/maxV*100)).toFixed(2);
+  const p5Pct=(levels[4]/maxV*100).toFixed(2);
+  const p1Pct=(levels[0]/maxV*100).toFixed(2);
   return ''+
     '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">'+
     '<span style="font-size:11px;font-weight:700;color:var(--text2);">'+label+'</span>'+
@@ -1159,8 +1160,10 @@ function buildGaugeHtml(label,value,levels,unit){
     segHtml+
     '<div style="position:absolute;left:'+markerPct+'%;top:-2px;width:2px;height:14px;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);"></div>'+
     '</div>'+
-    '<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:8.5px;color:var(--text3);">'+
-    '<span>0</span><span>ระดับ 1: '+levels[0].toFixed(2)+'</span><span>ระดับ 5: '+levels[4].toFixed(2)+'</span>'+
+    '<div style="position:relative;height:12px;margin-top:3px;font-size:8.5px;color:var(--text3);">'+
+    '<span style="position:absolute;left:0;">0</span>'+
+    '<span style="position:absolute;left:'+p5Pct+'%;transform:translateX(-50%);white-space:nowrap;">ระดับ 5: '+levels[4].toFixed(2)+'</span>'+
+    '<span style="position:absolute;left:'+p1Pct+'%;transform:translateX(-100%);white-space:nowrap;">ระดับ 1: '+levels[0].toFixed(2)+'</span>'+
     '</div>';
 }
 function renderGauges(saifiVal,saidiVal){
