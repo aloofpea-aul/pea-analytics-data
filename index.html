@@ -485,9 +485,15 @@ const GH = {
 
   // ชื่อไฟล์ JSON ใน repo → key ใน dataStore
   FILES: {
-    'data/hv-mv.json': 'Dashboard-HV-MV',
-    'data/lv.json':    'Dashboard-LV',
-    'data/area.json':  'รายงานแยกตามพื้นที่',
+    'data/hv-mv-lite.json': 'Dashboard-HV-MV',
+    'data/lv-lite.json':    'Dashboard-LV',
+    'data/area.json':       'รายงานแยกตามพื้นที่',
+  },
+
+  // ไฟล์คำบรรยายแยกต่างหาก (โหลดคู่กับไฟล์หลักด้านบน แล้วรวมกลับเข้าไป)
+  DESC_FILES: {
+    'Dashboard-HV-MV': 'data/hv-mv-desc.json',
+    'Dashboard-LV':    'data/lv-desc.json',
   },
 
   // URL สำเร็จรูป (ไม่ต้องแก้)
@@ -846,10 +852,31 @@ async function startLoad(){
         const json = await res.json();
 
         // แปลงและเก็บ
-        dataStore[storeName] = jsonToObjects(json);
+        const objs = jsonToObjects(json);
+        let headers = json.headers||[];
+
+        // ถ้ามีไฟล์คำบรรยายแยกสำหรับชีตนี้ ให้โหลดคู่ขนานแล้วรวมกลับเข้าไป
+        const descPath = GH.DESC_FILES && GH.DESC_FILES[storeName];
+        if(descPath){
+          try{
+            const descRes = await fetch(GH.raw(descPath), {cache:'no-store'});
+            if(descRes.ok){
+              const descJson = await descRes.json();
+              (descJson.rows||[]).forEach(pair=>{
+                const idx = pair[0], text = pair[1];
+                if(objs[idx]) objs[idx]['CauseDescription'] = text;
+              });
+              if(!headers.includes('CauseDescription')) headers = headers.concat('CauseDescription');
+            }
+          } catch(descErr){
+            console.warn(`Failed to load desc file ${descPath}:`, descErr.message);
+          }
+        }
+
+        dataStore[storeName] = objs;
 
         // สร้าง metaStore จาก JSON
-        metaStore[storeName] = { headers: json.headers||[], totalRows: json.total||0 };
+        metaStore[storeName] = { headers: headers, totalRows: json.total||0 };
 
         done++;
         setProgress(Math.round(done/files.length*90)+5);
@@ -1052,7 +1079,7 @@ function buildGaugeHtml(label,value,levels,unit){
   }
   const markerPct=Math.min(100,(value/maxV*100)).toFixed(2);
   return ''+
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">'+
     '<span style="font-size:11px;font-weight:700;color:var(--text2);">'+label+'</span>'+
     '<span style="font-size:11px;font-weight:800;color:var(--text1);">'+value.toFixed(3)+' <span style="font-size:9px;color:var(--text3);font-weight:400;">'+unit+'</span></span>'+
     '</div>'+
