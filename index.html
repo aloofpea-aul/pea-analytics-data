@@ -754,12 +754,22 @@ function renderDDList(type){
   else{ const b=raw.filter(r=>(!filters.sub.length||filters.sub.includes(String(r[subC]||'').trim()))&&(!filters.pea.length||filters.pea.includes(String(r[peaC]||'').trim()))); vals=[...new Set(b.map(r=>String(r[eqC]||'').trim()))].filter(v=>v);}
   vals=vals.sort().filter(v=>v.toLowerCase().includes(searchQ[type]));
   const sel=filters[type];
-  document.getElementById('fl-'+type).innerHTML=vals.map(v=>{
+  const listEl=document.getElementById('fl-'+type);
+  listEl.innerHTML=vals.map(function(v,i){
     const on=sel.includes(v);
-    return`<div class="filter-opt${on?' selected':''}" onclick="toggleSel('${type}','${v.replace(/'/g,"\\'")}',event)">
-      <div class="fcheck">${on?'<svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-      <span>${v}</span></div>`;
+    return'<div class="filter-opt'+(on?' selected':'')+'" data-idx="'+i+'">'
+      +'<div class="fcheck">'+(on?'<svg width="8" height="8" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+      +'<span></span></div>';
   }).join('');
+  // ผูก event ด้วย addEventListener แทน inline onclick (เสถียรกว่า ใช้ได้ในทุกเบราว์เซอร์)
+  // และใส่ข้อความผ่าน textContent เพื่อความปลอดภัย
+  Array.prototype.forEach.call(listEl.querySelectorAll('.filter-opt'), function(el, i){
+    el.querySelector('span').textContent=vals[i];
+    el.addEventListener('click', function(e){
+      e.stopPropagation();
+      toggleSel(type, vals[i], e);
+    });
+  });
 }
 function updateAllDD(){['sub','pea','eq','month'].forEach(renderDDList);}
 
