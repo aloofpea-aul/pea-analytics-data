@@ -626,6 +626,7 @@ let filters={sub:[],pea:[],eq:[],month:[]}, searchQ={sub:'',pea:'',eq:'',month:'
 let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแยกตามพื้นที่':[]};
 let metaStore={}, filteredData=[], currentTableData=[];
 let charts={}, mapInst=null, heatLayer=null, mapLayerType='incidents';
+let _renderRafId=null, _filterDebounceTimer=null;
 let isLoading=false, isDark=true;
 let dataSource='demo'; // 'github' | 'demo' | 'error'
 
@@ -789,11 +790,15 @@ function renderDDList(type){
 }
 function updateAllDD(){['sub','pea','eq','month'].forEach(renderDDList);}
 
+function applyFilterDebounced(full){
+  clearTimeout(_filterDebounceTimer);
+  _filterDebounceTimer=setTimeout(function(){ applyFilter(full); }, 220);
+}
 function toggleSel(type,val,e){
   e.stopPropagation();
   if(filters[type].includes(val)) filters[type]=filters[type].filter(v=>v!==val);
   else filters[type].push(val);
-  updateTriggers(); updateAllDD(); applyFilter(true);
+  updateTriggers(); updateAllDD(); applyFilterDebounced(true);
 }
 function toggleSelectAll(type){
   const vals=ddVals[type]||[];
@@ -806,7 +811,7 @@ function toggleSelectAll(type){
     vals.forEach(v=>set.add(v));
     filters[type]=Array.from(set);
   }
-  updateTriggers(); updateAllDD(); applyFilter(true);
+  updateTriggers(); updateAllDD(); applyFilterDebounced(true);
 }
 function updateTriggers(){
   const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default'};
@@ -1033,7 +1038,8 @@ function processRender(sName,full){
   currentTableData=filteredData;
   document.getElementById('rowBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   document.getElementById('recordCountBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
-  requestAnimationFrame(()=>{ renderTable(h); if(full)renderCharts(h); if(currentView==='analysis')renderAnalysis(); });
+  if(_renderRafId) cancelAnimationFrame(_renderRafId);
+  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(currentView==='analysis')renderAnalysis(); });
 }
 
 // ================================================================
