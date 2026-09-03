@@ -394,15 +394,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       
-      <div class="card" style="margin-bottom:12px;padding:10px 14px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:170px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:170px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:170px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 5 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:280px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:280px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:280px;overflow-y:auto;"></div></div></div></div>
+      <div class="card" style="margin-bottom:12px;padding:10px 14px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:220px;overflow-y:auto;"></div></div></div></div>
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
         <div class="card">
           <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
-          <div class="card-body"><div class="chart-wrap" style="height:300px;"><canvas id="trendChart"></canvas></div></div>
+          <div class="card-body"><div class="chart-wrap" style="height:230px;"><canvas id="trendChart"></canvas></div></div>
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title" data-i="chart_dist_title">การกระจายการดำเนินงาน</span></div>
-          <div class="card-body"><div id="distLegend" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div><div class="chart-wrap" style="height:260px;"><canvas id="distChart"></canvas></div></div>
+          <div class="card-body"><div id="distLegend" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div><div class="chart-wrap" style="height:200px;"><canvas id="distChart"></canvas></div></div>
         </div>
       </div>
 
@@ -410,11 +410,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
       <div class="card">
         <div class="card-header"><span class="card-title">สาเหตุการเกิดเหตุขัดข้อง</span><span class="badge badge-blue" id="causeCountBadge">0</span></div>
-        <div style="position:relative;height:150px;padding:16px;"><canvas id="causeChart"></canvas></div>
+        <div style="position:relative;height:130px;padding:16px;"><canvas id="causeChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-header"><span class="card-title">สาเหตุย่อย (Top 8)</span></div>
-        <div style="position:relative;height:150px;padding:16px;"><canvas id="subCauseChart"></canvas></div>
+        <div style="position:relative;height:130px;padding:16px;"><canvas id="subCauseChart"></canvas></div>
       </div>
       </div>
 <div class="card">
@@ -531,7 +531,7 @@ const LANG = {
     btn_export:'Export',btn_sync:'ซิงค์ข้อมูล',btn_reset:'รีเซ็ต',
     filter_title:'ตัวกรองข้อมูล',filter_sub:'สถานีไฟฟ้า',filter_pea:'รหัส กฟส.',filter_eq:'ประเภทอุปกรณ์',filter_month:'เดือน',
     filter_sub_default:'เลือกสถานี...',filter_pea_default:'เลือก กฟส....',filter_eq_default:'เลือกอุปกรณ์...',filter_month_default:'เลือกเดือน...',
-    filter_selected:'เลือกแล้ว',
+    filter_selected:'เลือกแล้ว',filter_known_default:'เลือกสถานะ...',
     sub_all:'ทั้งหมด',sub_main:'สายหลัก',sub_branch:'สายแยก',
     kpi_saifi_label:'SAIFI',kpi_saifi_sub:'ครั้ง/ผู้ใช้ไฟ',
     kpi_saidi_label:'SAIDI',kpi_saidi_sub:'นาที/ผู้ใช้ไฟ',
@@ -586,7 +586,7 @@ const LANG = {
     btn_export:'Export',btn_sync:'Sync Data',btn_reset:'Reset',
     filter_title:'Data Filters',filter_sub:'Substation',filter_pea:'PEA Code / Area',filter_eq:'Equipment Category',filter_month:'Month',
     filter_sub_default:'All substations',filter_pea_default:'All areas',filter_eq_default:'All equipment',filter_month_default:'All months',
-    filter_selected:'Selected',
+    filter_selected:'Selected',filter_known_default:'Select status...',
     sub_all:'All',sub_main:'Main Line',sub_branch:'Branch',
     kpi_saifi_label:'SAIFI',kpi_saifi_sub:'Interruptions / consumer',
     kpi_saidi_label:'SAIDI',kpi_saidi_sub:'Minutes / consumer',
@@ -1193,6 +1193,12 @@ function renderTopEquipment(h){
   });
   const entries=Object.entries(map);
   function top10(key){return entries.slice().sort(function(a,b){return b[1][key]-a[1][key];}).slice(0,10).filter(function(e){return e[1][key]>0;});}
+  const listSaifi=top10('affSum'), listSaidi=top10('custMin'), listCount=top10('count');
+  const colorMap={};
+  const seen=[];
+  [listSaifi,listSaidi,listCount].forEach(function(list){
+    list.forEach(function(e){ if(colorMap[e[0]]===undefined){ colorMap[e[0]]=seen.length%COLORS.length; seen.push(e[0]); } });
+  });
   function draw(id,list,key){
     const el=document.getElementById(id); if(!el)return;
     if(!list.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);">ไม่มีข้อมูล</div>';return;}
@@ -1200,7 +1206,8 @@ function renderTopEquipment(h){
     el.innerHTML=list.map(function(e){
       const pct=Math.round(e[1][key]/max*100);
       const val=fmt(e[1][key],0);
-      return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:7px;cursor:pointer;"><div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--text2);margin-bottom:3px;"><span class="eq-cell" style="font-weight:600;">'+e[0]+'</span><span>'+val+'</span></div><div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:#3b7ef8;"></div></div></div>';
+      const col=COLORS[colorMap[e[0]]];
+      return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:5px;cursor:pointer;"><div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--text2);margin-bottom:2px;"><span class="eq-cell" style="font-weight:600;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+col+';margin-right:5px;"></span>'+e[0]+'</span><span>'+val+'</span></div><div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div></div>';
     }).join('');
     Array.prototype.forEach.call(el.querySelectorAll('.topeq-row'), function(row){
       row.addEventListener('click', function(){
@@ -1209,9 +1216,9 @@ function renderTopEquipment(h){
       });
     });
   }
-  draw('topEqSaifi', top10('affSum'), 'affSum');
-  draw('topEqSaidi', top10('custMin'), 'custMin');
-  draw('topEqCount', top10('count'), 'count');
+  draw('topEqSaifi', listSaifi, 'affSum');
+  draw('topEqSaidi', listSaidi, 'custMin');
+  draw('topEqCount', listCount, 'count');
 }
 function renderSubCauseChart(h){
   const cC=h.find(function(n){return n.includes('CauseData');});
