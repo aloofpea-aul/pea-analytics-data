@@ -385,7 +385,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       
-      <div class="card" style="margin-bottom:12px;padding:10px 14px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div>
+      <div class="card" style="margin-bottom:12px;padding:10px 14px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:170px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:170px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:170px;"><canvas id="monthCountChart"></canvas></div></div></div></div>
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
         <div class="card">
           <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
@@ -1066,7 +1066,7 @@ function processRender(sName,full){
   document.getElementById('rowBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   document.getElementById('recordCountBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   if(_renderRafId) cancelAnimationFrame(_renderRafId);
-  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(currentView==='analysis')renderAnalysis(); });
+  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(full)renderMonthlyBars(h); if(currentView==='analysis')renderAnalysis(); });
 }
 
 // ================================================================
@@ -1114,6 +1114,52 @@ function renderCharts(h){
   renderCauseChart(h);
 }
 
+function renderMonthlyBars(h){
+  const dC=h.find(n=>n.includes('Date'));
+  const dur=h.find(n=>n.toLowerCase()==='duration');
+  const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
+  const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
+  const raw=dataStore[sName]||[];
+  const subC=h.find(n=>n.includes('SubstationName'));
+  const pC=h.find(n=>n.includes('PEA_Code'));
+  const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const tC=h.find(n=>n.toLowerCase().includes('equipmenttype'));
+  let base=currentMode==='HV'?raw.filter(r=>String(r[tC]).match(/115 kV|Incomming/)):currentMode==='MV'?raw.filter(r=>!String(r[tC]).match(/115 kV|Incomming/)):raw;
+  if(filters.sub.length) base=base.filter(r=>filters.sub.includes(String(r[subC]||'').trim()));
+  if(filters.pea.length) base=base.filter(r=>filters.pea.includes(String(r[pC]||'').trim()));
+  if(filters.eq.length) base=base.filter(r=>filters.eq.includes(String(r[eC]||'').trim()));
+  const total=getTotalCustomers();
+  const byMonth={};
+  base.forEach(r=>{
+    const mm=String(r[dC]||'').slice(0,7);
+    if(!mm)return;
+    if(!byMonth[mm])byMonth[mm]={affSum:0,custMin:0,count:0};
+    const d=parseFloat(String(r[dur]||'').replace(/,/g,''))||0;
+    const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
+    byMonth[mm].count++;
+    if(d>1){byMonth[mm].affSum+=c;byMonth[mm].custMin+=d*c;}
+  });
+  const monthKeys=Object.keys(byMonth).sort();
+  const thMonths=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const labels=monthKeys.map(m=>{const mm=+m.slice(5,7);return thMonths[mm-1]||mm;});
+  const saifi=monthKeys.map(m=>total?+(byMonth[m].affSum/total).toFixed(2):0);
+  const saidi=monthKeys.map(m=>total?+(byMonth[m].custMin/total).toFixed(2):0);
+  const cnt=monthKeys.map(m=>byMonth[m].count);
+  function draw(id,data,color){
+    if(window['__mc_'+id]) window['__mc_'+id].destroy();
+    const canvas=document.getElementById(id);
+    if(!canvas)return;
+    window['__mc_'+id]=new Chart(canvas.getContext('2d'),{
+      type:'bar',
+      data:{labels,datasets:[{data,backgroundColor:color,borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},anchor:'end',align:'top'}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9}}},y:{display:false,beginAtZero:true}}},
+      plugins:[ChartDataLabels]
+    });
+  }
+  draw('monthSaifiChart',saifi,'#85B7EB');
+  draw('monthSaidiChart',saidi,'#378ADD');
+  draw('monthCountChart',cnt,'#a78bfa');
+}
 function renderCauseChart(h){
   const cC=h.find(n=>n.includes('CauseType'));
   const canvas=document.getElementById('causeChart');
