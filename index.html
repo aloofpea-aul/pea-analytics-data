@@ -410,7 +410,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
       <div class="card">
         <div class="card-header"><span class="card-title">สาเหตุการเกิดเหตุขัดข้อง</span><span class="badge badge-blue" id="causeCountBadge">0</span></div>
-        <div style="position:relative;height:130px;padding:16px;"><canvas id="causeChart"></canvas></div>
+        <div style="position:relative;height:220px;padding:16px;"><canvas id="causeChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-header"><span class="card-title">สาเหตุย่อย (Top 8)</span></div>
@@ -1249,7 +1249,7 @@ function renderCauseChart(h){
     const v=String(r[cC]||'').trim()||'ไม่ระบุ';
     counts[v]=(counts[v]||0)+1;
   });
-  const entries=Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  const entries=Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
   const labels=entries.map(function(e){return e[0];});
   const data=entries.map(function(e){return e[1];});
   const badge=document.getElementById('causeCountBadge');
