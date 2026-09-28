@@ -410,9 +410,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="card-body" id="autoInsights" style="display:flex;flex-direction:column;gap:9px;padding:14px 16px;"></div>
       </div>
 
-      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:260px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:260px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:260px;overflow-y:auto;"></div></div></div></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:14px;margin-bottom:14px;align-items:start;">
-      <div class="card">
+      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount"></div></div></div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:14px;margin-bottom:14px;">
+      <div class="card" style="display:flex;flex-direction:column;">
         <div class="card-header">
           <span class="card-title">อันดับอุปกรณ์วิกฤต (รวมทุกมิติ)</span>
           <div style="display:flex;gap:6px;" id="eqRankTabs">
@@ -421,8 +421,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             <button class="map-tab" data-sort="count">จำนวนครั้ง</button>
           </div>
         </div>
-        <div class="card-body" style="padding:0;">
-          <div style="overflow-x:auto;">
+        <div class="card-body" style="padding:0;display:flex;flex-direction:column;flex:1;">
+          <div style="overflow-x:auto;flex:1;">
           <table style="width:100%;border-collapse:collapse;font-size:10.5px;min-width:380px;">
             <thead><tr style="border-bottom:1px solid var(--border);">
               <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;width:32px;">#</th>
@@ -443,10 +443,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" style="display:flex;flex-direction:column;">
         <div class="card-header"><span class="card-title">อุปกรณ์เกิดซ้ำใน 30 วันล่าสุด</span><span class="badge badge-amber" id="recurEqBadge">0</span></div>
-        <div class="card-body" style="padding:0;">
-          <div style="overflow-x:auto;">
+        <div class="card-body" style="padding:0;display:flex;flex-direction:column;flex:1;">
+          <div style="overflow-x:auto;flex:1;">
           <table style="width:100%;border-collapse:collapse;font-size:10.5px;min-width:380px;">
             <thead><tr style="border-bottom:1px solid var(--border);">
               <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;width:32px;">#</th>
@@ -1311,19 +1311,20 @@ function renderTopEquipment(h){
     if(!list.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);">ไม่มีข้อมูล</div>';return;}
     const max=Math.max.apply(null,list.map(function(e){return e[1][key];}));
     const mLbl=t('topeq_month'), cLbl=t('topeq_cum');
-    el.innerHTML=list.map(function(e){
+    el.innerHTML=list.map(function(e,i){
       const pct=Math.round(e[1][key]/max*100);
       const val=fmt(e[1][key],0);
       const mval=fmt(e[1][monthKey],0);
       const col=COLORS[colorMap[e[0]]];
       return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:2px;cursor:pointer;">'
-        +'<div style="display:grid;grid-template-columns:14px 1fr 50px 62px;column-gap:7px;align-items:center;">'
+        +'<div style="display:grid;grid-template-columns:16px 14px 1fr 50px 62px;column-gap:6px;align-items:center;">'
+        +'<span style="font-size:9.5px;font-weight:700;color:var(--text3);text-align:right;">'+(i+1)+'</span>'
         +'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+col+';"></span>'
         +'<span style="font-size:10.5px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;" title="'+e[0].replace(/"/g,'&quot;')+'">'+e[0]+'</span>'
         +'<div style="text-align:right;line-height:1.15;"><div style="font-size:10.5px;font-weight:700;color:var(--text1);white-space:nowrap;">'+mval+'</div><div style="font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;">'+mLbl+'</div></div>'
         +'<div style="text-align:right;line-height:1.15;"><div style="font-size:10.5px;font-weight:700;color:var(--text1);white-space:nowrap;">'+val+'</div><div style="font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;">'+cLbl+'</div></div>'
         +'</div>'
-        +'<div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:3px 0 7px 21px;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div>'
+        +'<div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:3px 0 7px 42px;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div>'
         +'</div>';
     }).join('');
     Array.prototype.forEach.call(el.querySelectorAll('.topeq-row'), function(row){
