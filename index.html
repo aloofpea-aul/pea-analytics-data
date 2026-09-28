@@ -508,7 +508,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="card"><div class="card-header"><span class="card-title" data-i="a_rc_title">วิเคราะห์สาเหตุ</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="rcChart"></canvas></div></div></div>
       </div>
       <div style="display:grid;grid-template-columns:3fr 2fr;gap:14px;">
-        <div class="card"><div class="card-header"><span class="card-title" data-i="a_task_title">ติดตามงานปฏิบัติการ</span><button class="btn btn-primary" style="font-size:10px;padding:5px 11px;" data-i="a_new_task">+ งานใหม่</button></div><div id="taskList"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title" data-i="a_task_title">ติดตามงานปฏิบัติการ</span><button class="btn btn-primary" style="font-size:10px;padding:5px 11px;" data-i="a_new_task" onclick="addNewTask()">+ งานใหม่</button></div><div id="taskList"></div></div>
         <div class="card"><div class="card-header"><span class="card-title" data-i="a_mitigation_title">กลยุทธ์ลดความเสี่ยง</span></div><div class="card-body" id="mitigationList" style="display:flex;flex-direction:column;gap:9px;"></div></div>
       </div>
     </div>
@@ -532,6 +532,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <!-- MAP VIEW -->
     <div class="view" id="view-map">
       <div class="card"><div class="card-header"><span class="card-title" data-i="map_title">แผนที่ความเสี่ยง (Heatmap)</span><div style="display:flex;gap:5px;"><button class="map-tab active" id="ml-incidents" onclick="setMapLayer('incidents')" data-i="map_incidents">เหตุการณ์</button><button class="map-tab" id="ml-duration" onclick="setMapLayer('duration')" data-i="map_duration">ระยะเวลา</button><button class="map-tab" id="ml-customers" onclick="setMapLayer('customers')" data-i="map_customers">ผู้ใช้ไฟ</button></div></div>
+        <div style="font-size:11px;color:var(--amber);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;margin:10px 14px 0;padding:8px 12px;" id="mapScopeNote">—</div>
         <div style="padding:14px;"><div id="mapEl"></div><div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:11px;color:var(--text2);flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#2563eb;border-radius:2px;display:inline-block;"></span><span data-i="map_low">ความเสี่ยงต่ำ</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#f59e0b;border-radius:2px;display:inline-block;"></span><span data-i="map_med">ความเสี่ยงปานกลาง</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#ef4444;border-radius:2px;display:inline-block;"></span><span data-i="map_high">ความเสี่ยงสูง</span></div></div></div>
       </div>
     </div>
@@ -619,6 +620,8 @@ const LANG = {
     comp_incidents:'จำนวนเหตุการณ์',comp_avg_dur:'ระยะเวลาเฉลี่ย',comp_chart_title:'กราฟเปรียบเทียบ',
     map_title:'แผนที่ความเสี่ยง (Heatmap)',map_incidents:'เหตุการณ์',map_duration:'ระยะเวลา',
     map_customers:'ผู้ใช้ไฟ',map_low:'ความเสี่ยงต่ำ',map_med:'ความเสี่ยงปานกลาง',map_high:'ความเสี่ยงสูง',
+    map_scope_note:'⚠ แสดงเฉพาะอุปกรณ์ที่มีพิกัดจริงในฐานข้อมูล GIS (สถานีอ่าวลึก/ฟีดเดอร์ ALA01-09 เท่านั้น) — {n} จาก {total} เหตุการณ์ในตัวกรองปัจจุบัน สถานีอื่นยังไม่มีพิกัดในระบบ',
+    map_no_data:'ไม่มีข้อมูลเหตุการณ์ในตัวกรองปัจจุบัน',
     modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
     modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
     notif_gh_ok:'โหลดข้อมูลสำเร็จ',notif_gh_ok_msg:'ข้อมูลจาก GitHub โหลดเรียบร้อย',
@@ -676,6 +679,8 @@ const LANG = {
     comp_incidents:'Total Incidents',comp_avg_dur:'Avg Duration',comp_chart_title:'Visual Comparison',
     map_title:'Risk Area Heatmap',map_incidents:'Incidents',map_duration:'Duration',
     map_customers:'Customers',map_low:'Low Risk',map_med:'Medium Risk',map_high:'High Risk',
+    map_scope_note:'⚠ Showing only equipment with real GIS coordinates (Ao Luek station / feeders ALA01-09 only) — {n} of {total} events in the current filter. Other stations have no coordinates yet.',
+    map_no_data:'No events in the current filter',
     modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
     modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
     notif_gh_ok:'Data Loaded',notif_gh_ok_msg:'GitHub data loaded successfully',
@@ -1153,7 +1158,7 @@ function processRender(sName,full){
   document.getElementById('recordCountBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   if(full) eqRankPage=0;
   if(_renderRafId) cancelAnimationFrame(_renderRafId);
-  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(full)renderMonthlyBars(h); if(full)renderTopEquipment(h); if(full)renderEqRankTable(h); if(full)renderSubCauseChart(h); if(full)renderParetoChart(h); if(full)renderHourlyChart(h); if(full)renderRecurringEquipment(h); if(full)renderAutoInsights(h); if(currentView==='analysis')renderAnalysis(); });
+  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(full)renderMonthlyBars(h); if(full)renderTopEquipment(h); if(full)renderEqRankTable(h); if(full)renderSubCauseChart(h); if(full)renderParetoChart(h); if(full)renderHourlyChart(h); if(full)renderRecurringEquipment(h); if(full)renderAutoInsights(h); if(currentView==='analysis')renderAnalysis(); if(currentView==='map')renderHeatmap(); });
 }
 
 // ================================================================
@@ -1714,27 +1719,178 @@ function renderAnalysis(){
   const h=metaStore[sName].headers;
   const dC=h.find(n=>n.toLowerCase()==='duration');
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const dtC=h.find(n=>n.includes('Date'));
+  const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
+  const caC=h.find(n=>n.includes('CauseType'));
   const totalDur=filteredData.reduce((s,r)=>s+(parseFloat(String(r[dC]||'').replace(/,/g,''))||0),0);
   document.getElementById('a-mttr').textContent=Math.round(totalDur/filteredData.length)||0;
-  document.getElementById('a-mtbf').textContent=filteredData.length>5?Math.round(30/(filteredData.length/10)):45;
-  const ec={};filteredData.forEach(r=>{const e=String(r[eC]||'—');ec[e]=(ec[e]||0)+1;});
+
+  let evCount=0,custMinSum=0,minTs=null,maxTs=null;
+  const ec={};
+  filteredData.forEach(r=>{
+    const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
+    const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
+    if(d>1){evCount++;custMinSum+=d*c;}
+    const e=String(r[eC]||'—');ec[e]=(ec[e]||0)+1;
+    const ts=parseDateOnly(r[dtC]);
+    if(ts!=null){ if(minTs===null||ts<minTs)minTs=ts; if(maxTs===null||ts>maxTs)maxTs=ts; }
+  });
+  const spanDays=(minTs!=null&&maxTs!=null)?Math.max(1,(maxTs-minTs)/86400000+1):null;
+  document.getElementById('a-mtbf').textContent=(spanDays&&evCount)?(spanDays/evCount).toFixed(1):'—';
+
   const mx=Object.entries(ec).sort((a,b)=>b[1]-a[1])[0];
   document.getElementById('a-risk').textContent=mx?mx[0]:'—';
-  document.getElementById('a-rel').textContent='94.2';
+
+  const totCust=getTotalCustomers();
+  let relText='—%';
+  if(totCust&&spanDays){
+    const saidiPeriod=custMinSum/totCust;
+    const periodMinutes=spanDays*24*60;
+    relText=Math.max(0,Math.min(100,(1-saidiPeriod/periodMinutes)*100)).toFixed(2)+'%';
+  }
+  document.getElementById('a-rel').textContent=relText;
+
+  // real weekly-bucketed forecast (simple linear trend on last 8 weeks)
   destroyChart('forecast');
-  const wk=Math.ceil(filteredData.length/4),hist=[wk,Math.round(wk*.9),Math.round(wk*1.1),wk];
-  const tr=(hist[3]-hist[0])/3, fData=[...hist,Math.round(hist[3]+tr),Math.round(hist[3]+tr*2)];
+  const weekMap={};
+  filteredData.forEach(r=>{
+    const ts=parseDateOnly(r[dtC]);
+    if(ts==null)return;
+    const wk=Math.floor(ts/(7*86400000));
+    weekMap[wk]=(weekMap[wk]||0)+1;
+  });
+  const weekKeys=Object.keys(weekMap).map(Number).sort((a,b)=>a-b);
+  const last8=weekKeys.slice(-8);
+  const histCounts=last8.map(k=>weekMap[k]);
+  const wkLabel=k=>{const d=new Date(k*7*86400000);return (d.getUTCMonth()+1)+'/'+d.getUTCDate();};
+  const histLabels=last8.map(wkLabel);
+  let forecast=[null,null];
+  if(histCounts.length>=2){
+    const n=histCounts.length;
+    const sumX=histCounts.reduce((s,_,i)=>s+i,0),sumY=histCounts.reduce((a,b)=>a+b,0);
+    const sumXY=histCounts.reduce((s,y,i)=>s+i*y,0),sumXX=histCounts.reduce((s,_,i)=>s+i*i,0);
+    const denom=(n*sumXX-sumX*sumX)||1;
+    const slope=(n*sumXY-sumX*sumY)/denom,intercept=(sumY-slope*sumX)/n;
+    forecast=[Math.max(0,Math.round(intercept+slope*n)),Math.max(0,Math.round(intercept+slope*(n+1)))];
+  }
+  const futureLabels=[1,2].map(i=>wkLabel((last8.length?last8[last8.length-1]:0)+i));
+  const allLabels=[...histLabels,...futureLabels];
+  const actualSeries=[...histCounts,null,null];
+  const predSeries=histCounts.length?new Array(histCounts.length-1).fill(null).concat([histCounts[histCounts.length-1]],forecast):[null,null,...forecast];
   charts.forecast=new Chart(document.getElementById('forecastChart').getContext('2d'),{
-    type:'line',data:{labels:t('forecast_labels'),datasets:[{label:t('forecast_actual'),data:[...hist,null,null],borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.07)',borderWidth:2,tension:.4,fill:true,pointBackgroundColor:'#3b7ef8',pointRadius:4},{label:t('forecast_predicted'),data:[null,null,null,hist[3],...fData.slice(4)],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.06)',borderWidth:2,borderDash:[5,4],tension:.4,fill:true,pointBackgroundColor:'#a78bfa',pointRadius:4}]},
+    type:'line',data:{labels:allLabels,datasets:[{label:t('forecast_actual'),data:actualSeries,borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.07)',borderWidth:2,tension:.3,fill:true,pointBackgroundColor:'#3b7ef8',pointRadius:4},{label:t('forecast_predicted'),data:predSeries,borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.06)',borderWidth:2,borderDash:[5,4],tension:.3,fill:true,pointBackgroundColor:'#a78bfa',pointRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tickColor(),font:{size:10}}},datalabels:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tickColor()}},y:{grid:{color:gridColor()},ticks:{color:tickColor()},beginAtZero:true}}}});
+
+  // real cause-type radar (top 5 + อื่นๆ, % of events)
   destroyChart('rc');
+  const causeCounts={};
+  filteredData.forEach(r=>{const v=String(r[caC]||'').trim()||'ไม่ระบุ';causeCounts[v]=(causeCounts[v]||0)+1;});
+  let centries=Object.entries(causeCounts).sort((a,b)=>b[1]-a[1]);
+  if(centries.length>6){
+    const head=centries.slice(0,5);
+    const restSum=centries.slice(5).reduce((s,e)=>s+e[1],0);
+    centries=head.concat([['อื่นๆ',restSum]]);
+  }
+  const totalC=centries.reduce((s,e)=>s+e[1],0)||1;
+  const rcLabels=centries.map(e=>e[0]);
+  const rcData=centries.map(e=>Math.round(e[1]/totalC*100));
   charts.rc=new Chart(document.getElementById('rcChart').getContext('2d'),{
-    type:'radar',data:{labels:t('rc_labels'),datasets:[{label:'%',data:[85,40,65,30,20,45],borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.13)',pointBackgroundColor:'#3b7ef8',borderWidth:2}]},
+    type:'radar',data:{labels:rcLabels,datasets:[{label:'%',data:rcData,borderColor:'#3b7ef8',backgroundColor:'rgba(59,126,248,0.13)',pointBackgroundColor:'#3b7ef8',borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false}},scales:{r:{angleLines:{color:gridColor()},grid:{color:gridColor()},pointLabels:{color:tickColor(),font:{size:9}},ticks:{display:false}}}}});
-  const tasks=[{desc_th:'ตัดต้นไม้ในเขตสายจ่ายไฟ MV สายแยก',desc_en:'Vegetation clearing - Branch MV lines',area:'ALA, KRT, PTL',prio_key:'task_prio_high',status_key:'task_status_progress',date:'2026-03-01',pcolor:'#f59e0b'},{desc_th:'เปลี่ยน Lightning Arrester CB-1',desc_en:'Lightning arrester replacement CB-1',area:'KRT Substation',prio_key:'task_prio_critical',status_key:'task_status_pending',date:'2026-03-05',pcolor:'#f43f5e'},{desc_th:'ตรวจสอบการตั้งค่า Relay สาย MV',desc_en:'Relay setting verification - MV feeders',area:'ALA Substation',prio_key:'task_prio_normal',status_key:'task_status_done',date:'2026-02-25',pcolor:'#10b981'}];
-  const sc={task_status_progress:'badge-amber',task_status_pending:'badge-rose',task_status_done:'badge-emerald'};
-  document.getElementById('taskList').innerHTML=tasks.map(task=>`<div class="task-row"><div class="pdot" style="background:${task.pcolor};"></div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text1);margin-bottom:2px;">${currentLang==='th'?task.desc_th:task.desc_en}</div><div style="font-size:10px;color:var(--text3);">${task.area} · ${task.date}</div></div><div style="display:flex;gap:7px;align-items:center;flex-shrink:0;"><span style="font-size:10px;font-weight:700;color:${task.pcolor};">${t(task.prio_key)}</span><span class="badge ${sc[task.status_key]}">${t(task.status_key)}</span></div></div>`).join('');
-  document.getElementById('mitigationList').innerHTML=[{icon:'🛡️',tk:'mit_pm_title',mk:'mit_pm_text'},{icon:'📡',tk:'mit_mon_title',mk:'mit_mon_text'},{icon:'✂️',tk:'mit_veg_title',mk:'mit_veg_text'}].map(m=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start;"><div style="font-size:17px;flex-shrink:0;">${m.icon}</div><div><div style="font-size:12px;font-weight:700;color:var(--text1);margin-bottom:3px;">${t(m.tk)}</div><div style="font-size:11px;color:var(--text2);line-height:1.5;">${t(m.mk)}</div></div></div>`).join('');
+
+  renderTaskList();
+  renderMitigation(mx,centries);
+}
+
+// ================================================================
+// REAL TASK TRACKER (localStorage-backed) + DATA-DRIVEN MITIGATION
+// ================================================================
+function loadTasks(){
+  try{ return JSON.parse(localStorage.getItem('pea_analytics_tasks')||'[]'); }catch(e){ return []; }
+}
+function saveTasks(tasks){
+  try{ localStorage.setItem('pea_analytics_tasks',JSON.stringify(tasks)); }catch(e){}
+}
+function renderTaskList(){
+  const tasks=loadTasks();
+  const list=document.getElementById('taskList');
+  if(!list)return;
+  if(!tasks.length){
+    list.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:11.5px;">ยังไม่มีงานที่บันทึกไว้ — กด "+ งานใหม่" เพื่อเพิ่ม</div>';
+    return;
+  }
+  const prioColor={critical:'#f43f5e',high:'#f59e0b',normal:'#10b981'};
+  const prioLabel={critical:t('task_prio_critical'),high:t('task_prio_high'),normal:t('task_prio_normal')};
+  list.innerHTML=tasks.map(function(task,i){
+    const col=prioColor[task.prio]||'#3b7ef8';
+    const doneStyle=task.status==='done'?'text-decoration:line-through;opacity:.6;':'';
+    return '<div class="task-row"><div class="pdot" style="background:'+col+';"></div>'+
+      '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text1);margin-bottom:2px;'+doneStyle+'">'+task.desc+'</div>'+
+      '<div style="font-size:10px;color:var(--text3);">'+(task.area||'-')+' · '+task.date+'</div></div>'+
+      '<div style="display:flex;gap:7px;align-items:center;flex-shrink:0;">'+
+      '<span style="font-size:10px;font-weight:700;color:'+col+';">'+(prioLabel[task.prio]||'')+'</span>'+
+      '<select class="task-status-sel" data-idx="'+i+'" style="font-size:10px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:5px;padding:2px 4px;">'+
+      '<option value="pending"'+(task.status==='pending'?' selected':'')+'>'+t('task_status_pending')+'</option>'+
+      '<option value="progress"'+(task.status==='progress'?' selected':'')+'>'+t('task_status_progress')+'</option>'+
+      '<option value="done"'+(task.status==='done'?' selected':'')+'>'+t('task_status_done')+'</option>'+
+      '</select><button class="task-del-btn" data-idx="'+i+'" style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:15px;line-height:1;padding:0 3px;" title="ลบ">×</button></div></div>';
+  }).join('');
+  list.querySelectorAll('.task-status-sel').forEach(function(sel){
+    sel.addEventListener('change',function(){
+      const idx=+sel.getAttribute('data-idx');
+      const ts=loadTasks(); if(ts[idx]){ts[idx].status=sel.value;saveTasks(ts);renderTaskList();}
+    });
+  });
+  list.querySelectorAll('.task-del-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      const idx=+btn.getAttribute('data-idx');
+      const ts=loadTasks(); ts.splice(idx,1); saveTasks(ts); renderTaskList();
+    });
+  });
+}
+function addNewTask(){
+  const desc=prompt('รายละเอียดงาน:');
+  if(!desc||!desc.trim())return;
+  const area=prompt('พื้นที่/สถานี (ไม่บังคับ):')||'';
+  let prio=(prompt('ระดับความสำคัญ (critical / high / normal):','normal')||'normal').trim().toLowerCase();
+  if(!['critical','high','normal'].includes(prio))prio='normal';
+  const tasks=loadTasks();
+  tasks.unshift({desc:desc.trim(),area:area.trim(),prio:prio,status:'pending',date:new Date().toISOString().slice(0,10)});
+  saveTasks(tasks);
+  renderTaskList();
+}
+function renderMitigation(topEqEntry,causeEntries){
+  const box=document.getElementById('mitigationList');
+  if(!box)return;
+  const cards=[];
+  if(topEqEntry&&topEqEntry[1]>=2){
+    cards.push({icon:'🛡️',title:'บำรุงรักษาเชิงป้องกัน',text:'อุปกรณ์ "'+topEqEntry[0]+'" เกิดเหตุขัดข้องบ่อยที่สุด ('+topEqEntry[1]+' ครั้ง) ควรเร่งตรวจสอบ/PM ภายใน 14 วัน'});
+  }
+  const topCause=causeEntries&&causeEntries[0];
+  if(topCause){
+    const totC=causeEntries.reduce(function(s,e){return s+e[1];},0)||1;
+    const pct=Math.round(topCause[1]/totC*100);
+    const adviceMap={
+      'ต้นไม้':'ควรเพิ่มรอบตัดต้นไม้ในพื้นที่เสี่ยง และพิจารณาใช้สาย Spacer Cable ในจุดวิกฤต',
+      'สัตว์':'ควรติดตั้งอุปกรณ์ป้องกันสัตว์ปีนป่าย (Animal Guard) บนอุปกรณ์ที่มีประวัติ',
+      'อุปกรณ์':'ควรเพิ่มความถี่การตรวจสอบสภาพอุปกรณ์ (Thermoscan) ในจุดที่มีประวัติ',
+      'ฟ้าผ่า':'ควรตรวจสอบระบบ Lightning Arrester และระบบกราวด์ในพื้นที่เสี่ยงฟ้าผ่า',
+      'ภัยธรรมชาติ':'ควรวางแผนรับมือภัยธรรมชาติล่วงหน้าตามฤดูกาล'
+    };
+    const advice=adviceMap[topCause[0]]||('ควรวิเคราะห์เชิงลึกสาเหตุ "'+topCause[0]+'" เพิ่มเติมเพื่อวางมาตรการที่เหมาะสม');
+    cards.push({icon:'📡',title:'จัดการสาเหตุหลัก',text:'สาเหตุอันดับ 1 คือ "'+topCause[0]+'" ('+pct+'%) — '+advice});
+  }
+  const recurCount=parseInt(document.getElementById('recurEqBadge')?.textContent||'0',10)||0;
+  if(recurCount>0){
+    cards.push({icon:'✂️',title:'เฝ้าระวังอุปกรณ์เกิดซ้ำ',text:'พบอุปกรณ์เกิดเหตุซ้ำ '+recurCount+' รายการในช่วง 30 วันล่าสุด ควรจัดคิวตรวจสอบตามลำดับความสำคัญ (ดูรายละเอียดในแดชบอร์ด)'});
+  }
+  if(!cards.length){
+    box.innerHTML='<div style="color:var(--text3);font-size:11.5px;">ไม่มีข้อมูลเพียงพอสำหรับสร้างคำแนะนำ</div>';
+    return;
+  }
+  box.innerHTML=cards.map(function(m){
+    return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start;"><div style="font-size:17px;flex-shrink:0;">'+m.icon+'</div><div><div style="font-size:12px;font-weight:700;color:var(--text1);margin-bottom:3px;">'+m.title+'</div><div style="font-size:11px;color:var(--text2);line-height:1.5;">'+m.text+'</div></div></div>';
+  }).join('');
 }
 
 // ================================================================
@@ -1771,9 +1927,18 @@ function runComparison(){
 // ================================================================
 // MAP
 // ================================================================
+let alaCoords=null;
+async function loadAlaCoords(){
+  if(alaCoords) return alaCoords;
+  try{
+    const res=await fetch(GH.raw('data/ala-coordinates.json'),{cache:'no-store'});
+    alaCoords=await res.json();
+  }catch(e){ alaCoords={}; }
+  return alaCoords;
+}
 function initMap(){
   if(mapInst)return;
-  mapInst=L.map('mapEl').setView([8.0863,98.9063],10);
+  mapInst=L.map('mapEl').setView([8.42051,98.739841],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(mapInst);
   setTimeout(()=>{mapInst.invalidateSize();renderHeatmap();},150);
 }
@@ -1782,19 +1947,27 @@ function setMapLayer(type){
   ['incidents','duration','customers'].forEach(k=>document.getElementById('ml-'+k)?.classList.toggle('active',k===type));
   renderHeatmap();
 }
-function renderHeatmap(){
+async function renderHeatmap(){
   if(!mapInst)return;
   if(heatLayer){mapInst.removeLayer(heatLayer);heatLayer=null;}
-  if(!filteredData.length)return;
+  const note=document.getElementById('mapScopeNote');
+  const coords=await loadAlaCoords();
+  if(!filteredData.length){ if(note) note.textContent=t('map_no_data'); return; }
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
   const h=metaStore[sName]?.headers||[];
   const dC=h.find(n=>n.toLowerCase()==='duration'),cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
-  const pts=filteredData.slice(0,200).map(r=>{
-    const lat=8.0863+(Math.random()-.5)*.6,lng=98.9063+(Math.random()-.5)*.7;
-    const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    const intens=mapLayerType==='incidents'?.8:mapLayerType==='duration'?Math.min(d/80,1):Math.min(c/800,1);
-    return[lat,lng,intens];
+  const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const pts=[];
+  filteredData.forEach(r=>{
+    const eq=String(r[eC]||'').trim();
+    const c=coords[eq];
+    if(!c)return;
+    const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,cust=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
+    const intens=mapLayerType==='incidents'?.8:mapLayerType==='duration'?Math.min(d/80,1):Math.min(cust/800,1);
+    pts.push([c[0],c[1],intens]);
   });
+  if(note) note.textContent=t('map_scope_note').replace('{n}',fmt(pts.length)).replace('{total}',fmt(filteredData.length));
+  if(!pts.length)return;
   heatLayer=L.heatLayer(pts,{radius:22,blur:14,gradient:{0:'#2563eb',.5:'#f59e0b',1:'#ef4444'}}).addTo(mapInst);
 }
 
