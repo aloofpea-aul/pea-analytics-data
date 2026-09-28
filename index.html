@@ -8,9 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="https://api.longdo.com/map/?key=f61a87ff70c39e610385809783d5a1b3"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -732,7 +730,8 @@ let currentLang='th', currentView='dashboard', currentMode='MV', subFilter='All'
 let filters={sub:[],pea:[],eq:[],month:[],known:[],causeData:[]}, searchQ={sub:'',pea:'',eq:'',month:'',known:''}, ddVals={};
 let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแยกตามพื้นที่':[]};
 let metaStore={}, filteredData=[], currentTableData=[];
-let charts={}, mapInst=null, heatLayer=null, markerLayer=null, mapLayerType='incidents';
+let charts={}, mapInst=null, mapMarkers=[], mapLayerType='incidents', mvLines=null, mvLinesPromise=null;
+const MV_LINES_URL='https://aloofpea-aul.github.io/sld-ala/mv-lines.json';
 let _renderRafId=null, _filterDebounceTimer=null;
 let isLoading=false, isDark=true;
 let dataSource='demo'; // 'github' | 'demo' | 'error'
@@ -1984,11 +1983,26 @@ async function loadAlaCoords(){
   }catch(e){ alaCoords={}; }
   return alaCoords;
 }
+async function loadMvLines(){
+  if(mvLines) return mvLines;
+  if(mvLinesPromise) return mvLinesPromise;
+  mvLinesPromise=fetch(MV_LINES_URL,{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(j){mvLines=j;return j;})
+    .catch(function(e){console.warn('โหลดแนวสาย MV ไม่สำเร็จ',e);mvLines={colors:{},lines:{}};return mvLines;});
+  return mvLinesPromise;
+}
 function initMap(){
   if(mapInst)return;
-  mapInst=L.map('mapEl').setView([8.42051,98.739841],13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(mapInst);
-  setTimeout(()=>{mapInst.invalidateSize();renderHeatmap();},150);
+  if(typeof longdo==='undefined'){
+    const note=document.getElementById('mapScopeNote');
+    if(note) note.textContent='โหลดแผนที่ไม่สำเร็จ — ต้องมีอินเทอร์เน็ตเพื่อดูแผนที่';
+    return;
+  }
+  try{
+    mapInst=new longdo.Map({placeholder:document.getElementById('mapEl'),location:{lon:98.739841,lat:8.42051},zoom:13,lastView:false});
+  }catch(e){ console.warn('Longdo map init failed',e); return; }
+  setTimeout(renderHeatmap,150);
 }
 function setMapLayer(type){
   mapLayerType=type;
@@ -1997,46 +2011,63 @@ function setMapLayer(type){
 }
 async function renderHeatmap(){
   if(!mapInst)return;
-  if(heatLayer){mapInst.removeLayer(heatLayer);heatLayer=null;}
-  if(markerLayer){mapInst.removeLayer(markerLayer);markerLayer=null;}
+  mapInst.Overlays.clear();
+  mapMarkers=[];
   const note=document.getElementById('mapScopeNote');
   const coords=await loadAlaCoords();
+  const lineData=await loadMvLines();
+  if(lineData&&lineData.lines){
+    Object.keys(lineData.lines).forEach(function(feederId){
+      const color=(lineData.colors&&lineData.colors[feederId])||'#8494ab';
+      (lineData.lines[feederId]||[]).forEach(function(seg){
+        if(!seg.v||seg.v.length<2)return;
+        const pts=seg.v.map(function(p){return {lat:p[0],lon:p[1]};});
+        try{
+          const ln=new longdo.Polyline(pts,{lineWidth:seg.m?2.5:1.2,lineColor:color});
+          mapInst.Overlays.add(ln);
+          mapMarkers.push(ln);
+        }catch(e){}
+      });
+    });
+  }
   if(!filteredData.length){ if(note) note.textContent=t('map_no_data'); return; }
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
   const h=metaStore[sName]?.headers||[];
   const dC=h.find(n=>n.toLowerCase()==='duration'),cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
-  const pts=[];
   const byEq=new Map();
+  let matched=0;
   filteredData.forEach(r=>{
     const eq=String(r[eC]||'').trim();
     const c=coords[eq];
     if(!c)return;
+    matched++;
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,cust=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    const intens=mapLayerType==='incidents'?.8:mapLayerType==='duration'?Math.min(d/80,1):Math.min(cust/800,1);
-    pts.push([c[0],c[1],intens]);
     if(!byEq.has(eq)) byEq.set(eq,{eq,lat:c[0],lng:c[1],count:0,sumDur:0,sumCust:0});
     const agg=byEq.get(eq);
     agg.count++; agg.sumDur+=d; agg.sumCust+=cust;
   });
-  if(note) note.textContent=t('map_scope_note').replace('{n}',fmt(pts.length)).replace('{total}',fmt(filteredData.length));
-  if(!pts.length)return;
-  heatLayer=L.heatLayer(pts,{radius:22,blur:14,gradient:{0:'#2563eb',.5:'#f59e0b',1:'#ef4444'}}).addTo(mapInst);
+  if(note) note.textContent=t('map_scope_note').replace('{n}',fmt(matched)).replace('{total}',fmt(filteredData.length));
   const locs=Array.from(byEq.values());
+  if(!locs.length)return;
   const metricOf=loc=>mapLayerType==='incidents'?loc.count:mapLayerType==='duration'?loc.sumDur:loc.sumCust;
   const maxMetric=Math.max(1,...locs.map(metricOf));
-  const markers=locs.map(loc=>{
+  locs.forEach(function(loc){
     const ratio=metricOf(loc)/maxMetric;
     const color=ratio<0.34?'#2563eb':ratio<0.67?'#f59e0b':'#ef4444';
     const riskLabel=ratio<0.34?t('map_low'):ratio<0.67?t('map_med'):t('map_high');
-    const html=`<div class="map-popup"><div class="mp-head"><span class="mp-dot" style="background:${color};"></span><b>${loc.eq||'-'}</b></div>`+
-      `${t('map_popup_incidents')}: <b>${fmt(loc.count)} ${t('times_unit')}</b><br>`+
-      `${t('map_popup_duration')}: <b>${fmt(Math.round(loc.sumDur))} ${t('dur_unit')}</b><br>`+
-      `${t('map_popup_customers')}: <b>${fmt(Math.round(loc.sumCust))} ${t('notif_affected')}</b><br>`+
-      `${t('map_popup_risk')}: <b style="color:${color};">${riskLabel}</b></div>`;
-    return L.circleMarker([loc.lat,loc.lng],{radius:6,color:'#fff',weight:1,fillColor:color,fillOpacity:0.9}).bindPopup(html);
+    const html='<div class="map-popup"><div class="mp-head"><span class="mp-dot" style="background:'+color+';"></span><b>'+(loc.eq||'-')+'</b></div>'+
+      t('map_popup_incidents')+': <b>'+fmt(loc.count)+' '+t('times_unit')+'</b><br>'+
+      t('map_popup_duration')+': <b>'+fmt(Math.round(loc.sumDur))+' '+t('dur_unit')+'</b><br>'+
+      t('map_popup_customers')+': <b>'+fmt(Math.round(loc.sumCust))+' '+t('notif_affected')+'</b><br>'+
+      t('map_popup_risk')+': <b style="color:'+color+';">'+riskLabel+'</b></div>';
+    const dotHtml='<div style="width:14px;height:14px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.5);"></div>';
+    try{
+      const marker=new longdo.Marker({lon:loc.lng,lat:loc.lat},{icon:{html:dotHtml,offset:{x:7,y:7}},popup:{html:html}});
+      mapInst.Overlays.add(marker);
+      mapMarkers.push(marker);
+    }catch(e){}
   });
-  markerLayer=L.layerGroup(markers).addTo(mapInst);
 }
 
 // ================================================================
