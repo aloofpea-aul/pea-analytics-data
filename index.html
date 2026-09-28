@@ -103,6 +103,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .kpi-card.k-aff{border-left:3px solid var(--purple);}.kpi-card.k-aff .kpi-value{color:var(--purple);}.kpi-card.k-aff .kpi-icon{background:rgba(167,139,250,.1);}
 .kpi-card.k-dur{border-left:3px solid var(--cyan);}.kpi-card.k-dur .kpi-value{color:var(--cyan);}.kpi-card.k-dur .kpi-icon{background:rgba(34,211,238,.1);}
 .kpi-card.k-node{border-left:3px solid var(--emerald);}.kpi-card.k-node .kpi-value{color:var(--emerald);}.kpi-card.k-node .kpi-icon{background:rgba(16,185,129,.1);}
+.kpi-card.k-mttr{border-left:3px solid var(--cyan);}.kpi-card.k-mttr .kpi-value{color:var(--cyan);}.kpi-card.k-mttr .kpi-icon{background:rgba(34,211,238,.1);}
+.kpi-card.k-known{border-left:3px solid var(--purple);}.kpi-card.k-known .kpi-value{color:var(--purple);}.kpi-card.k-known .kpi-icon{background:rgba(167,139,250,.1);}
+.kpi-mini-gauge{margin-top:8px;}
 
 /* TABS */
 .mode-tabs{display:flex;gap:3px;background:var(--bg2);padding:3px;border-radius:var(--radius);border:1px solid var(--border);}
@@ -384,17 +387,46 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
 
-      <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px;">
-        <div class="kpi-card k-saifi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--rose)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="kpi-label" data-i="kpi_saifi_label">SAIFI</div><div class="kpi-value" id="kpi-saifi">—</div><div class="kpi-sub" data-i="kpi_saifi_sub">ครั้ง/ผู้ใช้ไฟ</div></div>
-        <div class="kpi-card k-saidi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="kpi-label" data-i="kpi_saidi_label">SAIDI</div><div class="kpi-value" id="kpi-saidi">—</div><div class="kpi-sub" data-i="kpi_saidi_sub">นาที/ผู้ใช้ไฟ</div></div>
-        <div class="kpi-card k-con"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="kpi-label" data-i="kpi_total_label">ผู้ใช้ไฟรวม</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" data-i="kpi_total_sub">ราย</div></div>
-        <div class="kpi-card k-aff"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><div class="kpi-label" data-i="kpi_aff_label">ผู้ได้รับผลกระทบ</div><div class="kpi-value" id="kpi-affected">—</div><div class="kpi-sub" data-i="kpi_aff_sub">ราย</div></div>
-        <div class="kpi-card k-dur"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="kpi-label" data-i="kpi_dur_label">ระยะเวลาไฟดับรวม</div><div class="kpi-value" id="kpi-dur">—</div><div class="kpi-sub" data-i="kpi_dur_sub">นาที</div></div>
+      <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;">
+        <div class="kpi-card k-saifi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--rose)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="kpi-label" data-i="kpi_saifi_label">SAIFI</div><div class="kpi-value" id="kpi-saifi">—</div><div class="kpi-sub" data-i="kpi_saifi_sub">ครั้ง/ผู้ใช้ไฟ</div><div id="kpiGaugeSaifi" class="kpi-mini-gauge"></div></div>
+        <div class="kpi-card k-saidi"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="kpi-label" data-i="kpi_saidi_label">SAIDI</div><div class="kpi-value" id="kpi-saidi">—</div><div class="kpi-sub" data-i="kpi_saidi_sub">นาที/ผู้ใช้ไฟ</div><div id="kpiGaugeSaidi" class="kpi-mini-gauge"></div></div>
         <div class="kpi-card k-node"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div class="kpi-label" data-i="kpi_node_label">จำนวนเหตุการณ์</div><div class="kpi-value" id="kpi-nodes">—</div><div class="kpi-sub" data-i="kpi_node_sub">รายการ</div></div>
+        <div class="kpi-card k-mttr"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--cyan)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="kpi-label" data-i="kpi_mttr_label">MTTR เฉลี่ย</div><div class="kpi-value" id="kpi-mttr">—</div><div class="kpi-sub" data-i="kpi_mttr_sub">นาที/ครั้ง</div></div>
+        <div class="kpi-card k-known"><div class="kpi-icon"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="kpi-label" data-i="kpi_known_label">ทราบสาเหตุ</div><div class="kpi-value" id="kpi-known">—</div><div class="kpi-sub" data-i="kpi_known_sub">% ของเหตุการณ์</div></div>
       </div>
 
-      
-      <div class="card" style="margin-bottom:12px;padding:10px 14px;"><div class="card-header"><span class="card-title">เทียบเป้าหมาย KPI SAIFI/SAIDI (กฟต.2 ภาพรวม)</span></div><div id="gaugeSaifiWrap" style="margin-bottom:12px;"></div><div id="gaugeSaidiWrap"></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:220px;overflow-y:auto;"></div></div></div></div>
+      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:220px;overflow-y:auto;"></div></div></div></div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-header">
+          <span class="card-title">อันดับอุปกรณ์วิกฤต (รวมทุกมิติ)</span>
+          <div style="display:flex;gap:6px;" id="eqRankTabs">
+            <button class="map-tab active" data-sort="affSum">SAIFI</button>
+            <button class="map-tab" data-sort="custMin">SAIDI</button>
+            <button class="map-tab" data-sort="count">จำนวนครั้ง</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px;">
+            <thead><tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;width:44px;">#</th>
+              <th style="text-align:left;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">อุปกรณ์</th>
+              <th data-col="count" style="cursor:pointer;text-align:right;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">จำนวนครั้ง</th>
+              <th data-col="affSum" style="cursor:pointer;text-align:right;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">ผู้ใช้ไฟกระทบ (SAIFI)</th>
+              <th data-col="custMin" style="cursor:pointer;text-align:right;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">นาที-ผู้ใช้ไฟ (SAIDI)</th>
+            </tr></thead>
+            <tbody id="eqRankBody"></tbody>
+          </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);">
+            <span id="eqRankInfo">- / -</span>
+            <div style="display:flex;gap:6px;">
+              <button id="eqRankPrev" class="map-tab">‹ ก่อนหน้า</button>
+              <button id="eqRankNext" class="map-tab">ถัดไป ›</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
         <div class="card">
           <div class="card-header"><span class="card-title" data-i="chart_equip_title">ความถี่ความผิดปกติรายอุปกรณ์</span><span class="badge badge-blue" id="recordCountBadge">0</span></div>
@@ -539,6 +571,8 @@ const LANG = {
     kpi_aff_label:'ผู้ได้รับผลกระทบ',kpi_aff_sub:'ราย',
     kpi_dur_label:'ระยะเวลาไฟดับรวม',kpi_dur_sub:'นาที',
     kpi_node_label:'จำนวนเหตุการณ์',kpi_node_sub:'รายการ',
+    kpi_mttr_label:'MTTR เฉลี่ย',kpi_mttr_sub:'นาที/ครั้ง',
+    kpi_known_label:'ทราบสาเหตุ',kpi_known_sub:'% ของเหตุการณ์',
     chart_equip_title:'ความถี่ความผิดปกติรายอุปกรณ์',chart_dist_title:'การกระจายการดำเนินงาน',
     table_title:'ข้อมูลเหตุการณ์',table_hint:'คลิกแถวเพื่อดูรายละเอียด · แสดง 100 รายการแรก',
     table_wait:'รอการซิงค์...',table_empty:'ยังไม่มีข้อมูล',
@@ -594,6 +628,8 @@ const LANG = {
     kpi_aff_label:'Affected Consumers',kpi_aff_sub:'Interrupted users',
     kpi_dur_label:'Total Outage Duration',kpi_dur_sub:'Minutes',
     kpi_node_label:'Fault Nodes',kpi_node_sub:'Incident records',
+    kpi_mttr_label:'Avg. MTTR',kpi_mttr_sub:'Minutes / event',
+    kpi_known_label:'Known Cause',kpi_known_sub:'% of events',
     chart_equip_title:'Equipment Fault Frequency',chart_dist_title:'Operate Type Distribution',
     table_title:'Incident Records',table_hint:'Click row for details · Showing first 100',
     table_wait:'Waiting for sync...',table_empty:'No data loaded yet',
@@ -1065,26 +1101,27 @@ function processRender(sName,full){
   const h=metaStore[sName].headers;
   const dC=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
-  let durSum=0,affSum=0,custMin=0;
+  let durSum=0,affSum=0,custMin=0,evCount=0,knownCount=0;
   filteredData.forEach(r=>{
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
     const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    if(d>1){durSum+=d;affSum+=c;custMin+=d*c;}
+    if(d>1){durSum+=d;affSum+=c;custMin+=d*c;evCount++;}
+    if(String(r['Known']||'').trim()==='ทราบสาเหตุ') knownCount++;
   });
   const tot=getTotalCustomers();
   document.getElementById('kpi-saifi').textContent=tot?(affSum/tot).toFixed(3):'—';
   document.getElementById('kpi-saidi').textContent=tot?(custMin/tot).toFixed(3):'—';
   renderGauges(tot?affSum/tot:null, tot?custMin/tot:null);
 
-  document.getElementById('kpi-total').textContent=fmt(tot);
-  document.getElementById('kpi-affected').textContent=fmt(affSum);
-  document.getElementById('kpi-dur').textContent=fmt(durSum,1);
   document.getElementById('kpi-nodes').textContent=fmt(filteredData.length);
+  document.getElementById('kpi-mttr').textContent=evCount?fmt(durSum/evCount,1):'—';
+  document.getElementById('kpi-known').textContent=filteredData.length?Math.round(knownCount/filteredData.length*100)+'%':'—';
   currentTableData=filteredData;
   document.getElementById('rowBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
   document.getElementById('recordCountBadge').textContent=`${filteredData.length} ${t('records_unit')}`;
+  if(full) eqRankPage=0;
   if(_renderRafId) cancelAnimationFrame(_renderRafId);
-  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(full)renderMonthlyBars(h); if(full)renderTopEquipment(h); if(full)renderSubCauseChart(h); if(currentView==='analysis')renderAnalysis(); });
+  _renderRafId=requestAnimationFrame(()=>{ _renderRafId=null; renderTable(h); if(full)renderCharts(h); if(full)renderMonthlyBars(h); if(full)renderTopEquipment(h); if(full)renderEqRankTable(h); if(full)renderSubCauseChart(h); if(currentView==='analysis')renderAnalysis(); });
 }
 
 // ================================================================
@@ -1220,6 +1257,108 @@ function renderTopEquipment(h){
   draw('topEqSaidi', listSaidi, 'custMin');
   draw('topEqCount', listCount, 'count');
 }
+
+// ================================================================
+// UNIFIED EQUIPMENT RANKING TABLE
+// ================================================================
+let eqRankSort={key:'affSum',dir:'desc'};
+let eqRankPage=0;
+const eqRankPageSize=10;
+let _eqRankHeaders=null;
+function eqColor(name){
+  let hash=0;
+  for(let i=0;i<name.length;i++){ hash=(hash*31+name.charCodeAt(i))|0; }
+  return COLORS[Math.abs(hash)%COLORS.length];
+}
+function renderEqRankTable(h){
+  if(h) _eqRankHeaders=h; else h=_eqRankHeaders;
+  if(!h) return;
+  const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const dur=h.find(n=>n.toLowerCase()==='duration');
+  const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
+  const sC=h.find(n=>n.includes('SubstationName'));
+  const map={};
+  filteredData.forEach(function(r){
+    const eq=String(r[eC]||'—');
+    if(!map[eq])map[eq]={affSum:0,custMin:0,count:0,sub:String(r[sC]||'—')};
+    const d=parseFloat(String(r[dur]||'').replace(/,/g,''))||0;
+    const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
+    map[eq].count++;
+    if(d>1){map[eq].affSum+=c;map[eq].custMin+=d*c;}
+  });
+  let entries=Object.entries(map);
+  entries.sort(function(a,b){
+    const va=a[1][eqRankSort.key], vb=b[1][eqRankSort.key];
+    return eqRankSort.dir==='desc'?vb-va:va-vb;
+  });
+  const total=entries.length;
+  const maxPage=Math.max(0,Math.ceil(total/eqRankPageSize)-1);
+  if(eqRankPage>maxPage) eqRankPage=maxPage;
+  if(eqRankPage<0) eqRankPage=0;
+  const start=eqRankPage*eqRankPageSize;
+  const pageEntries=entries.slice(start,start+eqRankPageSize);
+  const body=document.getElementById('eqRankBody');
+  const info=document.getElementById('eqRankInfo');
+  const prevBtn=document.getElementById('eqRankPrev');
+  const nextBtn=document.getElementById('eqRankNext');
+  if(!body)return;
+  if(!total){
+    body.innerHTML='<tr><td colspan="5" style="padding:16px;text-align:center;color:var(--text3);font-size:11px;">ไม่มีข้อมูล</td></tr>';
+  } else {
+    body.innerHTML=pageEntries.map(function(e,i){
+      const rank=start+i+1;
+      const col=eqColor(e[0]);
+      const maxAff=Math.max.apply(null,entries.map(x=>x[1].affSum))||1;
+      const maxDur=Math.max.apply(null,entries.map(x=>x[1].custMin))||1;
+      const affPct=Math.round(e[1].affSum/maxAff*100);
+      const durPct=Math.round(e[1].custMin/maxDur*100);
+      return '<tr class="eqrank-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="border-bottom:1px solid var(--border);cursor:pointer;">'+
+        '<td style="padding:7px 10px;color:var(--text3);font-size:10.5px;">'+rank+'</td>'+
+        '<td style="padding:7px 10px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+col+';margin-right:6px;"></span><span style="font-weight:600;">'+e[0]+'</span><div style="font-size:9.5px;color:var(--text3);margin-left:14px;">'+e[1].sub+'</div></td>'+
+        '<td style="padding:7px 10px;text-align:right;">'+fmt(e[1].count,0)+'</td>'+
+        '<td style="padding:7px 10px;text-align:right;min-width:110px;"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;"><span>'+fmt(e[1].affSum,0)+'</span><div style="width:48px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:'+affPct+'%;height:100%;background:'+col+';"></div></div></div></td>'+
+        '<td style="padding:7px 10px;text-align:right;min-width:110px;"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;"><span>'+fmt(e[1].custMin,0)+'</span><div style="width:48px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:'+durPct+'%;height:100%;background:'+col+';"></div></div></div></td>'+
+        '</tr>';
+    }).join('');
+    Array.prototype.forEach.call(body.querySelectorAll('.eqrank-row'), function(row){
+      row.addEventListener('click', function(){
+        const eq=row.getAttribute('data-eq');
+        filters.eq=[eq]; updateTriggers(); updateAllDD(); applyFilter(true);
+      });
+    });
+  }
+  if(info) info.textContent=total?(start+1)+' - '+Math.min(start+eqRankPageSize,total)+' / '+total:'0 / 0';
+  if(prevBtn) prevBtn.disabled=eqRankPage<=0;
+  if(nextBtn) nextBtn.disabled=eqRankPage>=maxPage;
+  if(prevBtn) prevBtn.style.opacity=prevBtn.disabled?'.4':'1';
+  if(nextBtn) nextBtn.style.opacity=nextBtn.disabled?'.4':'1';
+}
+(function initEqRankControls(){
+  const tabs=document.getElementById('eqRankTabs');
+  if(tabs) tabs.querySelectorAll('button[data-sort]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      eqRankSort={key:btn.getAttribute('data-sort'),dir:'desc'};
+      eqRankPage=0;
+      tabs.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderEqRankTable();
+    });
+  });
+  document.querySelectorAll('th[data-col]').forEach(function(th){
+    th.addEventListener('click', function(){
+      const key=th.getAttribute('data-col');
+      if(eqRankSort.key===key){ eqRankSort.dir=eqRankSort.dir==='desc'?'asc':'desc'; }
+      else { eqRankSort={key:key,dir:'desc'}; }
+      eqRankPage=0;
+      if(tabs){ tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.getAttribute('data-sort')===key)); }
+      renderEqRankTable();
+    });
+  });
+  const prevBtn=document.getElementById('eqRankPrev');
+  const nextBtn=document.getElementById('eqRankNext');
+  if(prevBtn) prevBtn.addEventListener('click', function(){ if(eqRankPage>0){ eqRankPage--; renderEqRankTable(); } });
+  if(nextBtn) nextBtn.addEventListener('click', function(){ eqRankPage++; renderEqRankTable(); });
+})();
 function renderSubCauseChart(h){
   const cC=h.find(function(n){return n.includes('CauseData');});
   const canvas=document.getElementById('subCauseChart');
@@ -1263,8 +1402,8 @@ function renderCauseChart(h){
   });
 }
 const KPI_TARGETS={saifi:[4.994,4.738,4.482,4.226,3.97],saidi:[227.53,213.892,200.255,186.618,172.98]};
-function buildGaugeHtml(label,value,levels,unit){
-  if(value==null||isNaN(value)){return '<div style="font-size:11px;color:var(--text3);">'+label+': ไม่มีข้อมูลเพียงพอสำหรับการคำนวณ</div>';}
+function buildMiniGaugeHtml(value,levels){
+  if(value==null||isNaN(value)){return '';}
   const maxV=Math.max(levels[0],value)*1.08;
   const bounds=[0,levels[4],levels[3],levels[2],levels[1],levels[0]];
   const colors=['#10b981','#3b7ef8','#f59e0b','#f2994a','#f43f5e'];
@@ -1275,28 +1414,21 @@ function buildGaugeHtml(label,value,levels,unit){
     segHtml+='<div style="width:'+widthPct+'%;background:'+colors[i]+';height:100%;"></div>';
   }
   const markerPct=Math.min(100,(value/maxV*100)).toFixed(2);
-  const p5Pct=(levels[4]/maxV*100).toFixed(2);
-  const p1Pct=(levels[0]/maxV*100).toFixed(2);
   return ''+
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">'+
-    '<span style="font-size:11px;font-weight:700;color:var(--text2);">'+label+'</span>'+
-    '<span style="font-size:11px;font-weight:800;color:var(--text1);">'+value.toFixed(3)+' <span style="font-size:9px;color:var(--text3);font-weight:400;">'+unit+'</span></span>'+
-    '</div>'+
-    '<div style="position:relative;height:10px;border-radius:5px;overflow:hidden;display:flex;background:rgba(255,255,255,.06);">'+
+    '<div style="position:relative;height:6px;border-radius:3px;overflow:hidden;display:flex;background:rgba(255,255,255,.06);">'+
     segHtml+
-    '<div style="position:absolute;left:'+markerPct+'%;top:-2px;width:2px;height:14px;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);"></div>'+
+    '<div style="position:absolute;left:'+markerPct+'%;top:-2px;width:2px;height:10px;background:#fff;box-shadow:0 0 3px rgba(0,0,0,.6);"></div>'+
     '</div>'+
-    '<div style="position:relative;height:12px;margin-top:3px;font-size:8.5px;color:var(--text3);">'+
-    '<span style="position:absolute;left:0;">0</span>'+
-    '<span style="position:absolute;left:'+p5Pct+'%;transform:translateX(-50%);white-space:nowrap;">ระดับ 5: '+levels[4].toFixed(2)+'</span>'+
-    '<span style="position:absolute;left:'+p1Pct+'%;transform:translateX(-100%);white-space:nowrap;">ระดับ 1: '+levels[0].toFixed(2)+'</span>'+
+    '<div style="display:flex;justify-content:space-between;font-size:7.5px;color:var(--text3);margin-top:2px;">'+
+    '<span title="เป้าหมายระดับ 5">เป้า5: '+levels[4].toFixed(2)+'</span>'+
+    '<span title="เป้าหมายระดับ 1">เป้า1: '+levels[0].toFixed(2)+'</span>'+
     '</div>';
 }
 function renderGauges(saifiVal,saidiVal){
-  const wS=document.getElementById('gaugeSaifiWrap');
-  const wD=document.getElementById('gaugeSaidiWrap');
-  if(wS) wS.innerHTML=buildGaugeHtml('SAIFI (ครั้ง/ผู้ใช้ไฟ)',saifiVal,KPI_TARGETS.saifi,'');
-  if(wD) wD.innerHTML=buildGaugeHtml('SAIDI (นาที/ผู้ใช้ไฟ)',saidiVal,KPI_TARGETS.saidi,'');
+  const wS=document.getElementById('kpiGaugeSaifi');
+  const wD=document.getElementById('kpiGaugeSaidi');
+  if(wS) wS.innerHTML=buildMiniGaugeHtml(saifiVal,KPI_TARGETS.saifi);
+  if(wD) wD.innerHTML=buildMiniGaugeHtml(saidiVal,KPI_TARGETS.saidi);
 }
 
 
