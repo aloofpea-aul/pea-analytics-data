@@ -216,7 +216,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .info-chip-key{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
 .info-chip-val{font-size:12px;font-weight:600;color:var(--text1);word-break:break-all;}
 .view{display:none;}.view.active{display:block;}
-#mapEl{height:460px;width:100%;border-radius:var(--radius-lg);overflow:hidden;}
+#mapEl{height:calc(100vh - 300px);min-height:460px;width:100%;border-radius:var(--radius-lg);overflow:hidden;}
+.map-popup b{color:var(--text1);}
+.map-popup{font-size:12px;line-height:1.6;color:var(--text2);}
+.map-popup .mp-head{font-weight:700;font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.map-popup .mp-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:5px;}
 
 /* RESPONSIVE */
@@ -622,6 +626,8 @@ const LANG = {
     map_customers:'ผู้ใช้ไฟ',map_low:'ความเสี่ยงต่ำ',map_med:'ความเสี่ยงปานกลาง',map_high:'ความเสี่ยงสูง',
     map_scope_note:'⚠ แสดงเฉพาะอุปกรณ์ที่มีพิกัดจริงในฐานข้อมูล GIS (สถานีอ่าวลึก/ฟีดเดอร์ ALA01-09 เท่านั้น) — {n} จาก {total} เหตุการณ์ในตัวกรองปัจจุบัน สถานีอื่นยังไม่มีพิกัดในระบบ',
     map_no_data:'ไม่มีข้อมูลเหตุการณ์ในตัวกรองปัจจุบัน',
+    map_popup_incidents:'จำนวนครั้งที่เกิดเหตุ',map_popup_duration:'รวมระยะเวลาไฟดับ',
+    map_popup_customers:'ผู้ใช้ไฟที่ได้รับผลกระทบสะสม',map_popup_risk:'ระดับความเสี่ยง',times_unit:'ครั้ง',
     modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
     modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
     notif_gh_ok:'โหลดข้อมูลสำเร็จ',notif_gh_ok_msg:'ข้อมูลจาก GitHub โหลดเรียบร้อย',
@@ -681,6 +687,8 @@ const LANG = {
     map_customers:'Customers',map_low:'Low Risk',map_med:'Medium Risk',map_high:'High Risk',
     map_scope_note:'⚠ Showing only equipment with real GIS coordinates (Ao Luek station / feeders ALA01-09 only) — {n} of {total} events in the current filter. Other stations have no coordinates yet.',
     map_no_data:'No events in the current filter',
+    map_popup_incidents:'Incident Count',map_popup_duration:'Total Outage Duration',
+    map_popup_customers:'Cumulative Affected Customers',map_popup_risk:'Risk Level',times_unit:'times',
     modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
     modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
     notif_gh_ok:'Data Loaded',notif_gh_ok_msg:'GitHub data loaded successfully',
@@ -714,7 +722,7 @@ let currentLang='th', currentView='dashboard', currentMode='MV', subFilter='All'
 let filters={sub:[],pea:[],eq:[],month:[],known:[],causeData:[]}, searchQ={sub:'',pea:'',eq:'',month:'',known:''}, ddVals={};
 let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแยกตามพื้นที่':[]};
 let metaStore={}, filteredData=[], currentTableData=[];
-let charts={}, mapInst=null, heatLayer=null, mapLayerType='incidents';
+let charts={}, mapInst=null, heatLayer=null, markerLayer=null, mapLayerType='incidents';
 let _renderRafId=null, _filterDebounceTimer=null;
 let isLoading=false, isDark=true;
 let dataSource='demo'; // 'github' | 'demo' | 'error'
@@ -1950,6 +1958,7 @@ function setMapLayer(type){
 async function renderHeatmap(){
   if(!mapInst)return;
   if(heatLayer){mapInst.removeLayer(heatLayer);heatLayer=null;}
+  if(markerLayer){mapInst.removeLayer(markerLayer);markerLayer=null;}
   const note=document.getElementById('mapScopeNote');
   const coords=await loadAlaCoords();
   if(!filteredData.length){ if(note) note.textContent=t('map_no_data'); return; }
@@ -1958,6 +1967,7 @@ async function renderHeatmap(){
   const dC=h.find(n=>n.toLowerCase()==='duration'),cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const pts=[];
+  const byEq=new Map();
   filteredData.forEach(r=>{
     const eq=String(r[eC]||'').trim();
     const c=coords[eq];
@@ -1965,10 +1975,28 @@ async function renderHeatmap(){
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,cust=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
     const intens=mapLayerType==='incidents'?.8:mapLayerType==='duration'?Math.min(d/80,1):Math.min(cust/800,1);
     pts.push([c[0],c[1],intens]);
+    if(!byEq.has(eq)) byEq.set(eq,{eq,lat:c[0],lng:c[1],count:0,sumDur:0,sumCust:0});
+    const agg=byEq.get(eq);
+    agg.count++; agg.sumDur+=d; agg.sumCust+=cust;
   });
   if(note) note.textContent=t('map_scope_note').replace('{n}',fmt(pts.length)).replace('{total}',fmt(filteredData.length));
   if(!pts.length)return;
   heatLayer=L.heatLayer(pts,{radius:22,blur:14,gradient:{0:'#2563eb',.5:'#f59e0b',1:'#ef4444'}}).addTo(mapInst);
+  const locs=Array.from(byEq.values());
+  const metricOf=loc=>mapLayerType==='incidents'?loc.count:mapLayerType==='duration'?loc.sumDur:loc.sumCust;
+  const maxMetric=Math.max(1,...locs.map(metricOf));
+  const markers=locs.map(loc=>{
+    const ratio=metricOf(loc)/maxMetric;
+    const color=ratio<0.34?'#2563eb':ratio<0.67?'#f59e0b':'#ef4444';
+    const riskLabel=ratio<0.34?t('map_low'):ratio<0.67?t('map_med'):t('map_high');
+    const html=`<div class="map-popup"><div class="mp-head"><span class="mp-dot" style="background:${color};"></span><b>${loc.eq||'-'}</b></div>`+
+      `${t('map_popup_incidents')}: <b>${fmt(loc.count)} ${t('times_unit')}</b><br>`+
+      `${t('map_popup_duration')}: <b>${fmt(Math.round(loc.sumDur))} ${t('dur_unit')}</b><br>`+
+      `${t('map_popup_customers')}: <b>${fmt(Math.round(loc.sumCust))} ${t('notif_affected')}</b><br>`+
+      `${t('map_popup_risk')}: <b style="color:${color};">${riskLabel}</b></div>`;
+    return L.circleMarker([loc.lat,loc.lng],{radius:6,color:'#fff',weight:1,fillColor:color,fillOpacity:0.9}).bindPopup(html);
+  });
+  markerLayer=L.layerGroup(markers).addTo(mapInst);
 }
 
 // ================================================================
