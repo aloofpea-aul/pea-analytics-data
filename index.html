@@ -404,7 +404,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="card-body" id="autoInsights" style="display:flex;flex-direction:column;gap:9px;padding:14px 16px;"></div>
       </div>
 
-      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:220px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:220px;overflow-y:auto;"></div></div></div></div>
+      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:260px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:260px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:260px;overflow-y:auto;"></div></div></div></div>
       <div class="card" style="margin-bottom:14px;">
         <div class="card-header">
           <span class="card-title">อันดับอุปกรณ์วิกฤต (รวมทุกมิติ)</span>
@@ -628,6 +628,7 @@ const LANG = {
     map_no_data:'ไม่มีข้อมูลเหตุการณ์ในตัวกรองปัจจุบัน',
     map_popup_incidents:'จำนวนครั้งที่เกิดเหตุ',map_popup_duration:'รวมระยะเวลาไฟดับ',
     map_popup_customers:'ผู้ใช้ไฟที่ได้รับผลกระทบสะสม',map_popup_risk:'ระดับความเสี่ยง',times_unit:'ครั้ง',
+    topeq_month:'เดือนนี้',topeq_cum:'สะสม',
     modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
     modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
     notif_gh_ok:'โหลดข้อมูลสำเร็จ',notif_gh_ok_msg:'ข้อมูลจาก GitHub โหลดเรียบร้อย',
@@ -689,6 +690,7 @@ const LANG = {
     map_no_data:'No events in the current filter',
     map_popup_incidents:'Incident Count',map_popup_duration:'Total Outage Duration',
     map_popup_customers:'Cumulative Affected Customers',map_popup_risk:'Risk Level',times_unit:'times',
+    topeq_month:'This Month',topeq_cum:'Cumulative',
     modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
     modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
     notif_gh_ok:'Data Loaded',notif_gh_ok_msg:'GitHub data loaded successfully',
@@ -1264,14 +1266,26 @@ function renderTopEquipment(h){
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const dur=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
+  const dC=h.find(n=>n.includes('Date'));
+  const now=new Date();
+  const curY=now.getFullYear(), curM=now.getMonth();
   const map={};
   filteredData.forEach(function(r){
     const eq=String(r[eC]||'—');
-    if(!map[eq])map[eq]={affSum:0,custMin:0,count:0};
+    if(!map[eq])map[eq]={affSum:0,custMin:0,count:0,mAffSum:0,mCustMin:0,mCount:0};
     const d=parseFloat(String(r[dur]||'').replace(/,/g,''))||0;
     const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
+    let isCurM=false;
+    if(dC){
+      const ts=parseDateOnly(r[dC]);
+      if(ts!=null){ const dt=new Date(ts); isCurM=(dt.getUTCFullYear()===curY && dt.getUTCMonth()===curM); }
+    }
     map[eq].count++;
-    if(d>1){map[eq].affSum+=c;map[eq].custMin+=d*c;}
+    if(isCurM)map[eq].mCount++;
+    if(d>1){
+      map[eq].affSum+=c;map[eq].custMin+=d*c;
+      if(isCurM){map[eq].mAffSum+=c;map[eq].mCustMin+=d*c;}
+    }
   });
   const entries=Object.entries(map);
   function top10(key){return entries.slice().sort(function(a,b){return b[1][key]-a[1][key];}).slice(0,10).filter(function(e){return e[1][key]>0;});}
@@ -1281,15 +1295,25 @@ function renderTopEquipment(h){
   [listSaifi,listSaidi,listCount].forEach(function(list){
     list.forEach(function(e){ if(colorMap[e[0]]===undefined){ colorMap[e[0]]=seen.length%COLORS.length; seen.push(e[0]); } });
   });
-  function draw(id,list,key){
+  function draw(id,list,key,monthKey){
     const el=document.getElementById(id); if(!el)return;
     if(!list.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);">ไม่มีข้อมูล</div>';return;}
     const max=Math.max.apply(null,list.map(function(e){return e[1][key];}));
+    const mLbl=t('topeq_month'), cLbl=t('topeq_cum');
     el.innerHTML=list.map(function(e){
       const pct=Math.round(e[1][key]/max*100);
       const val=fmt(e[1][key],0);
+      const mval=fmt(e[1][monthKey],0);
       const col=COLORS[colorMap[e[0]]];
-      return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:5px;cursor:pointer;"><div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--text2);margin-bottom:2px;"><span class="eq-cell" style="font-weight:600;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+col+';margin-right:5px;"></span>'+e[0]+'</span><span>'+val+'</span></div><div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div></div>';
+      return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:2px;cursor:pointer;">'
+        +'<div style="display:grid;grid-template-columns:14px 1fr 50px 62px;column-gap:7px;align-items:center;">'
+        +'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+col+';"></span>'
+        +'<span style="font-size:10.5px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;" title="'+e[0].replace(/"/g,'&quot;')+'">'+e[0]+'</span>'
+        +'<div style="text-align:right;line-height:1.15;"><div style="font-size:10.5px;font-weight:700;color:var(--text1);white-space:nowrap;">'+mval+'</div><div style="font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;">'+mLbl+'</div></div>'
+        +'<div style="text-align:right;line-height:1.15;"><div style="font-size:10.5px;font-weight:700;color:var(--text1);white-space:nowrap;">'+val+'</div><div style="font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;">'+cLbl+'</div></div>'
+        +'</div>'
+        +'<div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin:3px 0 7px 21px;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div>'
+        +'</div>';
     }).join('');
     Array.prototype.forEach.call(el.querySelectorAll('.topeq-row'), function(row){
       row.addEventListener('click', function(){
@@ -1298,9 +1322,9 @@ function renderTopEquipment(h){
       });
     });
   }
-  draw('topEqSaifi', listSaifi, 'affSum');
-  draw('topEqSaidi', listSaidi, 'custMin');
-  draw('topEqCount', listCount, 'count');
+  draw('topEqSaifi', listSaifi, 'affSum', 'mAffSum');
+  draw('topEqSaidi', listSaidi, 'custMin', 'mCustMin');
+  draw('topEqCount', listCount, 'count', 'mCount');
 }
 
 // ================================================================
