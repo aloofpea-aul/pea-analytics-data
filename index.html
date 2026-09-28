@@ -157,6 +157,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .badge-emerald{background:rgba(16,185,129,.12);color:#34d399;}
 .badge-purple{background:rgba(167,139,250,.12);color:#c4b5fd;}
 .badge-ai{background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(59,126,248,.15));color:#a78bfa;border:1px solid rgba(167,139,250,.2);}
+[data-theme="light"] .badge-blue{background:rgba(59,126,248,.14);color:#1a56db;}
+[data-theme="light"] .badge-amber{background:rgba(245,158,11,.16);color:#b45309;}
+[data-theme="light"] .badge-rose{background:rgba(244,63,94,.14);color:#be123c;}
+[data-theme="light"] .badge-emerald{background:rgba(16,185,129,.14);color:#047857;}
+[data-theme="light"] .badge-purple{background:rgba(167,139,250,.18);color:#6d28d9;}
+[data-theme="light"] .badge-ai{color:#6d28d9;}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--radius);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .18s;border:none;font-family:inherit;letter-spacing:.2px;}
@@ -405,7 +411,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi" style="max-height:260px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi" style="max-height:260px;overflow-y:auto;"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount" style="max-height:260px;overflow-y:auto;"></div></div></div></div>
-      <div class="card" style="margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:14px;margin-bottom:14px;align-items:start;">
+      <div class="card">
         <div class="card-header">
           <span class="card-title">อันดับอุปกรณ์วิกฤต (รวมทุกมิติ)</span>
           <div style="display:flex;gap:6px;" id="eqRankTabs">
@@ -416,7 +423,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
         <div class="card-body" style="padding:0;">
           <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:10.5px;min-width:480px;">
+          <table style="width:100%;border-collapse:collapse;font-size:10.5px;min-width:380px;">
             <thead><tr style="border-bottom:1px solid var(--border);">
               <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;width:32px;">#</th>
               <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;">อุปกรณ์</th>
@@ -436,21 +443,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           </div>
         </div>
       </div>
-      <div class="card" style="margin-bottom:14px;">
+      <div class="card">
         <div class="card-header"><span class="card-title">อุปกรณ์เกิดซ้ำใน 30 วันล่าสุด</span><span class="badge badge-amber" id="recurEqBadge">0</span></div>
         <div class="card-body" style="padding:0;">
           <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:480px;">
+          <table style="width:100%;border-collapse:collapse;font-size:10.5px;min-width:380px;">
             <thead><tr style="border-bottom:1px solid var(--border);">
-              <th style="text-align:left;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;width:44px;">#</th>
-              <th style="text-align:left;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">อุปกรณ์</th>
-              <th style="text-align:right;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">จำนวนครั้ง (30 วัน)</th>
-              <th style="text-align:right;padding:8px 10px;color:var(--text3);font-size:10px;font-weight:700;">ล่าสุด</th>
+              <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;width:32px;">#</th>
+              <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;">อุปกรณ์</th>
+              <th style="text-align:right;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;">จำนวนครั้ง (30 วัน)</th>
+              <th style="text-align:right;padding:5px 8px;color:var(--text3);font-size:9px;font-weight:700;">ล่าสุด</th>
             </tr></thead>
             <tbody id="recurEqBody"></tbody>
           </table>
           </div>
         </div>
+      </div>
       </div>
       <div class="chart-row" style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
         <div class="card">
@@ -1469,7 +1477,7 @@ function renderCauseChart(h){
   window.__causeChartInst=new Chart(canvas.getContext('2d'),{
     type:'bar',
     data:{labels:labels,datasets:[{data:data,backgroundColor:labels.map(function(_,idx){return COLORS[idx%COLORS.length];}),borderRadius:6}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:function(v){return v>0?v:'';}}},scales:{x:{ticks:{color:'var(--text3)'},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'var(--text2)',font:{size:10}},grid:{display:false}}}},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:function(v){return v>0?v:'';}}},scales:{x:{ticks:{color:tickColor()},grid:{color:gridColor()}},y:{ticks:{color:tickColor(),font:{size:10}},grid:{display:false}}}},
     plugins:[ChartDataLabels]
   });
 }
@@ -1567,10 +1575,10 @@ function renderRecurringEquipment(h){
   }
   body.innerHTML=entries.map(function(e,i){
     return '<tr style="border-bottom:1px solid var(--border);cursor:pointer;" class="recur-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'">'+
-      '<td style="padding:7px 10px;color:var(--text3);font-size:10.5px;">'+(i+1)+'</td>'+
-      '<td style="padding:7px 10px;font-weight:600;">'+e[0]+'</td>'+
-      '<td style="padding:7px 10px;text-align:right;color:var(--rose);font-weight:700;">'+e[1].count+'</td>'+
-      '<td style="padding:7px 10px;text-align:right;color:var(--text3);font-size:10.5px;">'+e[1].lastStr+'</td>'+
+      '<td style="padding:5px 8px;color:var(--text3);font-size:10px;">'+(i+1)+'</td>'+
+      '<td style="padding:5px 8px;font-weight:600;color:var(--text1);font-size:10.5px;">'+e[0]+'</td>'+
+      '<td style="padding:5px 8px;text-align:right;color:var(--rose);font-weight:700;font-size:10.5px;">'+e[1].count+'</td>'+
+      '<td style="padding:5px 8px;text-align:right;color:var(--text3);font-size:10px;">'+e[1].lastStr+'</td>'+
       '</tr>';
   }).join('');
   Array.prototype.forEach.call(body.querySelectorAll('.recur-row'),function(row){
@@ -1679,7 +1687,8 @@ function renderGauges(saifiVal,saidiVal){
 
 
 function recolorCharts(){
-  const all=Object.values(charts).concat(Object.keys(window).filter(k=>k.indexOf('__mc_')===0).map(k=>window[k]));
+  const adhoc=['__subCauseChartInst','__causeChartInst','__paretoChartInst','__hourlyChartInst'].map(k=>window[k]);
+  const all=Object.values(charts).concat(Object.keys(window).filter(k=>k.indexOf('__mc_')===0).map(k=>window[k])).concat(adhoc);
   all.forEach(c=>{
     if(!c?.options)return;
     if(c.options.scales) Object.values(c.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridColor();if(s.ticks)s.ticks.color=tickColor();});
