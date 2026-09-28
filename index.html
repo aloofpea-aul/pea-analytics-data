@@ -1267,8 +1267,10 @@ function renderTopEquipment(h){
   const dur=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const dC=h.find(n=>n.includes('Date'));
-  const now=new Date();
-  const curY=now.getFullYear(), curM=now.getMonth();
+  let latestTs=null;
+  if(dC){ filteredData.forEach(function(r){const ts=parseDateOnly(r[dC]);if(ts!=null&&(latestTs===null||ts>latestTs))latestTs=ts;}); }
+  const refDate=latestTs!=null?new Date(latestTs):new Date();
+  const curY=refDate.getUTCFullYear(), curM=refDate.getUTCMonth();
   const map={};
   filteredData.forEach(function(r){
     const eq=String(r[eC]||'—');
