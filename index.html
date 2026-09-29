@@ -265,13 +265,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .info-chip-val{font-size:12px;font-weight:600;color:var(--text1);word-break:break-all;}
 .view{display:none;}.view.active{display:block;}
 #mapEl{height:calc(100vh - 300px);min-height:460px;width:100%;border-radius:var(--radius-lg);overflow:hidden;}
-/* การ์ด popup บนแผนที่ ใช้สีพื้น/ตัวหนังสือคงที่เสมอ (ไม่อิงตัวแปรธีมของหน้าเว็บ)
-   เพราะบอลลูน popup ของ Longdo Map มีพื้นหลังของตัวเองแยกต่างหาก ไม่รู้จักธีมมืด/สว่างของแดชบอร์ด
-   ถ้าใช้สีตามธีม (เช่น ตัวหนังสือสีอ่อนตอนธีมมืด) จะไปตกบนพื้นขาวของบอลลูนแล้วอ่านไม่ออก */
-.map-popup{font-size:12px;line-height:1.65;color:#dbe3f5;background:#0f1526;padding:10px 13px;border-radius:10px;min-width:175px;box-shadow:0 4px 18px rgba(0,0,0,.35);}
-.map-popup b{color:#ffffff;}
-.map-popup .mp-head{font-weight:700;font-size:13px;margin-bottom:5px;color:#ffffff;display:flex;align-items:center;gap:6px;}
-.map-popup .mp-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+/* การ์ดรายละเอียดจุดความเสี่ยงบนแผนที่ — เราวาดเอง (ไม่ใช้ popup ของ Longdo Map โดยตรง)
+   เพราะ popup ของ Longdo กดปิดไม่ค่อยติดและกดพื้นที่ว่างแล้วไม่หาย จึงคุมปุ่มปิด/การซ่อนเองทั้งหมด
+   ใช้สีพื้น/ตัวหนังสือคงที่เสมอ (ไม่อิงตัวแปรธีมของหน้าเว็บ) ให้อ่านง่ายไม่ว่าจะสลับธีมไหน */
+.map-detail-card{position:absolute;left:16px;bottom:16px;z-index:60;max-width:250px;font-size:12px;line-height:1.65;color:#dbe3f5;background:#0f1526;padding:12px 30px 12px 14px;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.45);display:none;}
+.map-detail-card.show{display:block;animation:fadeIn .15s ease;}
+.map-detail-card b{color:#ffffff;}
+.map-detail-card .mp-head{font-weight:700;font-size:13px;margin-bottom:5px;color:#ffffff;display:flex;align-items:center;gap:6px;}
+.map-detail-card .mp-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.map-detail-close{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#dbe3f5;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent;}
+.map-detail-close:hover,.map-detail-close:active{background:rgba(255,255,255,.22);color:#fff;}
+.map-detail-hide-btn{display:block;margin-top:10px;width:100%;background:rgba(244,63,94,.14);color:#fca5b1;border:1px solid rgba(244,63,94,.35);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+.map-detail-hide-btn:hover{background:rgba(244,63,94,.26);}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:5px;}
 
 /* RESPONSIVE */
@@ -595,7 +600,32 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="view" id="view-map">
       <div class="card"><div class="card-header"><span class="card-title" data-i="map_title">แผนที่ความเสี่ยง (Heatmap)</span><div style="display:flex;gap:5px;"><button class="map-tab active" id="ml-incidents" onclick="setMapLayer('incidents')" data-i="map_incidents">เหตุการณ์</button><button class="map-tab" id="ml-duration" onclick="setMapLayer('duration')" data-i="map_duration">ระยะเวลา</button><button class="map-tab" id="ml-customers" onclick="setMapLayer('customers')" data-i="map_customers">ผู้ใช้ไฟ</button></div></div>
         <div style="font-size:11px;color:var(--amber);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;margin:10px 14px 0;padding:8px 12px;" id="mapScopeNote">—</div>
-        <div style="padding:14px;"><div id="mapEl"></div><div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:11px;color:var(--text2);flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#2563eb;border-radius:2px;display:inline-block;"></span><span data-i="map_low">ความเสี่ยงต่ำ</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#f59e0b;border-radius:2px;display:inline-block;"></span><span data-i="map_med">ความเสี่ยงปานกลาง</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#ef4444;border-radius:2px;display:inline-block;"></span><span data-i="map_high">ความเสี่ยงสูง</span></div></div></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 14px 0;">
+          <span style="font-size:10.5px;color:var(--text3);font-weight:700;" data-i="map_line_layer_label">เส้นแนวสาย:</span>
+          <div class="sub-tabs" id="mapLineSubTabs">
+            <button class="sub-tab active" data-line="All" onclick="setMapLineFilter('All')" data-i="sub_all">ทั้งหมด</button>
+            <button class="sub-tab" data-line="Main" onclick="setMapLineFilter('Main')" data-i="sub_main">สายหลัก</button>
+            <button class="sub-tab" data-line="Branch" onclick="setMapLineFilter('Branch')" data-i="sub_branch">สายแยก</button>
+          </div>
+          <span style="font-size:10.5px;color:var(--text3);font-weight:700;margin-left:4px;" data-i="map_line_voltage_label">แรงดัน:</span>
+          <div class="sub-tabs">
+            <button class="sub-tab active" id="mapHvBtn" data-i="map_voltage_hv">แรงสูง</button>
+            <button class="sub-tab" id="mapLvBtn" onclick="toggleLvLines()" data-i="map_voltage_lv">แรงต่ำ</button>
+          </div>
+          <span style="flex:1;"></span>
+          <button class="map-tab" id="mapResetHidden" onclick="resetHiddenRiskMarkers()" style="display:none;align-items:center;gap:5px;"><span data-i="map_show_all_hidden">แสดงจุดที่ซ่อนไว้</span> (<span id="hiddenCount">0</span>)</button>
+        </div>
+        <div style="padding:14px;">
+          <div style="position:relative;">
+            <div id="mapEl"></div>
+            <div id="mapDetailCard" class="map-detail-card">
+              <button class="map-detail-close" onclick="closeMapDetail()" aria-label="ปิด" title="ปิด">✕</button>
+              <div id="mapDetailBody"></div>
+              <button class="map-detail-hide-btn" id="mapDetailHideBtn" onclick="hideCurrentMapDetail()" data-i="map_hide_point">ซ่อนจุดนี้</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:11px;color:var(--text2);flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#2563eb;border-radius:2px;display:inline-block;"></span><span data-i="map_low">ความเสี่ยงต่ำ</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#f59e0b;border-radius:2px;display:inline-block;"></span><span data-i="map_med">ความเสี่ยงปานกลาง</span></div><div style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#ef4444;border-radius:2px;display:inline-block;"></span><span data-i="map_high">ความเสี่ยงสูง</span></div></div>
+        </div>
       </div>
     </div>
 
@@ -708,6 +738,9 @@ const LANG = {
     map_no_data:'ไม่มีข้อมูลเหตุการณ์ในตัวกรองปัจจุบัน',
     map_popup_incidents:'จำนวนครั้งที่เกิดเหตุ',map_popup_duration:'รวมระยะเวลาไฟดับ',
     map_popup_customers:'ผู้ใช้ไฟที่ได้รับผลกระทบสะสม',map_popup_risk:'ระดับความเสี่ยง',times_unit:'ครั้ง',
+    map_line_layer_label:'เส้นแนวสาย:',map_line_voltage_label:'แรงดัน:',map_voltage_hv:'แรงสูง',map_voltage_lv:'แรงต่ำ',
+    map_show_all_hidden:'แสดงจุดที่ซ่อนไว้',map_hide_point:'ซ่อนจุดนี้',
+    map_lv_unavailable_title:'ยังไม่มีข้อมูลเส้นแรงต่ำ',map_lv_unavailable_msg:'ฐานข้อมูล SLD ปัจจุบันมีเฉพาะแนวสายแรงสูง (MV) ของ กฟส.อ่าวลึก ยังไม่มีพิกัดเส้นแรงต่ำ (LV)',
     topeq_month:'เดือนนี้',topeq_cum:'สะสม',
     modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
     modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
@@ -770,6 +803,9 @@ const LANG = {
     map_no_data:'No events in the current filter',
     map_popup_incidents:'Incident Count',map_popup_duration:'Total Outage Duration',
     map_popup_customers:'Cumulative Affected Customers',map_popup_risk:'Risk Level',times_unit:'times',
+    map_line_layer_label:'Lines:',map_line_voltage_label:'Voltage:',map_voltage_hv:'High Voltage',map_voltage_lv:'Low Voltage',
+    map_show_all_hidden:'Show hidden points',map_hide_point:'Hide this point',
+    map_lv_unavailable_title:'Low-voltage lines not available',map_lv_unavailable_msg:'The SLD database currently only has high-voltage (MV) line routes for Ao Luek — low-voltage (LV) line coordinates are not yet available',
     topeq_month:'This Month',topeq_cum:'Cumulative',
     modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
     modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
@@ -2237,6 +2273,11 @@ async function loadDeviceLocations(){
     .catch(function(e){console.warn('โหลดจุดติดตั้งอุปกรณ์ไม่สำเร็จ',e);deviceLocations={};return deviceLocations;});
   return deviceLocationsPromise;
 }
+// สถานะการดู/ซ่อนจุดความเสี่ยงและตัวกรองเส้นแนวสายบนแผนที่
+let mapDetailData=new Map(); // marker overlay -> ข้อมูลที่จะโชว์ในการ์ดรายละเอียด
+let _currentDetailMarker=null;
+let _suppressNextMapClick=false;
+let _mapHiddenCount=0;
 function initMap(){
   if(mapInst)return;
   if(typeof longdo==='undefined'){
@@ -2247,6 +2288,18 @@ function initMap(){
   try{
     mapInst=new longdo.Map({placeholder:document.getElementById('mapEl'),location:{lon:98.739841,lat:8.42051},zoom:13,lastView:false});
   }catch(e){ console.warn('Longdo map init failed',e); return; }
+  // การ์ดรายละเอียดของเราเอง แทน popup ของ Longdo Map (ที่กดปิด/กดพื้นที่ว่างแล้วบางทีไม่หาย)
+  // OverlayClick = คลิกโดนหมุด, Click = คลิกพื้นที่ว่างบนแผนที่ (ให้ปิดการ์ด เว้นแต่เพิ่งเปิดจากคลิกหมุดเดียวกันนี้)
+  try{
+    mapInst.Event.bind(longdo.EventName.OverlayClick,function(overlay){
+      const data=mapDetailData.get(overlay);
+      if(data){ showMapDetail(overlay,data); _suppressNextMapClick=true; }
+    });
+    mapInst.Event.bind(longdo.EventName.Click,function(){
+      if(_suppressNextMapClick){ _suppressNextMapClick=false; return; }
+      closeMapDetail();
+    });
+  }catch(e){ console.warn('bind map click events failed',e); }
   setTimeout(renderHeatmap,150);
 }
 function setMapLayer(type){
@@ -2254,36 +2307,92 @@ function setMapLayer(type){
   ['incidents','duration','customers'].forEach(k=>document.getElementById('ml-'+k)?.classList.toggle('active',k===type));
   renderHeatmap();
 }
-// เส้นแนวสาย MV (~2,000 เส้นทั่วเขต) เป็น "พื้นหลัง" ที่ไม่เปลี่ยนตามตัวกรอง — วาดครั้งเดียวแล้วเก็บแคชไว้
-// เดิมโค้ดนี้ล้าง+วาดใหม่ทั้งหมด (เส้น+หมุด รวมกว่า 2,000 overlay) ทุกครั้งที่ตัวกรอง/ข้อมูลเปลี่ยนขณะเปิดหน้าแผนที่
-// ทำให้ Longdo Map ต้องคำนวณ/จัดวาง overlay จำนวนมากซ้ำๆ ต่อเนื่อง จนหน้าจอค้างและกดปิด popup ไม่ค่อยติด
-// ตอนนี้จะวาดเส้นแนวสายแค่ครั้งเดียว แล้วอัปเดตเฉพาะหมุดความเสี่ยง (ของจริงมีแค่หลักร้อย) ตอนตัวกรองเปลี่ยน
-let mapLinesDrawn=false;
+function showMapDetail(marker,data){
+  _currentDetailMarker=marker;
+  const body=document.getElementById('mapDetailBody');
+  if(body){
+    body.innerHTML='<div class="mp-head"><span class="mp-dot" style="background:'+data.color+';"></span><b>'+(data.eq||'-')+'</b></div>'+
+      t('map_popup_incidents')+': <b>'+fmt(data.count)+' '+t('times_unit')+'</b><br>'+
+      t('map_popup_duration')+': <b>'+fmt(Math.round(data.sumDur))+' '+t('dur_unit')+'</b><br>'+
+      t('map_popup_customers')+': <b>'+fmt(Math.round(data.sumCust))+' '+t('notif_affected')+'</b><br>'+
+      t('map_popup_risk')+': <b style="color:'+data.color+';">'+data.riskLabel+'</b>';
+  }
+  document.getElementById('mapDetailCard')?.classList.add('show');
+}
+function closeMapDetail(){
+  _currentDetailMarker=null;
+  document.getElementById('mapDetailCard')?.classList.remove('show');
+}
+// ซ่อนเฉพาะจุดที่กำลังดูรายละเอียดอยู่ ออกจากแผนที่ชั่วคราว เพื่อให้เหลือแต่จุดที่ต้องการโฟกัส
+function hideCurrentMapDetail(){
+  if(!_currentDetailMarker)return;
+  try{ mapInst.Overlays.remove(_currentDetailMarker); }catch(e){}
+  const idx=mapRiskMarkers.indexOf(_currentDetailMarker);
+  if(idx>=0) mapRiskMarkers.splice(idx,1);
+  mapDetailData.delete(_currentDetailMarker);
+  _mapHiddenCount++;
+  updateMapHiddenBadge();
+  closeMapDetail();
+}
+function updateMapHiddenBadge(){
+  const btn=document.getElementById('mapResetHidden');
+  const cnt=document.getElementById('hiddenCount');
+  if(cnt) cnt.textContent=String(_mapHiddenCount);
+  if(btn) btn.style.display=_mapHiddenCount>0?'inline-flex':'none';
+}
+// กดแสดงจุดที่ซ่อนไว้ทั้งหมดคืน — สร้างหมุดความเสี่ยงใหม่จากข้อมูลปัจจุบันทั้งหมด
+function resetHiddenRiskMarkers(){
+  _mapHiddenCount=0;
+  updateMapHiddenBadge();
+  renderHeatmap();
+}
+// เส้นแนวสาย MV (~2,000 เส้นทั่วเขต) เป็น "พื้นหลัง" ที่ไม่เปลี่ยนตามตัวกรองเหตุการณ์ — จะวาดใหม่เฉพาะตอนสลับ
+// ตัวกรอง "ทั้งหมด/สายหลัก/สายแยก" เท่านั้น ไม่ใช่ทุกครั้งที่ตัวกรองข้อมูลเปลี่ยน (จุดที่เคยทำให้หน้าจอค้าง)
+let mapLineFilter='All'; // All | Main | Branch
+let mapLinesFilterDrawn=null;
+let mapLineOverlays=[];
 let mapRiskMarkers=[];
-async function drawMapLinesOnce(){
-  if(mapLinesDrawn||!mapInst)return;
+async function drawMapLines(filterVal){
+  if(!mapInst||mapLinesFilterDrawn===filterVal)return;
+  mapLineOverlays.forEach(function(ln){ try{mapInst.Overlays.remove(ln);}catch(e){} });
+  mapLineOverlays=[];
   const lineData=await loadMvLines();
   if(lineData&&lineData.lines){
     Object.keys(lineData.lines).forEach(function(feederId){
       const color=(lineData.colors&&lineData.colors[feederId])||'#8494ab';
       (lineData.lines[feederId]||[]).forEach(function(seg){
         if(!seg.v||seg.v.length<2)return;
+        if(filterVal==='Main'&&!seg.m)return;
+        if(filterVal==='Branch'&&seg.m)return;
         const pts=seg.v.map(function(p){return {lat:p[0],lon:p[1]};});
         try{
           const ln=new longdo.Polyline(pts,{lineWidth:seg.m?2.5:1.2,lineColor:color});
           mapInst.Overlays.add(ln);
+          mapLineOverlays.push(ln);
         }catch(e){}
       });
     });
   }
-  mapLinesDrawn=true;
+  mapLinesFilterDrawn=filterVal;
+}
+function setMapLineFilter(val){
+  mapLineFilter=val;
+  document.querySelectorAll('#mapLineSubTabs .sub-tab').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-line')===val); });
+  drawMapLines(val);
+}
+// เส้นแรงต่ำ (LV) ยังไม่มีข้อมูลพิกัดในฐาน SLD ขณะนี้ (มีแต่แนวสายแรงสูง/MV) — แจ้งผู้ใช้ตรงๆ แทนที่จะเงียบ
+function toggleLvLines(){
+  notify(t('map_lv_unavailable_title'),t('map_lv_unavailable_msg'),'info',6000);
 }
 async function renderHeatmap(){
   if(!mapInst)return;
+  closeMapDetail();
+  _mapHiddenCount=0;
+  updateMapHiddenBadge();
   // ล้างเฉพาะหมุดความเสี่ยงรอบก่อนหน้า ไม่แตะเส้นแนวสายที่วาดไว้แล้ว (ลดภาระ Longdo Map ไปมาก)
-  mapRiskMarkers.forEach(function(m){ try{mapInst.Overlays.remove(m);}catch(e){} });
+  mapRiskMarkers.forEach(function(m){ try{mapInst.Overlays.remove(m);}catch(e){} mapDetailData.delete(m); });
   mapRiskMarkers=[];
-  await drawMapLinesOnce();
+  await drawMapLines(mapLineFilter);
   const note=document.getElementById('mapScopeNote');
   const coords=await loadAlaCoords();
   if(!filteredData.length){ if(note) note.textContent=t('map_no_data'); return; }
@@ -2312,16 +2421,13 @@ async function renderHeatmap(){
     const ratio=metricOf(loc)/maxMetric;
     const color=ratio<0.34?'#2563eb':ratio<0.67?'#f59e0b':'#ef4444';
     const riskLabel=ratio<0.34?t('map_low'):ratio<0.67?t('map_med'):t('map_high');
-    const html='<div class="map-popup"><div class="mp-head"><span class="mp-dot" style="background:'+color+';"></span><b>'+(loc.eq||'-')+'</b></div>'+
-      t('map_popup_incidents')+': <b>'+fmt(loc.count)+' '+t('times_unit')+'</b><br>'+
-      t('map_popup_duration')+': <b>'+fmt(Math.round(loc.sumDur))+' '+t('dur_unit')+'</b><br>'+
-      t('map_popup_customers')+': <b>'+fmt(Math.round(loc.sumCust))+' '+t('notif_affected')+'</b><br>'+
-      t('map_popup_risk')+': <b style="color:'+color+';">'+riskLabel+'</b></div>';
     const dotHtml='<div style="width:14px;height:14px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.5);"></div>';
     try{
-      const marker=new longdo.Marker({lon:loc.lng,lat:loc.lat},{icon:{html:dotHtml,offset:{x:7,y:7}},popup:{html:html}});
+      // ไม่ใช้ popup ของ Longdo Map ตรงๆ — เก็บข้อมูลไว้ใน mapDetailData แล้วโชว์ผ่านการ์ดของเราเองตอนคลิกโดนหมุด (ดู initMap)
+      const marker=new longdo.Marker({lon:loc.lng,lat:loc.lat},{icon:{html:dotHtml,offset:{x:7,y:7}},clickable:true});
       mapInst.Overlays.add(marker);
       mapRiskMarkers.push(marker);
+      mapDetailData.set(marker,{eq:loc.eq,count:loc.count,sumDur:loc.sumDur,sumCust:loc.sumCust,color:color,riskLabel:riskLabel});
     }catch(e){}
   });
 }
