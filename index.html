@@ -72,7 +72,19 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* MAIN */
 .main{margin-left:var(--sidebar);min-height:100vh;position:relative;z-index:1;}
-.topbar{height:var(--header);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:90;gap:12px;}
+.topbar{height:var(--header);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:var(--drillbar-h,0px);z-index:90;gap:12px;}
+
+/* แถบ Drill-down "กำลังดูเฉพาะอุปกรณ์" — ลอยติดบนสุดเสมอไม่ว่าจะเลื่อนหน้าไปทางไหน */
+.drill-bar{position:sticky;top:0;z-index:95;background:rgba(59,126,248,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1.5px solid rgba(59,126,248,.4);padding:9px 22px;display:none;align-items:center;gap:10px;flex-wrap:wrap;}
+.drill-bar.show{display:flex;}
+.drill-bar .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.drill-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:4px 11px 4px 8px;font-size:11.5px;font-weight:700;color:var(--text1);}
+.drill-back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:7px 13px;border-radius:8px;white-space:nowrap;border:none;cursor:pointer;font-family:inherit;transition:background .18s;}
+.drill-back-btn:hover{background:var(--blue2);}
+.drill-clear-btn{display:inline-flex;align-items:center;gap:5px;color:var(--text3);font-size:10.5px;font-weight:600;padding:7px 4px;white-space:nowrap;border:none;background:transparent;cursor:pointer;font-family:inherit;}
+.drill-clear-btn:hover{color:var(--text1);}
+@media(max-width:768px){.drill-bar{padding:8px 12px;}}
+@media(max-width:420px){.drill-clear-btn span{display:none;}}
 .topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .page-title{font-weight:700;font-size:15px;letter-spacing:.2px;white-space:nowrap;}
@@ -306,6 +318,21 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <!-- ===== MAIN ===== -->
 <main class="main">
+  <!-- แถบแจ้งว่ากำลังดูเฉพาะอุปกรณ์ (Drill-down) — ลอยอยู่บนสุดตลอด กดย้อนกลับได้ทันทีไม่ต้องรีเฟรช -->
+  <div class="drill-bar" id="drillBar">
+    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" style="color:var(--blue);flex-shrink:0;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span style="font-size:11.5px;color:var(--text2);white-space:nowrap;">กำลังดูเฉพาะอุปกรณ์:</span>
+    <span class="drill-chip"><span class="dot" id="drillEqDot"></span><span id="drillEqLabel">—</span></span>
+    <span style="flex:1;"></span>
+    <button class="drill-clear-btn" onclick="clearDrillFilters()">
+      <span>ล้างตัวกรองทั้งหมด</span>
+      <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="drill-back-btn" onclick="goBackFilter()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>ย้อนกลับ</span>
+    </button>
+  </div>
   <div class="topbar">
     <div class="topbar-left">
       <div class="mobile-btn" onclick="openSidebar()">
@@ -996,6 +1023,44 @@ function toggleAulFilter(){
   filters.pea = isActive ? [] : AUL_PEA_CODES.slice();
   updateTriggers(); updateAllDD(); applyFilter(true);
 }
+// ================================================================
+// กดดูเฉพาะอุปกรณ์ (Drill-down) — จำสถานะตัวกรองก่อนหน้าไว้ กดย้อนกลับได้ทันทีโดยไม่ต้องรีเฟรช
+// ================================================================
+let filterHistory=[];
+function snapshotFilters(){
+  return JSON.parse(JSON.stringify(filters));
+}
+function drillToEquipment(eq){
+  filterHistory.push(snapshotFilters());
+  filters.eq=[eq];
+  updateTriggers(); updateAllDD(); applyFilter(true);
+  updateDrillBarUI();
+}
+function goBackFilter(){
+  if(!filterHistory.length) return;
+  filters=filterHistory.pop();
+  updateTriggers(); updateAllDD(); applyFilter(true);
+  updateDrillBarUI();
+}
+function clearDrillFilters(){
+  resetFilters();
+}
+function updateDrillBarUI(){
+  const bar=document.getElementById('drillBar');
+  if(!bar) return;
+  if(!filterHistory.length){
+    bar.classList.remove('show');
+    document.documentElement.style.setProperty('--drillbar-h','0px');
+    return;
+  }
+  bar.classList.add('show');
+  const eq=filters.eq[0]||'—';
+  const label=document.getElementById('drillEqLabel');
+  const dot=document.getElementById('drillEqDot');
+  if(label) label.textContent=eq;
+  if(dot) dot.style.background=eqColor(eq);
+  requestAnimationFrame(()=>{ document.documentElement.style.setProperty('--drillbar-h', bar.offsetHeight+'px'); });
+}
 function removeChip(type,val){
   filters[type]=filters[type].filter(v=>v!==val);
   updateTriggers(); updateAllDD(); applyFilter(true);
@@ -1024,7 +1089,9 @@ function renderActiveChips(){
 function resetFilters(){
   filters={sub:[],pea:[],eq:[],month:[],known:[],causeData:[]}; searchQ={sub:'',pea:'',eq:'',month:'',known:''};
   ['fs-sub','fs-pea','fs-eq','fs-month','fs-known'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  filterHistory=[];
   updateTriggers(); updateAllDD(); applyFilter(true);
+  updateDrillBarUI();
   notify(t('notif_filter_reset'),t('notif_filter_reset_msg'),'info',2500);
 }
 
@@ -1277,7 +1344,7 @@ function renderCharts(h){
 
   charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
     type:'bar',data:{labels,datasets:[{label:t('chart_equip_title'),data:top.map(f=>f[1]),backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]+'bb'),borderColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,onClick:(_,els)=>{if(els.length){filters.eq=[labels[els[0].index]];updateTriggers();updateAllDD();applyFilter(true);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
+    options:{responsive:true,maintainAspectRatio:false,onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
     plugins:[ChartDataLabels]});
 
   const dm={};filteredData.forEach(r=>{const v=String(r[opC]||'Unknown');dm[v]=(dm[v]||0)+1;});
@@ -1394,7 +1461,7 @@ function renderTopEquipment(h){
     Array.prototype.forEach.call(el.querySelectorAll('.topeq-row'), function(row){
       row.addEventListener('click', function(){
         const eq=row.getAttribute('data-eq');
-        filters.eq=[eq]; updateTriggers(); updateAllDD(); applyFilter(true);
+        drillToEquipment(eq);
       });
     });
   }
@@ -1479,7 +1546,7 @@ function renderEqRankTable(h){
     Array.prototype.forEach.call(body.querySelectorAll('.eqrank-row'), function(row){
       row.addEventListener('click', function(){
         const eq=row.getAttribute('data-eq');
-        filters.eq=[eq]; updateTriggers(); updateAllDD(); applyFilter(true);
+        drillToEquipment(eq);
       });
     });
   }
@@ -1660,7 +1727,7 @@ function renderRecurringEquipment(h){
   Array.prototype.forEach.call(body.querySelectorAll('.recur-row'),function(row){
     row.addEventListener('click',function(){
       const eq=row.getAttribute('data-eq');
-      filters.eq=[eq]; updateTriggers(); updateAllDD(); applyFilter(true);
+      drillToEquipment(eq);
     });
   });
 }
@@ -2189,6 +2256,7 @@ window.addEventListener('scroll',()=>{
   _scrollFabRaf=requestAnimationFrame(()=>{ _scrollFabRaf=null; updateScrollFabs(); });
 }, {passive:true});
 window.addEventListener('resize', updateScrollFabs);
+window.addEventListener('resize', updateDrillBarUI);
 /* Service Worker เก็บหน้าเว็บไว้ในเครื่อง (รองรับโหมด PWA) — ตรวจเวอร์ชันใหม่ทุกครั้งที่เปิด
    และโหลดหน้าซ้ำอัตโนมัติ 1 ครั้งเมื่อมีตัวใหม่พร้อมใช้ */
 if('serviceWorker' in navigator){
