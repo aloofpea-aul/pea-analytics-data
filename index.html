@@ -2254,12 +2254,14 @@ function setMapLayer(type){
   ['incidents','duration','customers'].forEach(k=>document.getElementById('ml-'+k)?.classList.toggle('active',k===type));
   renderHeatmap();
 }
-async function renderHeatmap(){
-  if(!mapInst)return;
-  mapInst.Overlays.clear();
-  mapMarkers=[];
-  const note=document.getElementById('mapScopeNote');
-  const coords=await loadAlaCoords();
+// เส้นแนวสาย MV (~2,000 เส้นทั่วเขต) เป็น "พื้นหลัง" ที่ไม่เปลี่ยนตามตัวกรอง — วาดครั้งเดียวแล้วเก็บแคชไว้
+// เดิมโค้ดนี้ล้าง+วาดใหม่ทั้งหมด (เส้น+หมุด รวมกว่า 2,000 overlay) ทุกครั้งที่ตัวกรอง/ข้อมูลเปลี่ยนขณะเปิดหน้าแผนที่
+// ทำให้ Longdo Map ต้องคำนวณ/จัดวาง overlay จำนวนมากซ้ำๆ ต่อเนื่อง จนหน้าจอค้างและกดปิด popup ไม่ค่อยติด
+// ตอนนี้จะวาดเส้นแนวสายแค่ครั้งเดียว แล้วอัปเดตเฉพาะหมุดความเสี่ยง (ของจริงมีแค่หลักร้อย) ตอนตัวกรองเปลี่ยน
+let mapLinesDrawn=false;
+let mapRiskMarkers=[];
+async function drawMapLinesOnce(){
+  if(mapLinesDrawn||!mapInst)return;
   const lineData=await loadMvLines();
   if(lineData&&lineData.lines){
     Object.keys(lineData.lines).forEach(function(feederId){
@@ -2270,11 +2272,20 @@ async function renderHeatmap(){
         try{
           const ln=new longdo.Polyline(pts,{lineWidth:seg.m?2.5:1.2,lineColor:color});
           mapInst.Overlays.add(ln);
-          mapMarkers.push(ln);
         }catch(e){}
       });
     });
   }
+  mapLinesDrawn=true;
+}
+async function renderHeatmap(){
+  if(!mapInst)return;
+  // ล้างเฉพาะหมุดความเสี่ยงรอบก่อนหน้า ไม่แตะเส้นแนวสายที่วาดไว้แล้ว (ลดภาระ Longdo Map ไปมาก)
+  mapRiskMarkers.forEach(function(m){ try{mapInst.Overlays.remove(m);}catch(e){} });
+  mapRiskMarkers=[];
+  await drawMapLinesOnce();
+  const note=document.getElementById('mapScopeNote');
+  const coords=await loadAlaCoords();
   if(!filteredData.length){ if(note) note.textContent=t('map_no_data'); return; }
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
   const h=metaStore[sName]?.headers||[];
@@ -2310,7 +2321,7 @@ async function renderHeatmap(){
     try{
       const marker=new longdo.Marker({lon:loc.lng,lat:loc.lat},{icon:{html:dotHtml,offset:{x:7,y:7}},popup:{html:html}});
       mapInst.Overlays.add(marker);
-      mapMarkers.push(marker);
+      mapRiskMarkers.push(marker);
     }catch(e){}
   });
 }
