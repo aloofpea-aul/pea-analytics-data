@@ -177,6 +177,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .btn-primary:hover{background:var(--blue2);transform:translateY(-1px);}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
 .btn-ghost:hover{background:var(--bg2);color:var(--text1);}
+.btn-aul{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius);font-size:11.5px;font-weight:800;letter-spacing:.4px;cursor:pointer;font-family:inherit;border:1.5px solid var(--blue);background:var(--blue-glow);color:var(--blue);transition:all .18s;}
+.btn-aul:hover{background:var(--blue);color:#fff;}
+.btn-aul.active{background:var(--blue);color:#fff;box-shadow:0 0 0 3px var(--blue-glow);}
 
 /* PROGRESS */
 #topProgress{position:fixed;top:0;left:0;right:0;z-index:999;height:2px;display:none;}
@@ -238,7 +241,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* RESPONSIVE */
 @media(max-width:1100px){:root{--sidebar:0px;}.sidebar{transform:translateX(-100%);--sidebar:242px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.mobile-btn{display:flex!important;}}
-@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:12px 12px 24px;}.topbar{padding:0 12px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}.anal-chart-grid{grid-template-columns:1fr!important;}}
+@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:12px 12px 24px;}.topbar{height:auto;flex-wrap:wrap;align-items:center;padding:10px 12px;row-gap:8px;}.topbar-left{width:100%;flex-wrap:wrap;row-gap:6px;}.topbar-right{width:100%;flex-wrap:wrap;justify-content:flex-start;row-gap:6px;}.page-title{font-size:13.5px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}.anal-chart-grid{grid-template-columns:1fr!important;}}
+@media(max-width:480px){.topbar-right .btn span{display:none;}.topbar-right .btn{padding:7px 9px;}#lastUpdateWrap{text-align:left!important;}.source-badge span{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;}}
 .mobile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;display:none;backdrop-filter:blur(2px);}
 .sidebar-overlay.open{display:block;}
@@ -346,6 +350,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               <button class="sub-tab" id="sub-Main" onclick="setSubFilter('Main')" data-i="sub_main">สายหลัก</button>
               <button class="sub-tab" id="sub-Branch" onclick="setSubFilter('Branch')" data-i="sub_branch">สายแยก</button>
             </div>
+            <button class="btn-aul" id="aulToggleBtn" onclick="toggleAulFilter()" title="กรองเฉพาะ กฟส.อ่าวลึก + กฟส.ปลายพระยา">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>AUL</span>
+            </button>
             <button class="btn btn-ghost" onclick="resetFilters()" style="font-size:10.5px;">
               <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
               <span data-i="btn_reset">รีเซ็ต</span>
@@ -741,7 +749,7 @@ let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแย�
 let metaStore={}, filteredData=[], currentTableData=[];
 let charts={}, mapInst=null, mapMarkers=[], mapLayerType='incidents', mvLines=null, mvLinesPromise=null;
 const MV_LINES_URL='https://aloofpea-aul.github.io/sld-ala/mv-lines.json';
-let _renderRafId=null, _filterDebounceTimer=null;
+let _renderRafId=null, _filterDebounceTimer=null, _ddIdleTimer=null;
 let isLoading=false, isDark=true;
 let dataSource='demo'; // 'github' | 'demo' | 'error'
 
@@ -842,6 +850,7 @@ function switchView(v){
 // ================================================================
 function toggleDD(type,e){
   e.stopPropagation();
+  clearTimeout(_ddIdleTimer);
   const dd=document.getElementById('dd-'+type);
   const wasOpen=dd.classList.contains('open');
   closeAllDD();
@@ -851,7 +860,13 @@ function toggleDD(type,e){
     dd.closest('.filter-wrap')?.classList.add('dd-open');
   }
 }
+// ถ้าเลือกหรือพิมพ์ค้นหาในตัวกรองแล้วไม่มีการเลือก/พิมพ์เพิ่มภายใน 3 วินาที ให้ยุบตัวเลือกลงอัตโนมัติ
+function scheduleDDIdleClose(){
+  clearTimeout(_ddIdleTimer);
+  _ddIdleTimer=setTimeout(closeAllDD, 3000);
+}
 function closeAllDD(){
+  clearTimeout(_ddIdleTimer);
   ['sub','pea','eq','month','known'].forEach(k=>{
     const dd=document.getElementById('dd-'+k);
     dd?.classList.remove('open');
@@ -861,7 +876,7 @@ function closeAllDD(){
 }
 window.addEventListener('click',(e)=>{ if(!e.target.closest('.filter-wrap')) closeAllDD(); });
 
-function filterOpts(type,val){searchQ[type]=val.toLowerCase();renderDDList(type);}
+function filterOpts(type,val){searchQ[type]=val.toLowerCase();renderDDList(type);scheduleDDIdleClose();}
 
 function renderDDList(type){
   const sName=currentMode==='LV'?'Dashboard-LV':'Dashboard-HV-MV';
@@ -922,6 +937,7 @@ function toggleSel(type,val,e){
   if(filters[type].includes(val)) filters[type]=filters[type].filter(v=>v!==val);
   else filters[type].push(val);
   updateTriggers(); updateAllDD(); applyFilterDebounced(true);
+  scheduleDDIdleClose();
 }
 function toggleSelectAll(type){
   const vals=ddVals[type]||[];
@@ -935,6 +951,7 @@ function toggleSelectAll(type){
     filters[type]=Array.from(set);
   }
   updateTriggers(); updateAllDD(); applyFilterDebounced(true);
+  scheduleDDIdleClose();
 }
 function updateTriggers(){
   const def={sub:'filter_sub_default',pea:'filter_pea_default',eq:'filter_eq_default',month:'filter_month_default',known:'filter_known_default'};
@@ -944,6 +961,22 @@ function updateTriggers(){
     el.textContent=sel.length===0?t(def[k]):sel.length===1?sel[0]:`${t('filter_selected')} (${sel.length})`;
   });
   renderActiveChips();
+  syncAulButtonState();
+}
+// ปุ่มตัวกรองด่วน "AUL" — เลือกเฉพาะ กฟส.อ่าวลึก + กฟส.ปลายพระยา, ถ้าไม่กดคือภาพรวมทั้งหมด (ไม่กรอง กฟส.)
+const AUL_PEA_CODES=['0421.กฟส.อ่าวลึก (S)','0422.กฟส.ปลายพระยา (XS)'];
+function syncAulButtonState(){
+  const btn=document.getElementById('aulToggleBtn');
+  if(!btn) return;
+  const cur=filters.pea.slice().sort().join('|');
+  const aul=AUL_PEA_CODES.slice().sort().join('|');
+  btn.classList.toggle('active', cur===aul);
+}
+function toggleAulFilter(){
+  const btn=document.getElementById('aulToggleBtn');
+  const isActive=btn && btn.classList.contains('active');
+  filters.pea = isActive ? [] : AUL_PEA_CODES.slice();
+  updateTriggers(); updateAllDD(); applyFilter(true);
 }
 function removeChip(type,val){
   filters[type]=filters[type].filter(v=>v!==val);
@@ -1020,6 +1053,7 @@ function jsonToObjects(json){
 async function startLoad(){
   if(isLoading) return;
   isLoading=true;
+  loadMvLines(); // โหลดสีฟีดเดอร์จาก SLD คู่ขนานไปเลย เพื่อให้การ์ดอุปกรณ์ได้สีที่ถูกต้องตั้งแต่แรก
   Object.keys(dataStore).forEach(k=>dataStore[k]=[]);
   setProgress(5); setSidebarStatus('status_connecting'); setStatusDot('loading');
 
@@ -1285,7 +1319,10 @@ function renderMonthlyBars(h){
   draw('monthSaidiChart',saidi,'#378ADD');
   draw('monthCountChart',cnt,'#a78bfa');
 }
+let _topEqHeaders=null;
 function renderTopEquipment(h){
+  if(h) _topEqHeaders=h; else h=_topEqHeaders;
+  if(!h) return;
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const dur=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
@@ -1315,11 +1352,6 @@ function renderTopEquipment(h){
   const entries=Object.entries(map);
   function top10(key){return entries.slice().sort(function(a,b){return b[1][key]-a[1][key];}).slice(0,10).filter(function(e){return e[1][key]>0;});}
   const listSaifi=top10('affSum'), listSaidi=top10('custMin'), listCount=top10('count');
-  const colorMap={};
-  const seen=[];
-  [listSaifi,listSaidi,listCount].forEach(function(list){
-    list.forEach(function(e){ if(colorMap[e[0]]===undefined){ colorMap[e[0]]=seen.length%COLORS.length; seen.push(e[0]); } });
-  });
   function draw(id,list,key,monthKey){
     const el=document.getElementById(id); if(!el)return;
     if(!list.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);">ไม่มีข้อมูล</div>';return;}
@@ -1329,7 +1361,7 @@ function renderTopEquipment(h){
       const pct=Math.round(e[1][key]/max*100);
       const val=fmt(e[1][key],0);
       const mval=fmt(e[1][monthKey],0);
-      const col=COLORS[colorMap[e[0]]];
+      const col=eqColor(e[0]);
       return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:2px;cursor:pointer;">'
         +'<div style="display:grid;grid-template-columns:16px 14px 1fr 50px 62px;column-gap:6px;align-items:center;">'
         +'<span style="font-size:9.5px;font-weight:700;color:var(--text3);text-align:right;">'+(i+1)+'</span>'
@@ -1360,10 +1392,21 @@ let eqRankSort={key:'affSum',dir:'desc'};
 let eqRankPage=0;
 const eqRankPageSize=10;
 let _eqRankHeaders=null;
-function eqColor(name){
+// รหัสฟีดเดอร์จากรหัสอุปกรณ์ (5 ตัวอักษรแรก เช่น ALA01, WSA08) ให้ตรงกับคอลัมน์ Feeder ใน devices.csv ของ SLD
+function feederOf(name){
+  return String(name||'').trim().toUpperCase().slice(0,5);
+}
+function hashColor(key){
   let hash=0;
-  for(let i=0;i<name.length;i++){ hash=(hash*31+name.charCodeAt(i))|0; }
+  for(let i=0;i<key.length;i++){ hash=(hash*31+key.charCodeAt(i))|0; }
   return COLORS[Math.abs(hash)%COLORS.length];
+}
+// สีของอุปกรณ์ = สีฟีดเดอร์เดียวกับใน SLD (ดึงจาก mv-lines.json ของ sld-ala ถ้ามี) — อุปกรณ์ย่อย/ลูกในฟีดเดอร์เดียวกันจะได้สีเดียวกับแม่เสมอ
+// ถ้าฟีดเดอร์นั้นไม่มีสีจริงใน SLD (นอกเขตอ่าวลึก) จะคำนวณสีคงที่จากรหัสฟีดเดอร์แทน เพื่อให้อุปกรณ์ในฟีดเดอร์เดียวกันยังได้สีเดียวกัน
+function eqColor(name){
+  const fid=feederOf(name);
+  if(mvLines && mvLines.colors && mvLines.colors[fid]) return mvLines.colors[fid];
+  return hashColor(fid);
 }
 function renderEqRankTable(h){
   if(h) _eqRankHeaders=h; else h=_eqRankHeaders;
@@ -2003,7 +2046,12 @@ async function loadMvLines(){
   if(mvLinesPromise) return mvLinesPromise;
   mvLinesPromise=fetch(MV_LINES_URL,{cache:'no-store'})
     .then(function(r){return r.json();})
-    .then(function(j){mvLines=j;return j;})
+    .then(function(j){
+      mvLines=j;
+      // มาช้ากว่าการ์ดอุปกรณ์ที่ render ไปก่อนด้วยสีสำรอง — ให้ระบายสีใหม่ตามฟีดเดอร์จริงจาก SLD ทันทีที่โหลดเสร็จ
+      if(filteredData.length){ renderTopEquipment(); renderEqRankTable(); }
+      return j;
+    })
     .catch(function(e){console.warn('โหลดแนวสาย MV ไม่สำเร็จ',e);mvLines={colors:{},lines:{}};return mvLines;});
   return mvLinesPromise;
 }
