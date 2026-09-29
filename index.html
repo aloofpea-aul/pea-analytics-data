@@ -72,19 +72,19 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* MAIN */
 .main{margin-left:var(--sidebar);min-height:100vh;position:relative;z-index:1;}
-.topbar{height:var(--header);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:var(--drillbar-h,0px);z-index:90;gap:12px;}
+.topbar{height:var(--header);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:90;gap:12px;}
 
-/* แถบ Drill-down "กำลังดูเฉพาะอุปกรณ์" — ลอยติดบนสุดเสมอไม่ว่าจะเลื่อนหน้าไปทางไหน */
-.drill-bar{position:sticky;top:0;z-index:95;background:rgba(59,126,248,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1.5px solid rgba(59,126,248,.4);padding:9px 22px;display:none;align-items:center;gap:10px;flex-wrap:wrap;}
-.drill-bar.show{display:flex;}
-.drill-bar .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
-.drill-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:4px 11px 4px 8px;font-size:11.5px;font-weight:700;color:var(--text1);}
-.drill-back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:7px 13px;border-radius:8px;white-space:nowrap;border:none;cursor:pointer;font-family:inherit;transition:background .18s;}
-.drill-back-btn:hover{background:var(--blue2);}
-.drill-clear-btn{display:inline-flex;align-items:center;gap:5px;color:var(--text3);font-size:10.5px;font-weight:600;padding:7px 4px;white-space:nowrap;border:none;background:transparent;cursor:pointer;font-family:inherit;}
-.drill-clear-btn:hover{color:var(--text1);}
-@media(max-width:768px){.drill-bar{padding:8px 12px;}}
-@media(max-width:420px){.drill-clear-btn span{display:none;}}
+/* ปุ่มลอย "กำลังดูเฉพาะอุปกรณ์ / ย้อนกลับ" — ลอยมุมขวาบนตลอด ไม่ว่าจะเลื่อนหน้าไปทางไหน */
+.drill-fab-wrap{position:fixed;top:74px;right:20px;z-index:950;display:flex;flex-direction:column;align-items:flex-end;gap:8px;transition:top .15s ease;}
+.drill-fab{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--blue);border-radius:24px;padding:8px 14px 8px 10px;box-shadow:0 10px 28px rgba(0,0,0,.45);cursor:pointer;font-family:inherit;color:var(--text1);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .22s ease,transform .22s ease,background .18s,color .18s;}
+.drill-fab.show{opacity:1;visibility:visible;transform:translateY(0);}
+.drill-fab:hover{background:var(--blue);color:#fff;}
+.drill-fab .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.drill-fab-label{font-size:11px;font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.drill-fab-clear{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--panel);border:1px solid var(--border2);color:var(--text3);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .22s ease,transform .22s ease,background .18s,color .18s,border-color .18s;}
+.drill-fab-clear.show{opacity:1;visibility:visible;transform:translateY(0);}
+.drill-fab-clear:hover{background:var(--rose);color:#fff;border-color:var(--rose);}
+@media(max-width:768px){.drill-fab-wrap{right:14px;}.drill-fab-label{max-width:96px;}}
 .topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .page-title{font-weight:700;font-size:15px;letter-spacing:.2px;white-space:nowrap;}
@@ -260,7 +260,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* RESPONSIVE */
 @media(max-width:1100px){:root{--sidebar:0px;}.sidebar{transform:translateX(-100%);--sidebar:242px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.mobile-btn{display:flex!important;}}
-@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:12px 12px 24px;}.topbar{height:auto;flex-wrap:wrap;align-items:center;padding:10px 12px;row-gap:8px;}.topbar-left{width:100%;flex-wrap:wrap;row-gap:6px;}.topbar-right{width:100%;flex-wrap:wrap;justify-content:flex-start;row-gap:6px;}.page-title{font-size:13.5px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}.anal-chart-grid{grid-template-columns:1fr!important;}}
+@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:12px 12px 24px;}.topbar{height:auto;flex-wrap:wrap;align-items:center;padding:10px 12px;row-gap:8px;}.topbar-left{width:100%;flex-wrap:wrap;row-gap:6px;}.topbar-right{width:100%;flex-wrap:wrap;justify-content:flex-start;row-gap:6px;}.page-title{font-size:13.5px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}.anal-chart-grid{grid-template-columns:1fr!important;}.rank-recur-grid{grid-template-columns:1fr!important;}.task-mitig-grid{grid-template-columns:1fr!important;}}
 @media(max-width:480px){.topbar-right .btn span{display:none;}.topbar-right .btn{padding:7px 9px;}#lastUpdateWrap{text-align:left!important;}.source-badge span{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;}}
 .mobile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;display:none;backdrop-filter:blur(2px);}
@@ -318,21 +318,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <!-- ===== MAIN ===== -->
 <main class="main">
-  <!-- แถบแจ้งว่ากำลังดูเฉพาะอุปกรณ์ (Drill-down) — ลอยอยู่บนสุดตลอด กดย้อนกลับได้ทันทีไม่ต้องรีเฟรช -->
-  <div class="drill-bar" id="drillBar">
-    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" style="color:var(--blue);flex-shrink:0;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <span style="font-size:11.5px;color:var(--text2);white-space:nowrap;">กำลังดูเฉพาะอุปกรณ์:</span>
-    <span class="drill-chip"><span class="dot" id="drillEqDot"></span><span id="drillEqLabel">—</span></span>
-    <span style="flex:1;"></span>
-    <button class="drill-clear-btn" onclick="clearDrillFilters()">
-      <span>ล้างตัวกรองทั้งหมด</span>
-      <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <button class="drill-back-btn" onclick="goBackFilter()">
-      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      <span>ย้อนกลับ</span>
-    </button>
-  </div>
   <div class="topbar">
     <div class="topbar-left">
       <div class="mobile-btn" onclick="openSidebar()">
@@ -459,8 +444,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="card-body" id="autoInsights" style="display:flex;flex-direction:column;gap:9px;padding:14px 16px;"></div>
       </div>
 
-      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount"></div></div></div></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:14px;margin-bottom:14px;">
+      <div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">SAIFI / SAIDI / จำนวนเหตุการณ์ รายเดือน</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;"><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIFI</div><div style="position:relative;height:120px;"><canvas id="monthSaifiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">SAIDI</div><div style="position:relative;height:120px;"><canvas id="monthSaidiChart"></canvas></div></div><div><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-align:center;">จำนวนเหตุการณ์</div><div style="position:relative;height:120px;"><canvas id="monthCountChart"></canvas></div></div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Top 10 อุปกรณ์วิกฤต (แยกตามผลกระทบ)</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;"><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">จำนวนครั้ง</div><div id="topEqCount"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">ผู้ใช้ไฟกระทบสะสม (SAIFI)</div><div id="topEqSaifi"></div></div><div><div style="font-size:10.5px;color:var(--text3);margin-bottom:8px;font-weight:700;">นาที-ผู้ใช้ไฟสะสม (SAIDI)</div><div id="topEqSaidi"></div></div></div></div>
+      <div class="rank-recur-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:14px;margin-bottom:14px;">
       <div class="card" style="display:flex;flex-direction:column;">
         <div class="card-header">
           <span class="card-title">อันดับอุปกรณ์วิกฤต (รวมทุกมิติ)</span>
@@ -568,7 +553,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="card"><div class="card-header"><span class="card-title" data-i="a_forecast_title">แนวโน้มพยากรณ์ 30 วัน</span><span class="badge badge-ai" data-i="a_ai_badge">AI Forecast</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="forecastChart"></canvas></div></div></div>
         <div class="card"><div class="card-header"><span class="card-title" data-i="a_rc_title">วิเคราะห์สาเหตุ</span></div><div class="card-body"><div class="chart-wrap" style="height:260px;"><canvas id="rcChart"></canvas></div></div></div>
       </div>
-      <div style="display:grid;grid-template-columns:3fr 2fr;gap:14px;">
+      <div class="task-mitig-grid" style="display:grid;grid-template-columns:3fr 2fr;gap:14px;">
         <div class="card"><div class="card-header"><span class="card-title" data-i="a_task_title">ติดตามงานปฏิบัติการ</span><button class="btn btn-primary" style="font-size:10px;padding:5px 11px;" data-i="a_new_task" onclick="addNewTask()">+ งานใหม่</button></div><div id="taskList"></div></div>
         <div class="card"><div class="card-header"><span class="card-title" data-i="a_mitigation_title">กลยุทธ์ลดความเสี่ยง</span></div><div class="card-body" id="mitigationList" style="display:flex;flex-direction:column;gap:9px;"></div></div>
       </div>
@@ -600,6 +585,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   </div>
 </main>
+
+<!-- ปุ่มลอยกลับสู่มุมมองก่อนหน้า (Drill-down) — ลอยมุมขวาบนตลอด กดย้อนกลับได้ทันทีไม่ต้องรีเฟรช -->
+<div class="drill-fab-wrap" id="drillFabWrap">
+  <button class="drill-fab" id="drillFab" onclick="goBackFilter()" title="ย้อนกลับไปยังตัวกรองก่อนหน้า" aria-label="ย้อนกลับไปยังตัวกรองก่อนหน้า">
+    <span class="dot" id="drillEqDot"></span>
+    <span class="drill-fab-label" id="drillEqLabel">—</span>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="drill-fab-clear" id="drillFabClear" onclick="clearDrillFilters()" title="ล้างตัวกรองทั้งหมด" aria-label="ล้างตัวกรองทั้งหมด">
+    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
 
 <!-- ปุ่มลอยเลื่อนขึ้นสุด/ลงสุด -->
 <div class="scroll-fab-wrap">
@@ -1045,21 +1042,30 @@ function goBackFilter(){
 function clearDrillFilters(){
   resetFilters();
 }
+function positionDrillFab(){
+  const wrap=document.getElementById('drillFabWrap');
+  const topbar=document.querySelector('.topbar');
+  if(!wrap||!topbar) return;
+  const rect=topbar.getBoundingClientRect();
+  wrap.style.top=Math.max(8, rect.bottom+10)+'px';
+}
 function updateDrillBarUI(){
-  const bar=document.getElementById('drillBar');
-  if(!bar) return;
+  const fab=document.getElementById('drillFab');
+  const clearBtn=document.getElementById('drillFabClear');
+  if(!fab||!clearBtn) return;
   if(!filterHistory.length){
-    bar.classList.remove('show');
-    document.documentElement.style.setProperty('--drillbar-h','0px');
+    fab.classList.remove('show');
+    clearBtn.classList.remove('show');
     return;
   }
-  bar.classList.add('show');
   const eq=filters.eq[0]||'—';
   const label=document.getElementById('drillEqLabel');
   const dot=document.getElementById('drillEqDot');
   if(label) label.textContent=eq;
   if(dot) dot.style.background=eqColor(eq);
-  requestAnimationFrame(()=>{ document.documentElement.style.setProperty('--drillbar-h', bar.offsetHeight+'px'); });
+  fab.classList.add('show');
+  clearBtn.classList.add('show');
+  positionDrillFab();
 }
 function removeChip(type,val){
   filters[type]=filters[type].filter(v=>v!==val);
@@ -1344,7 +1350,7 @@ function renderCharts(h){
 
   charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
     type:'bar',data:{labels,datasets:[{label:t('chart_equip_title'),data:top.map(f=>f[1]),backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]+'bb'),borderColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
     plugins:[ChartDataLabels]});
 
   const dm={};filteredData.forEach(r=>{const v=String(r[opC]||'Unknown');dm[v]=(dm[v]||0)+1;});
@@ -1396,7 +1402,7 @@ function renderMonthlyBars(h){
     window['__mc_'+id]=new Chart(canvas.getContext('2d'),{
       type:'bar',
       data:{labels,datasets:[{data,backgroundColor:color,borderRadius:4}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top'}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9}}},y:{display:false,beginAtZero:true}}},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top'}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9}}},y:{display:false,beginAtZero:true}}},
       plugins:[ChartDataLabels]
     });
   }
@@ -1654,7 +1660,7 @@ function renderParetoChart(h){
       {type:'bar',label:'จำนวนครั้ง',data:data,backgroundColor:labels.map(function(_,i){return COLORS[i%COLORS.length]+'cc';}),borderColor:labels.map(function(_,i){return COLORS[i%COLORS.length];}),borderWidth:1,borderRadius:4,yAxisID:'y'},
       {type:'line',label:'สะสม %',data:cum,borderColor:'#f59e0b',backgroundColor:'#f59e0b',borderWidth:2,pointRadius:3,pointBackgroundColor:'#f59e0b',tension:0.25,yAxisID:'y1'}
     ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:tickColor(),font:{size:9},boxWidth:9}},datalabels:{display:function(ctx){return ctx.dataset.type==='line';},color:'#f59e0b',font:{size:9,weight:'bold'},align:'top',formatter:function(v){return v+'%';}}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{position:'left',grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true},y1:{position:'right',min:0,max:100,grid:{display:false},ticks:{color:tickColor(),font:{size:9},callback:function(v){return v+'%';}}}}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:tickColor(),font:{size:9},boxWidth:9}},datalabels:{display:function(ctx){return ctx.dataset.type==='line';},color:'#f59e0b',font:{size:9,weight:'bold'},align:'top',formatter:function(v){return v+'%';}}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{position:'left',grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true},y1:{position:'right',min:0,max:100,grid:{display:false},ticks:{color:tickColor(),font:{size:9},callback:function(v){return v+'%';}}}}},
     plugins:[ChartDataLabels]
   });
 }
@@ -1677,7 +1683,7 @@ function renderHourlyChart(h){
   window.__hourlyChartInst=new Chart(canvas.getContext('2d'),{
     type:'bar',
     data:{labels:labels,datasets:[{data:hourCounts,backgroundColor:hourCounts.map(function(v){return v===maxV&&v>0?'#f43f5e':'#3b7ef8bb';}),borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:8,weight:'bold'},anchor:'end',align:'top',display:function(ctx){return ctx.dataset.data[ctx.dataIndex]>0;}}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8},maxRotation:60}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:8,weight:'bold'},anchor:'end',align:'top',display:function(ctx){return ctx.dataset.data[ctx.dataIndex]>0;}}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8},maxRotation:60}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
     plugins:[ChartDataLabels]
   });
 }
@@ -2256,7 +2262,7 @@ window.addEventListener('scroll',()=>{
   _scrollFabRaf=requestAnimationFrame(()=>{ _scrollFabRaf=null; updateScrollFabs(); });
 }, {passive:true});
 window.addEventListener('resize', updateScrollFabs);
-window.addEventListener('resize', updateDrillBarUI);
+window.addEventListener('resize', positionDrillFab);
 /* Service Worker เก็บหน้าเว็บไว้ในเครื่อง (รองรับโหมด PWA) — ตรวจเวอร์ชันใหม่ทุกครั้งที่เปิด
    และโหลดหน้าซ้ำอัตโนมัติ 1 ครั้งเมื่อมีตัวใหม่พร้อมใช้ */
 if('serviceWorker' in navigator){
