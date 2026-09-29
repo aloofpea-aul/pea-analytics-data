@@ -127,11 +127,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* TABS */
 .mode-tabs{display:flex;gap:3px;background:var(--bg2);padding:3px;border-radius:var(--radius);border:1px solid var(--border);}
-.mode-tab{padding:5px 13px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:7px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
+.mode-tab{padding:5px 13px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:7px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;-webkit-tap-highlight-color:transparent;}
 .mode-tab.active{background:var(--blue);color:#fff;box-shadow:0 2px 10px rgba(59,126,248,.3);}
+.mode-tab:active{transform:scale(.91);}
 .sub-tabs{display:flex;gap:2px;background:var(--bg2);padding:3px;border-radius:8px;border:1px solid var(--border);}
-.sub-tab{padding:4px 11px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;}
-.sub-tab.active{background:var(--bg3);color:var(--text1);}
+.sub-tab{padding:4px 11px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:none;background:transparent;font-family:inherit;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;gap:3px;}
+.sub-tab.active{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(59,126,248,.3);}
+.sub-tab:active{transform:scale(.9);}
+.sub-tab::before{content:'';display:inline-block;width:0;opacity:0;transition:width .18s ease,opacity .15s ease;}
+.sub-tab.active::before{content:'✓';width:11px;opacity:1;font-size:9px;}
+@media(max-width:768px){
+  .mode-tab{padding:8px 16px;font-size:12.5px;}
+  .sub-tabs{gap:4px;padding:4px;}
+  .sub-tab{padding:7px 13px;font-size:11.5px;}
+}
 .map-tab{padding:5px 12px;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .18s;color:var(--text2);border:1px solid var(--border);background:var(--bg2);font-family:inherit;}
 .map-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 
@@ -219,6 +228,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .notif.info{border-left:3px solid var(--blue);}
 .notif-title{font-size:11.5px;font-weight:700;color:var(--text1);margin-bottom:2px;}
 .notif-msg{font-size:10.5px;color:var(--text2);}
+.notif.closing{animation:slideOut .18s ease forwards;}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(360px);opacity:0}}
+.notif-close{background:none;border:none;cursor:pointer;color:var(--text3);flex-shrink:0;width:26px;height:26px;min-width:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;margin:-4px -5px 0 0;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent;}
+.notif-close:hover,.notif-close:active{background:var(--bg3);color:var(--text1);}
 
 /* TOGGLE */
 .toggle{width:42px;height:22px;background:var(--bg3);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border2);}
@@ -252,9 +265,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .info-chip-val{font-size:12px;font-weight:600;color:var(--text1);word-break:break-all;}
 .view{display:none;}.view.active{display:block;}
 #mapEl{height:calc(100vh - 300px);min-height:460px;width:100%;border-radius:var(--radius-lg);overflow:hidden;}
-.map-popup b{color:var(--text1);}
-.map-popup{font-size:12px;line-height:1.6;color:var(--text2);}
-.map-popup .mp-head{font-weight:700;font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+/* การ์ด popup บนแผนที่ ใช้สีพื้น/ตัวหนังสือคงที่เสมอ (ไม่อิงตัวแปรธีมของหน้าเว็บ)
+   เพราะบอลลูน popup ของ Longdo Map มีพื้นหลังของตัวเองแยกต่างหาก ไม่รู้จักธีมมืด/สว่างของแดชบอร์ด
+   ถ้าใช้สีตามธีม (เช่น ตัวหนังสือสีอ่อนตอนธีมมืด) จะไปตกบนพื้นขาวของบอลลูนแล้วอ่านไม่ออก */
+.map-popup{font-size:12px;line-height:1.65;color:#dbe3f5;background:#0f1526;padding:10px 13px;border-radius:10px;min-width:175px;box-shadow:0 4px 18px rgba(0,0,0,.35);}
+.map-popup b{color:#ffffff;}
+.map-popup .mp-head{font-weight:700;font-size:13px;margin-bottom:5px;color:#ffffff;display:flex;align-items:center;gap:6px;}
 .map-popup .mp-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:5px;}
 
@@ -830,16 +846,23 @@ function setLang(lang){ currentLang=lang; applyLang(); }
 // ================================================================
 // NOTIFICATIONS
 // ================================================================
+let _notifSeq=0;
+function closeNotif(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.add('closing');
+  setTimeout(()=>{el&&el.remove();},180);
+}
 function notify(title,msg,type='info',dur=4000){
-  const id='n'+Date.now();
+  const id='n'+Date.now()+'_'+(_notifSeq++);
   const col={info:COLORS[0],warning:'#f59e0b',critical:'#f43f5e'}[type];
   const el=document.createElement('div');
   el.id=id; el.className=`notif ${type}`;
   el.innerHTML=`<div style="width:6px;height:6px;border-radius:50%;background:${col};flex-shrink:0;margin-top:4px;"></div>
     <div style="flex:1;min-width:0;"><div class="notif-title">${title}</div><div class="notif-msg">${msg}</div></div>
-    <button onclick="document.getElementById('${id}').remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;font-size:13px;">✕</button>`;
+    <button class="notif-close" onclick="closeNotif('${id}')" aria-label="ปิด" title="ปิด">✕</button>`;
   document.getElementById('notifStack').appendChild(el);
-  if(dur>0) setTimeout(()=>{el&&el.remove();},dur);
+  if(dur>0) setTimeout(()=>{closeNotif(id);},dur);
 }
 
 // ================================================================
@@ -1343,14 +1366,15 @@ function renderCharts(h){
   destroyChart('trend'); destroyChart('dist');
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const opC=h.find(n=>n.toLowerCase()==='operate');
-  const counts={};
-  filteredData.forEach(r=>{const n=String(r[eC]||'—');if(!counts[n])counts[n]=0;counts[n]++;});
+  const sC=h.find(n=>n.includes('SubstationName'));
+  const counts={}, subOf={};
+  filteredData.forEach(r=>{const n=String(r[eC]||'—');if(!counts[n])counts[n]=0;counts[n]++;if(!subOf[n])subOf[n]=String(r[sC]||'—');});
   const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const labels=top.map(f=>f[0]); if(!labels.length)return;
 
   charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
     type:'bar',data:{labels,datasets:[{label:t('chart_equip_title'),data:top.map(f=>f[1]),backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]+'bb'),borderColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>subOf[ctx.label]||''}},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
     plugins:[ChartDataLabels]});
 
   const dm={};filteredData.forEach(r=>{const v=String(r[opC]||'Unknown');dm[v]=(dm[v]||0)+1;});
@@ -1418,6 +1442,7 @@ function renderTopEquipment(h){
   const dur=h.find(n=>n.toLowerCase()==='duration');
   const cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const dC=h.find(n=>n.includes('Date'));
+  const sC=h.find(n=>n.includes('SubstationName'));
   let latestTs=null;
   if(dC){ filteredData.forEach(function(r){const ts=parseDateOnly(r[dC]);if(ts!=null&&(latestTs===null||ts>latestTs))latestTs=ts;}); }
   const refDate=latestTs!=null?new Date(latestTs):new Date();
@@ -1425,7 +1450,7 @@ function renderTopEquipment(h){
   const map={};
   filteredData.forEach(function(r){
     const eq=String(r[eC]||'—');
-    if(!map[eq])map[eq]={affSum:0,custMin:0,count:0,mAffSum:0,mCustMin:0,mCount:0};
+    if(!map[eq])map[eq]={affSum:0,custMin:0,count:0,mAffSum:0,mCustMin:0,mCount:0,sub:String(r[sC]||'—')};
     const d=parseFloat(String(r[dur]||'').replace(/,/g,''))||0;
     const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
     let isCurM=false;
@@ -1453,11 +1478,13 @@ function renderTopEquipment(h){
       const val=fmt(e[1][key],0);
       const mval=fmt(e[1][monthKey],0);
       const col=eqColor(e[0]);
+      const subName=e[1].sub||'—';
+      const eqTip=(e[0]+' · '+subName).replace(/"/g,'&quot;');
       return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:2px;cursor:pointer;">'
         +'<div style="display:grid;grid-template-columns:16px 14px 1fr 50px 62px;column-gap:6px;align-items:center;">'
         +'<span style="font-size:9.5px;font-weight:700;color:var(--text3);text-align:right;">'+(i+1)+'</span>'
         +'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+col+';"></span>'
-        +'<span style="font-size:10.5px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;" title="'+e[0].replace(/"/g,'&quot;')+'">'+e[0]+'</span>'
+        +'<div style="min-width:0;overflow:hidden;" title="'+eqTip+'"><div style="font-size:10.5px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+e[0]+'</div><div style="font-size:7.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+subName+'</div></div>'
         +'<div style="text-align:right;line-height:1.15;"><div style="font-size:10.5px;font-weight:700;color:var(--text1);white-space:nowrap;">'+mval+'</div><div style="font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;">'+mLbl+'</div></div>'
         +'<div style="text-align:right;line-height:1.15;"><div style="font-size:10.5px;font-weight:700;color:var(--text1);white-space:nowrap;">'+val+'</div><div style="font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;">'+cLbl+'</div></div>'
         +'</div>'
@@ -1699,6 +1726,7 @@ function parseDateOnly(s){
 function renderRecurringEquipment(h){
   const eC=h.find(function(n){return n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type');});
   const dC=h.find(function(n){return n.includes('Date');});
+  const sC=h.find(function(n){return n.includes('SubstationName');});
   const body=document.getElementById('recurEqBody');
   const badge=document.getElementById('recurEqBadge');
   if(!body||!eC||!dC)return;
@@ -1711,7 +1739,7 @@ function renderRecurringEquipment(h){
     const ts=parseDateOnly(r[dC]);
     if(ts===null||ts<cutoff)return;
     const eq=String(r[eC]||'—');
-    if(!map[eq])map[eq]={count:0,last:ts,lastStr:String(r[dC]||'').slice(0,10)};
+    if(!map[eq])map[eq]={count:0,last:ts,lastStr:String(r[dC]||'').slice(0,10),sub:String(r[sC]||'—')};
     map[eq].count++;
     if(ts>map[eq].last){map[eq].last=ts;map[eq].lastStr=String(r[dC]||'').slice(0,10);}
   });
@@ -1723,9 +1751,11 @@ function renderRecurringEquipment(h){
     return;
   }
   body.innerHTML=entries.map(function(e,i){
+    const subName=e[1].sub||'—';
+    const eqTip=(e[0]+' · '+subName).replace(/"/g,'&quot;');
     return '<tr style="border-bottom:1px solid var(--border);cursor:pointer;" class="recur-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'">'+
       '<td style="padding:5px 8px;color:var(--text3);font-size:10px;">'+(i+1)+'</td>'+
-      '<td style="padding:5px 8px;font-weight:600;color:var(--text1);font-size:10.5px;">'+e[0]+'</td>'+
+      '<td style="padding:5px 8px;" title="'+eqTip+'"><div style="font-weight:600;color:var(--text1);font-size:10.5px;">'+e[0]+'</div><div style="font-size:7.5px;color:var(--text3);">'+subName+'</div></td>'+
       '<td style="padding:5px 8px;text-align:right;color:var(--rose);font-weight:700;font-size:10.5px;">'+e[1].count+'</td>'+
       '<td style="padding:5px 8px;text-align:right;color:var(--text3);font-size:10px;">'+e[1].lastStr+'</td>'+
       '</tr>';
@@ -1901,8 +1931,8 @@ function checkAlerts(){
     if(cnt>=2)return;
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0;
     const c=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    if(d>120){notify(t('notif_dur_alert'),`${r[eC]} · ${d} ${t('dur_unit')}`,'warning',0);cnt++;}
-    else if(c>1000&&cnt<2){notify(t('notif_cust_alert'),`${r[eC]} · ${fmt(c)} ${t('notif_affected')}`,'critical',0);cnt++;}
+    if(d>120){notify(t('notif_dur_alert'),`${r[eC]} · ${d} ${t('dur_unit')}`,'warning',10000);cnt++;}
+    else if(c>1000&&cnt<2){notify(t('notif_cust_alert'),`${r[eC]} · ${fmt(c)} ${t('notif_affected')}`,'critical',10000);cnt++;}
   });
 }
 
