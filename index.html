@@ -806,6 +806,32 @@ let dataStore={'Dashboard-HV-MV':[],'Dashboard-LV':[],'รายงานแย�
 let metaStore={}, filteredData=[], currentTableData=[];
 let charts={}, mapInst=null, mapMarkers=[], mapLayerType='incidents', mvLines=null, mvLinesPromise=null;
 const MV_LINES_URL='https://aloofpea-aul.github.io/sld-ala/mv-lines.json';
+// จุดติดตั้งจริงของอุปกรณ์แต่ละตัว (รหัสอุปกรณ์ -> คำอธิบายจุดติดตั้งภาษาไทย) จากฐานข้อมูล SLD อ่าวลึก
+let deviceLocations=null, deviceLocationsPromise=null;
+const DEVICE_LOCATIONS_URL='https://aloofpea-aul.github.io/sld-ala/devices.csv';
+// ชื่อ/ที่ตั้งของอุปกรณ์ที่จะโชว์ให้ผู้ใช้เห็น: ใช้จุดติดตั้งจริงจาก SLD ก่อนถ้ามี (ละเอียดกว่า)
+// ถ้าไม่มีข้อมูล (อุปกรณ์นอกเขตอ่าวลึกที่ยังไม่ได้ลงฐานข้อมูล SLD) ค่อย fallback ไปใช้ชื่อสถานีไฟฟ้าแทน
+function eqLocation(eq,fallbackSub){
+  const hit=deviceLocations && deviceLocations[String(eq||'').trim().toUpperCase()];
+  return (hit&&hit.trim())?hit.trim():(fallbackSub||'—');
+}
+// ตัด CSV แบบรองรับ field ที่ครอบด้วย " " (มีบางแถวใน devices.csv ที่มี comma อยู่ในคำอธิบาย)
+function parseCsvLine(line){
+  const out=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(inQ){
+      if(c==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else inQ=false; }
+      else cur+=c;
+    } else {
+      if(c==='"') inQ=true;
+      else if(c===','){ out.push(cur); cur=''; }
+      else cur+=c;
+    }
+  }
+  out.push(cur);
+  return out;
+}
 let _renderRafId=null, _filterDebounceTimer=null, _ddIdleTimer=null;
 let isLoading=false, isDark=true;
 let dataSource='demo'; // 'github' | 'demo' | 'error'
@@ -1168,6 +1194,7 @@ async function startLoad(){
   if(isLoading) return;
   isLoading=true;
   loadMvLines(); // โหลดสีฟีดเดอร์จาก SLD คู่ขนานไปเลย เพื่อให้การ์ดอุปกรณ์ได้สีที่ถูกต้องตั้งแต่แรก
+  loadDeviceLocations(); // โหลดจุดติดตั้งจริงของอุปกรณ์จาก SLD คู่ขนานไปเลย เพื่อโชว์จุดติดตั้งแทนชื่อสถานีเมื่อมีข้อมูล
   Object.keys(dataStore).forEach(k=>dataStore[k]=[]);
   setProgress(5); setSidebarStatus('status_connecting'); setStatusDot('loading');
 
@@ -1363,6 +1390,8 @@ function renderTable(h){
 function destroyChart(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
 
 function renderCharts(h){
+  if(h) _chartsHeaders=h; else h=_chartsHeaders;
+  if(!h) return;
   destroyChart('trend'); destroyChart('dist');
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
   const opC=h.find(n=>n.toLowerCase()==='operate');
@@ -1374,7 +1403,7 @@ function renderCharts(h){
 
   charts.trend=new Chart(document.getElementById('trendChart').getContext('2d'),{
     type:'bar',data:{labels,datasets:[{label:t('chart_equip_title'),data:top.map(f=>f[1]),backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]+'bb'),borderColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>subOf[ctx.label]||''}},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},onClick:(_,els)=>{if(els.length){drillToEquipment(labels[els[0].index]);notify(t('notif_filter_applied'),labels[els[0].index],'info',2500);}},plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>eqLocation(ctx.label,subOf[ctx.label])}},datalabels:{color:labelColor(),font:{size:9,weight:'bold'},anchor:'end',align:'top',display:ctx=>ctx.dataset.data[ctx.dataIndex]>0}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:9},maxRotation:30}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true}}},
     plugins:[ChartDataLabels]});
 
   const dm={};filteredData.forEach(r=>{const v=String(r[opC]||'Unknown');dm[v]=(dm[v]||0)+1;});
@@ -1435,6 +1464,8 @@ function renderMonthlyBars(h){
   draw('monthCountChart',cnt,'#a78bfa');
 }
 let _topEqHeaders=null;
+let _chartsHeaders=null;
+let _recurEqHeaders=null;
 function renderTopEquipment(h){
   if(h) _topEqHeaders=h; else h=_topEqHeaders;
   if(!h) return;
@@ -1478,7 +1509,7 @@ function renderTopEquipment(h){
       const val=fmt(e[1][key],0);
       const mval=fmt(e[1][monthKey],0);
       const col=eqColor(e[0]);
-      const subName=e[1].sub||'—';
+      const subName=eqLocation(e[0],e[1].sub);
       const eqTip=(e[0]+' · '+subName).replace(/"/g,'&quot;');
       return '<div class="topeq-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="margin-bottom:2px;cursor:pointer;">'
         +'<div style="display:grid;grid-template-columns:16px 14px 1fr 50px 62px;column-gap:6px;align-items:center;">'
@@ -1570,7 +1601,7 @@ function renderEqRankTable(h){
       const durPct=Math.round(e[1].custMin/maxDur*100);
       return '<tr class="eqrank-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'" style="border-bottom:1px solid var(--border);cursor:pointer;">'+
         '<td style="padding:4px 8px;color:var(--text3);font-size:10px;">'+rank+'</td>'+
-        '<td style="padding:4px 8px;"><span style="display:inline-block;width:7px;height:7px;border-radius:2px;background:'+col+';margin-right:5px;"></span><span style="font-weight:600;color:var(--text1);">'+e[0]+'</span><div style="font-size:9px;color:var(--text3);margin-left:12px;">'+e[1].sub+'</div></td>'+
+        '<td style="padding:4px 8px;"><span style="display:inline-block;width:7px;height:7px;border-radius:2px;background:'+col+';margin-right:5px;"></span><span style="font-weight:600;color:var(--text1);">'+e[0]+'</span><div style="font-size:9px;color:var(--text3);margin-left:12px;">'+eqLocation(e[0],e[1].sub)+'</div></td>'+
         '<td style="padding:4px 8px;text-align:right;color:var(--text1);">'+fmt(e[1].count,0)+'</td>'+
         '<td style="padding:4px 8px;text-align:right;min-width:92px;"><div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;"><span style="color:var(--text1);">'+fmt(e[1].affSum,0)+'</span><div style="width:36px;height:4px;background:var(--border);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:'+affPct+'%;height:100%;background:'+col+';"></div></div></div></td>'+
         '<td style="padding:4px 8px;text-align:right;min-width:92px;"><div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;"><span style="color:var(--text1);">'+fmt(e[1].custMin,0)+'</span><div style="width:36px;height:4px;background:var(--border);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:'+durPct+'%;height:100%;background:'+col+';"></div></div></div></td>'+
@@ -1724,6 +1755,8 @@ function parseDateOnly(s){
   return Date.UTC(+m[1],+m[2]-1,+m[3]);
 }
 function renderRecurringEquipment(h){
+  if(h) _recurEqHeaders=h; else h=_recurEqHeaders;
+  if(!h) return;
   const eC=h.find(function(n){return n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type');});
   const dC=h.find(function(n){return n.includes('Date');});
   const sC=h.find(function(n){return n.includes('SubstationName');});
@@ -1751,7 +1784,7 @@ function renderRecurringEquipment(h){
     return;
   }
   body.innerHTML=entries.map(function(e,i){
-    const subName=e[1].sub||'—';
+    const subName=eqLocation(e[0],e[1].sub);
     const eqTip=(e[0]+' · '+subName).replace(/"/g,'&quot;');
     return '<tr style="border-bottom:1px solid var(--border);cursor:pointer;" class="recur-row" data-eq="'+e[0].replace(/"/g,'&quot;')+'">'+
       '<td style="padding:5px 8px;color:var(--text3);font-size:10px;">'+(i+1)+'</td>'+
@@ -2175,6 +2208,34 @@ async function loadMvLines(){
     })
     .catch(function(e){console.warn('โหลดแนวสาย MV ไม่สำเร็จ',e);mvLines={colors:{},lines:{}};return mvLines;});
   return mvLinesPromise;
+}
+async function loadDeviceLocations(){
+  if(deviceLocations) return deviceLocations;
+  if(deviceLocationsPromise) return deviceLocationsPromise;
+  deviceLocationsPromise=fetch(DEVICE_LOCATIONS_URL,{cache:'no-store'})
+    .then(function(r){return r.text();})
+    .then(function(text){
+      const lines=text.replace(/^﻿/,'').split(/\r?\n/).filter(function(l){return l.trim().length;});
+      const map={};
+      if(lines.length){
+        const headers=parseCsvLine(lines[0]).map(function(h){return h.trim();});
+        const idIdx=headers.indexOf('DeviceID'), descIdx=headers.indexOf('Description');
+        if(idIdx>=0&&descIdx>=0){
+          for(let i=1;i<lines.length;i++){
+            const cols=parseCsvLine(lines[i]);
+            const id=String(cols[idIdx]||'').trim().toUpperCase();
+            const desc=String(cols[descIdx]||'').trim();
+            if(id&&desc) map[id]=desc;
+          }
+        }
+      }
+      deviceLocations=map;
+      // มาช้ากว่าการ์ด/ตาราง/กราฟที่ render ไปก่อนด้วยชื่อสถานีแทน — รีเฟรชให้เป็นจุดติดตั้งจริงทันทีที่โหลดเสร็จ
+      if(filteredData.length){ renderTopEquipment(); renderEqRankTable(); renderRecurringEquipment(); renderCharts(); }
+      return map;
+    })
+    .catch(function(e){console.warn('โหลดจุดติดตั้งอุปกรณ์ไม่สำเร็จ',e);deviceLocations={};return deviceLocations;});
+  return deviceLocationsPromise;
 }
 function initMap(){
   if(mapInst)return;
