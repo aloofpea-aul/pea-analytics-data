@@ -16,7 +16,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://api.longdo.com/map/?key=f61a87ff70c39e610385809783d5a1b3"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1227,12 +1227,49 @@ function jsonToObjects(json){
   });
 }
 
+/* ===== เปิดเร็ว: เก็บข้อมูลชุดล่าสุดไว้ในเครื่อง (IndexedDB) เปิดครั้งต่อไปแสดงทันที
+   แล้วเช็ก meta.json — ถ้าข้อมูลบน GitHub ไม่เปลี่ยน ไม่ต้องโหลด ~42MB ซ้ำ ===== */
+const ADB_NAME='pea_analytics_cache', ADB_STORE='kv';
+function adbOpen(){ return new Promise((ok,no)=>{ const r=indexedDB.open(ADB_NAME,1); r.onupgradeneeded=()=>r.result.createObjectStore(ADB_STORE); r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error); }); }
+async function adbGet(k){ try{ const db=await adbOpen(); return await new Promise(ok=>{ const q=db.transaction(ADB_STORE).objectStore(ADB_STORE).get(k); q.onsuccess=()=>ok(q.result||null); q.onerror=()=>ok(null); }); }catch(e){ return null; } }
+async function adbPut(k,v){ try{ const db=await adbOpen(); await new Promise(ok=>{ const tx=db.transaction(ADB_STORE,'readwrite'); tx.objectStore(ADB_STORE).put(v,k); tx.oncomplete=ok; tx.onerror=ok; tx.onabort=ok; }); }catch(e){} }
+
+async function fetchAllFromGitHub(){
+  const files = Object.entries(GH.FILES); let done=0; const ds={}, ms={};
+  await Promise.all(files.map(async ([path, storeName])=>{
+    try {
+      const [res, descRes] = await Promise.all([
+        fetch(GH.raw(path), {cache:'no-store'}),
+        (GH.DESC_FILES && GH.DESC_FILES[storeName]) ? fetch(GH.raw(GH.DESC_FILES[storeName]), {cache:'no-store'}).catch(()=>null) : Promise.resolve(null)
+      ]);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const objs = jsonToObjects(json);
+      let headers = json.headers||[];
+      if(descRes && descRes.ok){
+        try{
+          const descJson = await descRes.json();
+          (descJson.rows||[]).forEach(pair=>{ const idx=pair[0], text=pair[1]; if(objs[idx]) objs[idx]['CauseDescription']=text; });
+          if(!headers.includes('CauseDescription')) headers = headers.concat('CauseDescription');
+        }catch(descErr){ console.warn('desc file:', descErr.message); }
+      }
+      ds[storeName]=objs; ms[storeName]={ headers: headers, totalRows: json.total||0 };
+      done++; setProgress(Math.round(done/files.length*90)+5);
+    } catch(e){ console.warn(`Failed to load ${path}:`, e.message); }
+  }));
+  return {ds, ms};
+}
+function applyLoaded(ds, ms){
+  Object.keys(dataStore).forEach(k=>dataStore[k]=[]);
+  Object.keys(ds).forEach(k=>{ dataStore[k]=ds[k]; });
+  Object.keys(ms).forEach(k=>{ metaStore[k]=ms[k]; });
+}
+
 async function startLoad(){
   if(isLoading) return;
   isLoading=true;
   loadMvLines(); // โหลดสีฟีดเดอร์จาก SLD คู่ขนานไปเลย เพื่อให้การ์ดอุปกรณ์ได้สีที่ถูกต้องตั้งแต่แรก
   loadDeviceLocations(); // โหลดจุดติดตั้งจริงของอุปกรณ์จาก SLD คู่ขนานไปเลย เพื่อโชว์จุดติดตั้งแทนชื่อสถานีเมื่อมีข้อมูล
-  Object.keys(dataStore).forEach(k=>dataStore[k]=[]);
   setProgress(5); setSidebarStatus('status_connecting'); setStatusDot('loading');
 
   // ตรวจว่า config ยังเป็นค่า default อยู่ไหม
@@ -1242,59 +1279,31 @@ async function startLoad(){
     simulateLoad(); return;
   }
 
+  // 1) มีข้อมูลในเครื่อง → แสดงทันที
+  const cached = await adbGet('data');
+  if(cached && cached.ds){
+    applyLoaded(cached.ds, cached.ms||{});
+    dataSource='github'; finalizeLoad(); isLoading=true;
+  }
+
   try {
-    // ดึง meta.json ก่อนเพื่อตรวจว่า repo ถูกต้อง
+    // 2) เช็ก meta.json ว่าข้อมูลบน GitHub เปลี่ยนไหม
     const metaRes = await fetch(GH.meta(), {cache:'no-store'});
     if(!metaRes.ok) throw new Error(`meta.json: HTTP ${metaRes.status}`);
+    const metaText = await metaRes.text();
+    if(cached && cached.meta === metaText){ isLoading=false; setProgress(0); setSidebarStatus('status_online'); setStatusDot('online'); return; }
 
-    const files = Object.entries(GH.FILES);
-    let done=0;
-
-    await Promise.all(files.map(async ([path, storeName])=>{
-      try {
-        const res = await fetch(GH.raw(path), {cache:'no-store'});
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-
-        // แปลงและเก็บ
-        const objs = jsonToObjects(json);
-        let headers = json.headers||[];
-
-        // ถ้ามีไฟล์คำบรรยายแยกสำหรับชีตนี้ ให้โหลดคู่ขนานแล้วรวมกลับเข้าไป
-        const descPath = GH.DESC_FILES && GH.DESC_FILES[storeName];
-        if(descPath){
-          try{
-            const descRes = await fetch(GH.raw(descPath), {cache:'no-store'});
-            if(descRes.ok){
-              const descJson = await descRes.json();
-              (descJson.rows||[]).forEach(pair=>{
-                const idx = pair[0], text = pair[1];
-                if(objs[idx]) objs[idx]['CauseDescription'] = text;
-              });
-              if(!headers.includes('CauseDescription')) headers = headers.concat('CauseDescription');
-            }
-          } catch(descErr){
-            console.warn(`Failed to load desc file ${descPath}:`, descErr.message);
-          }
-        }
-
-        dataStore[storeName] = objs;
-
-        // สร้าง metaStore จาก JSON
-        metaStore[storeName] = { headers: headers, totalRows: json.total||0 };
-
-        done++;
-        setProgress(Math.round(done/files.length*90)+5);
-      } catch(e){
-        console.warn(`Failed to load ${path}:`, e.message);
-      }
-    }));
-
+    // 3) ข้อมูลใหม่ → โหลดทั้งหมด (ถ้ามีของเก่าแสดงอยู่ ผู้ใช้ใช้ต่อได้ระหว่างรอ)
+    const {ds, ms} = await fetchAllFromGitHub();
+    if(!Object.keys(ds).length) throw new Error('no data');
+    applyLoaded(ds, ms);
     dataSource='github';
     finalizeLoad();
+    adbPut('data', {meta: metaText, ds, ms, at: Date.now()});
 
   } catch(err){
     console.error('GitHub load error:', err);
+    if(cached && cached.ds){ isLoading=false; setProgress(0); setStatusDot('online'); return; }   // ออฟไลน์ ใช้ข้อมูลในเครื่องต่อ
     notify(t('notif_gh_err'),t('notif_gh_err_msg'),'warning',6000);
     dataSource='error'; updateSourceBadge(); setStatusDot('error');
     simulateLoad();
