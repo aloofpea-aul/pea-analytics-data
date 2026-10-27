@@ -269,7 +269,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* การ์ดรายละเอียดจุดความเสี่ยงบนแผนที่ — เราวาดเอง (ไม่ใช้ popup ของ Longdo Map โดยตรง)
    เพราะ popup ของ Longdo กดปิดไม่ค่อยติดและกดพื้นที่ว่างแล้วไม่หาย จึงคุมปุ่มปิด/การซ่อนเองทั้งหมด
    ใช้สีพื้น/ตัวหนังสือคงที่เสมอ (ไม่อิงตัวแปรธีมของหน้าเว็บ) ให้อ่านง่ายไม่ว่าจะสลับธีมไหน */
-.map-detail-card{position:absolute;left:16px;bottom:16px;z-index:60;max-width:250px;font-size:12px;line-height:1.65;color:#dbe3f5;background:#0f1526;padding:12px 30px 12px 14px;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.45);display:none;}
+.map-detail-card{position:absolute;left:16px;bottom:16px;z-index:60;max-width:300px;max-height:calc(100% - 32px);overflow-y:auto;font-size:12px;line-height:1.65;color:#dbe3f5;background:#0f1526;padding:12px 30px 12px 14px;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.45);display:none;}
+.wx-box{margin-top:8px;border-top:1px solid rgba(255,255,255,.1);padding-top:8px;}
+.wx-head{font-weight:700;color:#fff;font-size:12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.wx-sum{font-weight:600;color:#9fb0d0;font-size:11px;}
+.wx-list{max-height:210px;overflow-y:auto;}
+.wx-row{display:grid;grid-template-columns:auto 16px 1fr;gap:4px 6px;align-items:start;font-size:11px;line-height:1.45;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.08);}
+.wx-row .wx-dt{color:#9fb0d0;white-space:nowrap;}
+.wx-row .wx-mark{font-weight:700;text-align:center;}
+.wx-row.ok .wx-mark{color:#34d399;}.wx-row.bad .wx-mark{color:#fbbf24;}
+.wx-na{grid-column:2 / 4;color:#9fb0d0;}
+.wx-load{font-size:11px;color:#9fb0d0;padding:4px 0;}
+.wx-load a{color:#93c5fd;}
+.wx-note{font-size:10px;color:#8494ab;margin-top:6px;line-height:1.5;}
+.wx-summary{margin:10px 14px 0;padding:12px 14px;border-radius:10px;background:var(--bg2,rgba(37,99,235,.06));border:1px solid var(--border,rgba(37,99,235,.2));font-size:12px;color:var(--text1,inherit);}
+.wx-summary .wx-load,.wx-summary .wx-note{color:var(--text3,#8494ab);}
+.wx-sum-title{font-weight:700;margin-bottom:8px;}.wx-sum-title span{font-weight:500;color:var(--text3,#8494ab);}
+.wx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px;}
+.wx-kpis div{padding:8px 10px;border-radius:8px;background:rgba(127,127,127,.08);}
+.wx-kpis b{display:block;font-size:18px;}.wx-kpis span{font-size:10.5px;color:var(--text3,#8494ab);}
+.wx-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.wx-tbl th,.wx-tbl td{padding:5px 8px;text-align:left;border-bottom:1px solid rgba(127,127,127,.18);white-space:nowrap;}
+.wx-tbl th{font-size:10.5px;color:var(--text3,#8494ab);}
 .map-detail-card.show{display:block;animation:fadeIn .15s ease;}
 .map-detail-card b{color:#ffffff;}
 .map-detail-card .mp-head{font-weight:700;font-size:13px;margin-bottom:5px;color:#ffffff;display:flex;align-items:center;gap:6px;}
@@ -614,8 +635,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             <button class="sub-tab" id="mapLvBtn" onclick="toggleLvLines()" data-i="map_voltage_lv">แรงต่ำ</button>
           </div>
           <span style="flex:1;"></span>
+          <button class="map-tab" id="mapWxSummaryBtn" onclick="showWxSummary()" data-i="wx_sum_btn">🌧 เทียบสภาพอากาศช่วงไฟดับ</button>
           <button class="map-tab" id="mapResetHidden" onclick="resetHiddenRiskMarkers()" style="display:none;align-items:center;gap:5px;"><span data-i="map_show_all_hidden">แสดงจุดที่ซ่อนไว้</span> (<span id="hiddenCount">0</span>)</button>
         </div>
+        <div id="mapWxSummary" class="wx-summary" style="display:none;"></div>
         <div style="padding:14px;">
           <div style="position:relative;">
             <div id="mapEl"></div>
@@ -742,6 +765,7 @@ const LANG = {
     map_line_layer_label:'เส้นแนวสาย:',map_line_voltage_label:'แรงดัน:',map_voltage_hv:'แรงสูง',map_voltage_lv:'แรงต่ำ',
     map_show_all_hidden:'แสดงจุดที่ซ่อนไว้',map_hide_point:'ซ่อนจุดนี้',
     map_lv_unavailable_title:'ยังไม่มีข้อมูลเส้นแรงต่ำ',map_lv_unavailable_msg:'ฐานข้อมูล SLD ปัจจุบันมีเฉพาะแนวสายแรงสูง (MV) ของ กฟส.อ่าวลึก ยังไม่มีพิกัดเส้นแรงต่ำ (LV)',
+    wx_title:'สภาพอากาศจริงช่วงไฟดับ (±1 ชม.)',wx_loading:'กำลังดึงข้อมูลอากาศ…',wx_error:'ดึงข้อมูลอากาศไม่สำเร็จ',wx_retry:'ลองใหม่',wx_nodata:'ไม่มีข้อมูลอากาศช่วงนี้',wx_match:'ตรง',wx_diff:'ต่าง',wx_logged:'บันทึก',wx_actual:'จริง',wx_rain_l:'ฝนเล็กน้อย',wx_rain_m:'ฝนปานกลาง',wx_rain_h:'ฝนหนัก',wx_mm:'มม./ชม.',wx_storm:'ฟ้าคะนอง',wx_gust:'ลมกระโชก',wx_kmh:'กม./ชม.',wx_humid:'ชื้น/หมอก',wx_normal:'อากาศปกติ',wx_note:'ข้อมูลอากาศจาก Open-Meteo (แบบจำลองกริด ~10 กม. ไม่ใช่เครื่องวัดที่จุดเกิดเหตุ) · เกณฑ์: ฝน ≥ 0.5 มม./ชม., ลมแรง = ลมกระโชก ≥ 40 กม./ชม. · "ตรง" = ฝนและลมตรงกับที่บันทึก',wx_sum_btn:'🌧 เทียบสภาพอากาศช่วงไฟดับ',wx_sum_title:'สรุปเทียบสภาพอากาศจริงกับที่บันทึก',wx_sum_match:'บันทึกตรงกับอากาศจริง',wx_sum_rain:'ไฟดับขณะมีฝนจริง',wx_sum_wind:'ไฟดับขณะลมแรงจริง',wx_sum_base:'ปกติมี',wx_sum_obs_rain:'จริง: มีฝน',wx_sum_obs_wind:'จริง: ลมแรง',wx_g_normal:'อากาศปกติ',wx_g_rain:'ฝนตก',wx_g_wind:'ลมแรง',wx_g_humid:'ชื้น/หมอก',wx_partial:'บางพื้นที่ดึงไม่สำเร็จ',
     topeq_month:'เดือนนี้',topeq_cum:'สะสม',
     modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
     modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
@@ -807,6 +831,7 @@ const LANG = {
     map_line_layer_label:'Lines:',map_line_voltage_label:'Voltage:',map_voltage_hv:'High Voltage',map_voltage_lv:'Low Voltage',
     map_show_all_hidden:'Show hidden points',map_hide_point:'Hide this point',
     map_lv_unavailable_title:'Low-voltage lines not available',map_lv_unavailable_msg:'The SLD database currently only has high-voltage (MV) line routes for Ao Luek — low-voltage (LV) line coordinates are not yet available',
+    wx_title:'Actual weather at outage (±1 h)',wx_loading:'Loading weather…',wx_error:'Could not load weather data',wx_retry:'Retry',wx_nodata:'No weather data for this time',wx_match:'Match',wx_diff:'Differ',wx_logged:'Logged',wx_actual:'Actual',wx_rain_l:'Light rain',wx_rain_m:'Moderate rain',wx_rain_h:'Heavy rain',wx_mm:'mm/h',wx_storm:'Thunderstorm',wx_gust:'Gusts',wx_kmh:'km/h',wx_humid:'Humid/fog',wx_normal:'Normal',wx_note:'Weather from Open-Meteo (~10 km grid model, not an on-site gauge) · Rain ≥ 0.5 mm/h, strong wind = gusts ≥ 40 km/h · "Match" = rain and wind agree with the log',wx_sum_btn:'🌧 Compare outage weather',wx_sum_title:'Actual vs logged weather',wx_sum_match:'Log matches actual weather',wx_sum_rain:'Outages during actual rain',wx_sum_wind:'Outages during strong wind',wx_sum_base:'usual',wx_sum_obs_rain:'Actual: rain',wx_sum_obs_wind:'Actual: wind',wx_g_normal:'Normal',wx_g_rain:'Rain',wx_g_wind:'Strong wind',wx_g_humid:'Humid/fog',wx_partial:'some areas failed',
     topeq_month:'This Month',topeq_cum:'Cumulative',
     modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
     modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
@@ -2325,12 +2350,15 @@ function showMapDetail(marker,data){
       t('map_popup_incidents')+': <b>'+fmt(data.count)+' '+t('times_unit')+'</b><br>'+
       t('map_popup_duration')+': <b>'+fmt(Math.round(data.sumDur))+' '+t('dur_unit')+'</b><br>'+
       t('map_popup_customers')+': <b>'+fmt(Math.round(data.sumCust))+' '+t('notif_affected')+'</b><br>'+
-      t('map_popup_risk')+': <b style="color:'+data.color+';">'+data.riskLabel+'</b>';
+      t('map_popup_risk')+': <b style="color:'+data.color+';">'+data.riskLabel+'</b>'+
+      '<div id="mapWxBox" class="wx-box"></div>';
   }
   document.getElementById('mapDetailCard')?.classList.add('show');
+  loadMarkerWeather(marker,data);
 }
 function closeMapDetail(){
   _currentDetailMarker=null;
+  _wxToken++;
   document.getElementById('mapDetailCard')?.classList.remove('show');
 }
 // ซ่อนเฉพาะจุดที่กำลังดูรายละเอียดอยู่ ออกจากแผนที่ชั่วคราว เพื่อให้เหลือแต่จุดที่ต้องการโฟกัส
@@ -2356,6 +2384,207 @@ function resetHiddenRiskMarkers(){
   updateMapHiddenBadge();
   renderHeatmap();
 }
+// ================================================================
+// เทียบสภาพอากาศจริง ณ วัน-เวลา-พิกัดที่ไฟดับ (Open-Meteo — ฟรี ไม่ต้องใช้ key, เรียกจากเบราว์เซอร์ผู้ใช้)
+// ข้อมูลอากาศเป็นแบบจำลองตารางกริด ~0.1° (ERA5/พยากรณ์ย้อนหลัง) ไม่ใช่เครื่องวัดที่จุดเกิดเหตุ
+// ================================================================
+const WX_RAIN_MM=0.5, WX_GUST_KMH=40, WX_RH=95;
+const wxCells=new Map();          // 'lat,lon' -> {start,end,promise}
+let _mapEvents=[];                // เหตุการณ์ที่มีพิกัดตามตัวกรองปัจจุบัน (ใช้สรุปรวม)
+let _wxToken=0;
+function wxPad(n){return String(n).padStart(2,'0');}
+function wxParse(dt){
+  const m=String(dt||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if(!m)return null;
+  let y=+m[1]; if(y>2400)y-=543;               // ปี พ.ศ. -> ค.ศ.
+  return {date:y+'-'+wxPad(+m[2])+'-'+wxPad(+m[3]), hour:m[4]!=null?+m[4]:12};
+}
+function wxKey(date,hour){                      // รองรับชั่วโมงที่ข้ามวัน
+  return new Date(Date.parse(date+'T00:00:00Z')+hour*3600000).toISOString().slice(0,13)+':00';
+}
+function wxShowDate(dt){                        // แสดงตามปีที่ข้อมูลต้นทางใช้ (พ.ศ.) เช่น 26/09/2569 22:00
+  const m=String(dt||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if(!m)return String(dt||'-');
+  return wxPad(+m[3])+'/'+wxPad(+m[2])+'/'+m[1]+(m[4]!=null?' '+wxPad(+m[4])+':'+m[5]:'');
+}
+function wxCellKey(lat,lng){return (Math.round(lat*10)/10).toFixed(1)+','+(Math.round(lng*10)/10).toFixed(1);}
+function wxLogged(w){
+  const s=String(w||'');
+  return {rain:s.indexOf('ฝน')>=0, wind:s.indexOf('ลมแรง')>=0, storm:s.indexOf('ฟ้าคะนอง')>=0, humid:s.indexOf('ชื้น')>=0||s.indexOf('หมอก')>=0, raw:s.trim()};
+}
+async function wxFetchJson(url){
+  const r=await fetch(url);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  if(!j.hourly||!j.hourly.time) throw new Error('no data');
+  return j.hourly;
+}
+async function wxFetchRange(latKey,lonKey,start,end){
+  const q='&latitude='+latKey+'&longitude='+lonKey+'&hourly=precipitation,wind_gusts_10m,weather_code,relative_humidity_2m,temperature_2m&timezone=Asia%2FBangkok&wind_speed_unit=kmh';
+  const todayBkk=new Date(Date.now()+7*3600000).toISOString().slice(0,10);
+  const cut=new Date(Date.parse(todayBkk+'T00:00:00Z')-6*86400000).toISOString().slice(0,10); // archive ล่าช้า ~5 วัน
+  const next=new Date(Date.parse(cut+'T00:00:00Z')+86400000).toISOString().slice(0,10);
+  const jobs=[];
+  const aEnd=end<cut?end:cut;
+  if(start<=aEnd) jobs.push(wxFetchJson('https://archive-api.open-meteo.com/v1/archive?start_date='+start+'&end_date='+aEnd+q));
+  if(end>cut) jobs.push(wxFetchJson('https://api.open-meteo.com/v1/forecast?start_date='+(start>cut?start:next)+'&end_date='+end+q));
+  const parts=await Promise.all(jobs);
+  const cell={idx:new Map(),time:[],p:[],g:[],c:[],rh:[],t:[]};
+  parts.forEach(function(h){
+    h.time.forEach(function(tm,i){
+      if(cell.idx.has(tm))return;
+      cell.idx.set(tm,cell.time.length);
+      cell.time.push(tm);
+      cell.p.push(h.precipitation[i]);cell.g.push(h.wind_gusts_10m[i]);cell.c.push(h.weather_code[i]);
+      cell.rh.push(h.relative_humidity_2m[i]);cell.t.push(h.temperature_2m[i]);
+    });
+  });
+  return cell;
+}
+let _wxActive=0; const _wxWait=[];
+function wxSlot(){return new Promise(function(res){ if(_wxActive<3){_wxActive++;res();} else _wxWait.push(res); });}
+function wxRelease(){ const n=_wxWait.shift(); if(n) n(); else _wxActive--; }
+function wxGetCell(lat,lng,start,end){
+  const key=wxCellKey(lat,lng), parts=key.split(',');
+  const hit=wxCells.get(key);
+  if(hit&&hit.start<=start&&hit.end>=end) return hit.promise;
+  const s=hit?(hit.start<start?hit.start:start):start, e=hit?(hit.end>end?hit.end:end):end;
+  const promise=(async function(){
+    await wxSlot();
+    try{ return await wxFetchRange(parts[0],parts[1],s,e); }
+    catch(err){ wxCells.delete(key); throw err; }
+    finally{ wxRelease(); }
+  })();
+  wxCells.set(key,{start:s,end:e,promise:promise});
+  return promise;
+}
+// ประเมินสภาพอากาศจริงช่วง ±1 ชม. จากเวลาเกิดเหตุ
+function wxEval(cell,ev){
+  const tt=wxParse(ev.dt); if(!tt)return null;
+  let p=null,g=null,c=null,rh=null,tmp=null,found=false;
+  const mx=function(a,b){return b==null?a:(a==null||b>a?b:a);};
+  for(let d=-1;d<=1;d++){
+    const i=cell.idx.get(wxKey(tt.date,tt.hour+d));
+    if(i==null)continue;
+    found=true;
+    p=mx(p,cell.p[i]);g=mx(g,cell.g[i]);c=mx(c,cell.c[i]);rh=mx(rh,cell.rh[i]);
+    if(d===0)tmp=cell.t[i];
+  }
+  if(!found||(p==null&&g==null&&c==null))return null;
+  const lg=wxLogged(ev.weather);
+  const obs={rain:(p||0)>=WX_RAIN_MM, wind:(g||0)>=WX_GUST_KMH, storm:(c||0)>=95, humid:c===45||c===48||(rh||0)>=WX_RH, p:p||0, g:g||0, tmp:tmp};
+  return {obs:obs,logged:lg,match:(lg.rain===obs.rain&&lg.wind===obs.wind)};
+}
+function wxObsLabel(o){
+  const out=[];
+  if(o.rain) out.push((o.p>=10?t('wx_rain_h'):o.p>=2.5?t('wx_rain_m'):t('wx_rain_l'))+' '+o.p.toFixed(1)+' '+t('wx_mm'));
+  if(o.storm) out.push(t('wx_storm'));
+  if(o.wind) out.push(t('wx_gust')+' '+Math.round(o.g)+' '+t('wx_kmh'));
+  if(!o.rain&&!o.wind&&o.humid) out.push(t('wx_humid'));
+  if(!out.length) out.push(t('wx_normal'));
+  return out.join(' · ')+(o.tmp!=null?' · '+Math.round(o.tmp)+'°C':'');
+}
+function wxRange(evs){
+  let s=null,e=null;
+  evs.forEach(function(x){const p=wxParse(x.dt);if(!p)return;if(s===null||p.date<s)s=p.date;if(e===null||p.date>e)e=p.date;});
+  return s?{start:s,end:e}:null;
+}
+// ---- แสดงในการ์ดรายละเอียดของหมุด ----
+async function loadMarkerWeather(marker,data){
+  const box=document.getElementById('mapWxBox'); if(!box)return;
+  const token=++_wxToken;
+  const evs=(data.events||[]).slice().sort(function(a,b){return String(b.dt).localeCompare(String(a.dt));});
+  if(!evs.length){box.innerHTML='';return;}
+  const rg=wxRange(evs);
+  if(!rg){box.innerHTML='';return;}
+  box.innerHTML='<div class="wx-load">'+t('wx_loading')+'</div>';
+  try{
+    const cell=await wxGetCell(data.lat,data.lng,rg.start,rg.end);
+    if(token!==_wxToken||_currentDetailMarker!==marker)return;
+    let ok=0,bad=0,rows='';
+    evs.forEach(function(ev){
+      const r=wxEval(cell,ev);
+      if(!r){rows+='<div class="wx-row"><span class="wx-dt">'+wxShowDate(ev.dt)+'</span><span class="wx-na">'+t('wx_nodata')+'</span></div>';return;}
+      if(r.match)ok++;else bad++;
+      rows+='<div class="wx-row '+(r.match?'ok':'bad')+'"><span class="wx-dt">'+wxShowDate(ev.dt)+'</span>'+
+        '<span class="wx-mark">'+(r.match?'✓':'≠')+'</span>'+
+        '<span class="wx-txt">'+t('wx_logged')+': <b>'+(r.logged.raw||'-')+'</b><br>'+t('wx_actual')+': <b>'+wxObsLabel(r.obs)+'</b></span></div>';
+    });
+    box.innerHTML='<div class="wx-head">'+t('wx_title')+'<span class="wx-sum">'+t('wx_match')+' '+ok+' · '+t('wx_diff')+' '+bad+'</span></div>'+
+      '<div class="wx-list">'+rows+'</div><div class="wx-note">'+t('wx_note')+'</div>';
+  }catch(err){
+    if(token!==_wxToken||_currentDetailMarker!==marker)return;
+    box.innerHTML='<div class="wx-load">'+t('wx_error')+' <a href="#" onclick="loadMarkerWeatherRetry();return false;">'+t('wx_retry')+'</a></div>';
+  }
+}
+function loadMarkerWeatherRetry(){
+  if(_currentDetailMarker&&mapDetailData.has(_currentDetailMarker)) loadMarkerWeather(_currentDetailMarker,mapDetailData.get(_currentDetailMarker));
+}
+// ---- สรุปรวมทุกเหตุการณ์ที่เห็นบนแผนที่ ----
+async function showWxSummary(){
+  const panel=document.getElementById('mapWxSummary'); if(!panel)return;
+  if(panel.style.display==='block'&&panel.getAttribute('data-busy')!=='1'){panel.style.display='none';return;}
+  const evs=_mapEvents.filter(function(e){return wxParse(e.dt);});
+  panel.style.display='block';
+  if(!evs.length){panel.textContent=t('map_no_data');return;}
+  panel.setAttribute('data-busy','1');
+  const rg=wxRange(evs);
+  const cellKeys=Array.from(new Set(evs.map(function(e){return wxCellKey(e.lat,e.lng);})));
+  const byCell=new Map(); cellKeys.forEach(function(k){byCell.set(k,null);});
+  let done=0,failed=0;
+  panel.innerHTML='<div class="wx-load">'+t('wx_loading')+' 0/'+cellKeys.length+'</div>';
+  await Promise.all(cellKeys.map(async function(k){
+    const pr=k.split(',');
+    try{ byCell.set(k,await wxGetCell(+pr[0],+pr[1],rg.start,rg.end)); }catch(e){ failed++; }
+    done++;
+    panel.innerHTML='<div class="wx-load">'+t('wx_loading')+' '+done+'/'+cellKeys.length+'</div>';
+  }));
+  panel.removeAttribute('data-busy');
+  if(failed===cellKeys.length){panel.innerHTML='<div class="wx-load">'+t('wx_error')+' <a href="#" onclick="document.getElementById(\'mapWxSummary\').style.display=\'none\';showWxSummary();return false;">'+t('wx_retry')+'</a></div>';return;}
+  const groups={normal:{n:0,rain:0,wind:0},rain:{n:0,rain:0,wind:0},wind:{n:0,rain:0,wind:0},humid:{n:0,rain:0,wind:0}};
+  let total=0,match=0,obsRain=0,obsWind=0,expRain=0,expWind=0;
+  const baseCache=new Map();
+  function base(k,cell){                         // สัดส่วนชั่วโมง (±1 ชม.) ที่ฝน/ลมเข้าเกณฑ์ ในช่วงวันเดียวกัน
+    if(baseCache.has(k))return baseCache.get(k);
+    let n=0,r=0,w=0;
+    for(let i=0;i<cell.time.length;i++){
+      if(cell.time[i]<rg.start+'T00:00'||cell.time[i]>rg.end+'T23:00')continue;
+      let pm=null,gm=null;
+      for(let d=-1;d<=1;d++){const j=i+d;if(j<0||j>=cell.time.length)continue;
+        if(cell.p[j]!=null&&(pm==null||cell.p[j]>pm))pm=cell.p[j];
+        if(cell.g[j]!=null&&(gm==null||cell.g[j]>gm))gm=cell.g[j];}
+      if(pm==null&&gm==null)continue;
+      n++; if((pm||0)>=WX_RAIN_MM)r++; if((gm||0)>=WX_GUST_KMH)w++;
+    }
+    const res=n?{rain:r/n,wind:w/n}:null; baseCache.set(k,res); return res;
+  }
+  evs.forEach(function(ev){
+    const k=wxCellKey(ev.lat,ev.lng), cell=byCell.get(k); if(!cell)return;
+    const r=wxEval(cell,ev); if(!r)return;
+    const b=base(k,cell); if(!b)return;
+    total++; if(r.match)match++;
+    if(r.obs.rain)obsRain++; if(r.obs.wind)obsWind++;
+    expRain+=b.rain; expWind+=b.wind;
+    const gk=r.logged.rain?'rain':r.logged.wind?'wind':r.logged.humid?'humid':'normal';
+    groups[gk].n++; if(r.obs.rain)groups[gk].rain++; if(r.obs.wind)groups[gk].wind++;
+  });
+  if(!total){panel.innerHTML='<div class="wx-load">'+t('wx_nodata')+'</div>';return;}
+  const pct=function(a,b){return b?Math.round(a/b*100)+'%':'-';};
+  const names={normal:t('wx_g_normal'),rain:t('wx_g_rain'),wind:t('wx_g_wind'),humid:t('wx_g_humid')};
+  let tr='';
+  ['normal','rain','wind','humid'].forEach(function(k){const g=groups[k];if(!g.n)return;
+    tr+='<tr><td>'+names[k]+'</td><td>'+fmt(g.n)+'</td><td>'+g.rain+' ('+pct(g.rain,g.n)+')</td><td>'+g.wind+' ('+pct(g.wind,g.n)+')</td></tr>';});
+  const lift=function(o,e){return e>0?(o/e).toFixed(1):'-';};
+  panel.innerHTML='<div class="wx-sum-title">'+t('wx_sum_title')+' <span>'+fmt(total)+' '+t('times_unit')+'</span></div>'+
+    '<div class="wx-kpis">'+
+      '<div><b>'+pct(match,total)+'</b><span>'+t('wx_sum_match')+'</span></div>'+
+      '<div><b>'+pct(obsRain,total)+'</b><span>'+t('wx_sum_rain')+' ('+t('wx_sum_base')+' '+pct(expRain,total)+' · '+lift(obsRain,expRain)+'×)</span></div>'+
+      '<div><b>'+pct(obsWind,total)+'</b><span>'+t('wx_sum_wind')+' ('+t('wx_sum_base')+' '+pct(expWind,total)+' · '+lift(obsWind,expWind)+'×)</span></div>'+
+    '</div>'+
+    '<div style="overflow-x:auto;"><table class="wx-tbl"><thead><tr><th>'+t('wx_logged')+'</th><th>'+t('times_unit')+'</th><th>'+t('wx_sum_obs_rain')+'</th><th>'+t('wx_sum_obs_wind')+'</th></tr></thead><tbody>'+tr+'</tbody></table></div>'+
+    '<div class="wx-note">'+t('wx_note')+(failed?' ('+t('wx_partial')+' '+failed+'/'+cellKeys.length+')':'')+'</div>';
+}
+
 // เส้นแนวสาย MV (~2,000 เส้นทั่วเขต) เป็น "พื้นหลัง" ที่ไม่เปลี่ยนตามตัวกรองเหตุการณ์ — จะวาดใหม่เฉพาะตอนสลับ
 // ตัวกรอง "ทั้งหมด/สายหลัก/สายแยก" เท่านั้น ไม่ใช่ทุกครั้งที่ตัวกรองข้อมูลเปลี่ยน (จุดที่เคยทำให้หน้าจอค้าง)
 let mapLineFilter='All'; // All | Main | Branch
@@ -2410,17 +2639,23 @@ async function renderHeatmap(){
   const h=metaStore[sName]?.headers||[];
   const dC=h.find(n=>n.toLowerCase()==='duration'),cC=h.find(n=>n.includes('Customer')||n.includes('ผู้ใช้ไฟ'));
   const eC=h.find(n=>n.toLowerCase().includes('equipment')&&!n.toLowerCase().includes('type'));
+  const tC=h.find(n=>n.includes('Date'));
+  const wC=h.find(n=>n==='Weather'||n.includes('สภาพอากาศ'));
   const byEq=new Map();
   let matched=0;
+  _mapEvents=[];
+  const wxPanel=document.getElementById('mapWxSummary'); if(wxPanel&&wxPanel.getAttribute('data-busy')!=='1') wxPanel.style.display='none';
   filteredData.forEach(r=>{
     const eq=String(r[eC]||'').trim();
     const c=coords[eq];
     if(!c)return;
     matched++;
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,cust=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    if(!byEq.has(eq)) byEq.set(eq,{eq,lat:c[0],lng:c[1],count:0,sumDur:0,sumCust:0});
+    if(!byEq.has(eq)) byEq.set(eq,{eq,lat:c[0],lng:c[1],count:0,sumDur:0,sumCust:0,events:[]});
     const agg=byEq.get(eq);
     agg.count++; agg.sumDur+=d; agg.sumCust+=cust;
+    const ev={eq:eq,lat:c[0],lng:c[1],dt:tC?r[tC]:'',weather:wC?r[wC]:''};
+    agg.events.push(ev); _mapEvents.push(ev);
   });
   if(note) note.textContent=t('map_scope_note').replace('{n}',fmt(matched)).replace('{total}',fmt(filteredData.length));
   const locs=Array.from(byEq.values());
@@ -2437,7 +2672,7 @@ async function renderHeatmap(){
       const marker=new longdo.Marker({lon:loc.lng,lat:loc.lat},{icon:{html:dotHtml,offset:{x:7,y:7}},clickable:true});
       mapInst.Overlays.add(marker);
       mapRiskMarkers.push(marker);
-      mapDetailData.set(marker,{eq:loc.eq,count:loc.count,sumDur:loc.sumDur,sumCust:loc.sumCust,color:color,riskLabel:riskLabel});
+      mapDetailData.set(marker,{eq:loc.eq,lat:loc.lat,lng:loc.lng,events:loc.events,count:loc.count,sumDur:loc.sumDur,sumCust:loc.sumCust,color:color,riskLabel:riskLabel});
     }catch(e){}
   });
 }
