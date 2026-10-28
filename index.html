@@ -288,6 +288,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .wx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px;}
 .wx-kpis div{padding:8px 10px;border-radius:8px;background:rgba(127,127,127,.08);}
 .wx-kpis b{display:block;font-size:18px;}.wx-kpis span{font-size:10.5px;color:var(--text3,#8494ab);}
+.wx-sum-title{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.wx-x{margin-left:auto;width:26px;height:26px;border-radius:50%;border:none;background:rgba(127,127,127,.14);color:inherit;cursor:pointer;font-size:12px;}
+.wx-x:hover{background:rgba(127,127,127,.28);}
+.wx-sec{font-weight:700;font-size:12px;margin:14px 0 6px;}
+.wx-mis-wrap{max-height:320px;overflow:auto;border:1px solid rgba(127,127,127,.15);border-radius:8px;}
+.wx-mis-wrap .wx-tbl td{white-space:normal;vertical-align:top;}
+.wx-mis-wrap thead th{position:sticky;top:0;background:var(--bg2,#fff);}
+.wx-loc{font-size:10.5px;color:var(--text3,#8494ab);}
+.wx-missed{color:#d97706;font-weight:600;}.wx-over{color:#7c3aed;font-weight:600;}
+.fc-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+.fc-badge.lv0,.fc-banner.lv0{background:rgba(16,185,129,.14);color:#059669;}
+.fc-badge.lv1,.fc-banner.lv1{background:rgba(37,99,235,.14);color:#2563eb;}
+.fc-badge.lv2,.fc-banner.lv2{background:rgba(245,158,11,.18);color:#b45309;}
+.fc-badge.lv3,.fc-banner.lv3{background:rgba(239,68,68,.16);color:#dc2626;}
+.fc-banner{padding:8px 12px;border-radius:8px;font-weight:600;margin-bottom:10px;font-size:12px;}
+.fc-top{white-space:normal !important;font-size:10.5px;min-width:160px;}
 .wx-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
 .wx-tbl th,.wx-tbl td{padding:5px 8px;text-align:left;border-bottom:1px solid rgba(127,127,127,.18);white-space:nowrap;}
 .wx-tbl th{font-size:10.5px;color:var(--text3,#8494ab);}
@@ -620,7 +636,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
     <!-- MAP VIEW -->
     <div class="view" id="view-map">
-      <div class="card"><div class="card-header"><span class="card-title" data-i="map_title">แผนที่ความเสี่ยง (Heatmap)</span><div style="display:flex;gap:5px;"><button class="map-tab active" id="ml-incidents" onclick="setMapLayer('incidents')" data-i="map_incidents">เหตุการณ์</button><button class="map-tab" id="ml-duration" onclick="setMapLayer('duration')" data-i="map_duration">ระยะเวลา</button><button class="map-tab" id="ml-customers" onclick="setMapLayer('customers')" data-i="map_customers">ผู้ใช้ไฟ</button></div></div>
+      <div class="card"><div class="card-header"><span class="card-title" data-i="map_title">แผนที่ความเสี่ยง (Heatmap)</span><div style="display:flex;gap:5px;"><button class="map-tab active" id="ml-incidents" onclick="setMapLayer('incidents')" data-i="map_incidents">เหตุการณ์</button><button class="map-tab" id="ml-duration" onclick="setMapLayer('duration')" data-i="map_duration">ระยะเวลา</button><button class="map-tab" id="ml-customers" onclick="setMapLayer('customers')" data-i="map_customers">ผู้ใช้ไฟ</button><button class="map-tab" id="ml-rainshare" onclick="setMapLayer('rainshare')" data-i="wx_layer_share">% ขณะฝน</button></div></div>
         <div style="font-size:11px;color:var(--amber);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;margin:10px 14px 0;padding:8px 12px;" id="mapScopeNote">—</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 14px 0;">
           <span style="font-size:10.5px;color:var(--text3);font-weight:700;" data-i="map_line_layer_label">เส้นแนวสาย:</span>
@@ -634,10 +650,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             <button class="sub-tab active" id="mapHvBtn" data-i="map_voltage_hv">แรงสูง</button>
             <button class="sub-tab" id="mapLvBtn" onclick="toggleLvLines()" data-i="map_voltage_lv">แรงต่ำ</button>
           </div>
+          <span style="font-size:10.5px;color:var(--text3);font-weight:700;margin-left:4px;" data-i="wx_f_label">อากาศจริง:</span>
+          <div class="sub-tabs" id="mapWxFilterTabs">
+            <button class="sub-tab active" data-wx="All" onclick="setMapWxFilter('All')" data-i="sub_all">ทั้งหมด</button>
+            <button class="sub-tab" data-wx="Rain" onclick="setMapWxFilter('Rain')" data-i="wx_f_rain">ขณะฝนตก</button>
+            <button class="sub-tab" data-wx="Wind" onclick="setMapWxFilter('Wind')" data-i="wx_f_wind">ขณะลมแรง</button>
+          </div>
           <span style="flex:1;"></span>
+          <button class="map-tab" id="mapFcBtn" onclick="showForecastPanel()" data-i="fc_btn">⛈ พยากรณ์ 48 ชม.</button>
           <button class="map-tab" id="mapWxSummaryBtn" onclick="showWxSummary()" data-i="wx_sum_btn">🌧 เทียบสภาพอากาศช่วงไฟดับ</button>
           <button class="map-tab" id="mapResetHidden" onclick="resetHiddenRiskMarkers()" style="display:none;align-items:center;gap:5px;"><span data-i="map_show_all_hidden">แสดงจุดที่ซ่อนไว้</span> (<span id="hiddenCount">0</span>)</button>
         </div>
+        <div id="mapFcPanel" class="wx-summary" style="display:none;"></div>
         <div id="mapWxSummary" class="wx-summary" style="display:none;"></div>
         <div style="padding:14px;">
           <div style="position:relative;">
@@ -766,6 +790,8 @@ const LANG = {
     map_show_all_hidden:'แสดงจุดที่ซ่อนไว้',map_hide_point:'ซ่อนจุดนี้',
     map_lv_unavailable_title:'ยังไม่มีข้อมูลเส้นแรงต่ำ',map_lv_unavailable_msg:'ฐานข้อมูล SLD ปัจจุบันมีเฉพาะแนวสายแรงสูง (MV) ของ กฟส.อ่าวลึก ยังไม่มีพิกัดเส้นแรงต่ำ (LV)',
     wx_title:'สภาพอากาศจริงช่วงไฟดับ (±1 ชม.)',wx_loading:'กำลังดึงข้อมูลอากาศ…',wx_error:'ดึงข้อมูลอากาศไม่สำเร็จ',wx_retry:'ลองใหม่',wx_nodata:'ไม่มีข้อมูลอากาศช่วงนี้',wx_match:'ตรง',wx_diff:'ต่าง',wx_logged:'บันทึก',wx_actual:'จริง',wx_rain_l:'ฝนเล็กน้อย',wx_rain_m:'ฝนปานกลาง',wx_rain_h:'ฝนหนัก',wx_mm:'มม./ชม.',wx_storm:'ฟ้าคะนอง',wx_gust:'ลมกระโชก',wx_kmh:'กม./ชม.',wx_humid:'ชื้น/หมอก',wx_normal:'อากาศปกติ',wx_note:'ข้อมูลอากาศจาก Open-Meteo (แบบจำลองกริด ~10 กม. ไม่ใช่เครื่องวัดที่จุดเกิดเหตุ) · เกณฑ์: ฝน ≥ 0.5 มม./ชม., ลมแรง = ลมกระโชก ≥ 40 กม./ชม. · "ตรง" = ฝนและลมตรงกับที่บันทึก',wx_sum_btn:'🌧 เทียบสภาพอากาศช่วงไฟดับ',wx_sum_title:'สรุปเทียบสภาพอากาศจริงกับที่บันทึก',wx_sum_match:'บันทึกตรงกับอากาศจริง',wx_sum_rain:'ไฟดับขณะมีฝนจริง',wx_sum_wind:'ไฟดับขณะลมแรงจริง',wx_sum_base:'ปกติมี',wx_sum_obs_rain:'จริง: มีฝน',wx_sum_obs_wind:'จริง: ลมแรง',wx_g_normal:'อากาศปกติ',wx_g_rain:'ฝนตก',wx_g_wind:'ลมแรง',wx_g_humid:'ชื้น/หมอก',wx_partial:'บางพื้นที่ดึงไม่สำเร็จ',
+    wx_kpi_missed:'ครั้งที่บันทึกไม่ครบ (มีฝน/ลมจริง)',wx_month_title:'ไฟดับรายเดือนเทียบปริมาณฝน',wx_group_title:'แยกตามสภาพอากาศที่บันทึก',wx_mis_title:'รายการที่บันทึกไม่ตรงกับอากาศจริง',wx_mis_missed:'บันทึกไม่ครบ',wx_mis_over:'บันทึกเกิน',wx_mis_none:'ไม่มีรายการ',wx_mis_more:'แสดง {n} รายการล่าสุด จากทั้งหมด {total} — ดาวน์โหลด CSV เพื่อดูครบ',wx_col_dt:'วันเวลา',wx_col_eq:'อุปกรณ์ / จุดติดตั้ง',wx_csv_mis:'CSV รายการไม่ตรง',wx_csv_all:'CSV ทั้งหมด',wx_csv_empty:'ไม่มีข้อมูลให้ดาวน์โหลด',wx_ch_rain_out:'ไฟดับขณะมีฝน',wx_ch_dry_out:'ไฟดับขณะไม่มีฝน',wx_ch_rain_mm:'ฝนรวมเฉลี่ย (มม.)',wx_ch_y_out:'ครั้ง',wx_ch_y_mm:'มม.',wx_f_label:'อากาศจริง:',wx_f_rain:'ขณะฝนตก',wx_f_wind:'ขณะลมแรง',wx_f_note_rain:'กรองเฉพาะไฟดับขณะมีฝนจริง',wx_f_note_wind:'กรองเฉพาะไฟดับขณะลมแรงจริง',wx_layer_share:'% ขณะฝน',wx_share_lbl:'เกิดขณะฝน',
+    fc_btn:'⛈ พยากรณ์ 48 ชม.',fc_loading:'กำลังดึงพยากรณ์อากาศ…',fc_title:'พยากรณ์ความเสี่ยงไฟดับจากสภาพอากาศ 48 ชม. ข้างหน้า',fc_asof:'ข้อมูล ณ',fc_refresh:'โหลดใหม่',fc_lv0:'ปกติ',fc_lv1:'เฝ้าระวัง',fc_lv2:'เสี่ยง',fc_lv3:'เสี่ยงสูง',fc_hr:'ชม.',fc_banner_0:'✓ 48 ชม. ข้างหน้าไม่มีฝนหนักหรือลมแรงที่เข้าเกณฑ์ในพื้นที่ กฟส.อ่าวลึก',fc_banner_1:'ⓘ มีฝนเล็กน้อย/ลมปานกลางบางช่วง — เฝ้าระวังตามปกติ',fc_banner_2:'⚠ มีช่วงฝนปานกลางหรือลมกระโชก ≥ 40 กม./ชม. — แนะนำเตรียมทีมแก้ไฟฟ้า',fc_banner_3:'⛔ มีพายุฝนฟ้าคะนอง ฝนหนัก หรือลมกระโชกแรง — แนะนำเตรียมทีมและพัสดุสำรองล่วงหน้า',fc_col_feeder:'ฟีดเดอร์',fc_col_level:'ระดับ',fc_col_when:'เริ่มเสี่ยง',fc_col_rain:'ฝนสูงสุด/รวม (มม.)',fc_col_prob:'โอกาสฝน',fc_col_gust:'ลมกระโชก (กม./ชม.)',fc_col_storm:'ฟ้าคะนอง',fc_col_watch:'อุปกรณ์ที่ควรเฝ้าระวัง (ไฟดับตามตัวกรอง)',fc_note:'พยากรณ์รายชั่วโมงจาก Open-Meteo (ฟรี) ทุกกริด ~10 กม. ที่มีอุปกรณ์ของฟีดเดอร์นั้น · เสี่ยงสูง = ฟ้าคะนอง/ฝน ≥ 10 มม./ชม./ลมกระโชก ≥ 55 · เสี่ยง = ฝน ≥ 2.5 หรือลมกระโชก ≥ 40 · เฝ้าระวัง = ฝน ≥ 0.5 หรือลมกระโชก ≥ 30',
     topeq_month:'เดือนนี้',topeq_cum:'สะสม',
     modal_title:'รายละเอียดเหตุการณ์',modal_sub:'ข้อมูลทั้งหมดและการเปรียบเทียบเกณฑ์',
     modal_benchmark:'เปรียบเทียบค่าเฉลี่ย',modal_all_fields:'ข้อมูลทั้งหมด',
@@ -832,6 +858,8 @@ const LANG = {
     map_show_all_hidden:'Show hidden points',map_hide_point:'Hide this point',
     map_lv_unavailable_title:'Low-voltage lines not available',map_lv_unavailable_msg:'The SLD database currently only has high-voltage (MV) line routes for Ao Luek — low-voltage (LV) line coordinates are not yet available',
     wx_title:'Actual weather at outage (±1 h)',wx_loading:'Loading weather…',wx_error:'Could not load weather data',wx_retry:'Retry',wx_nodata:'No weather data for this time',wx_match:'Match',wx_diff:'Differ',wx_logged:'Logged',wx_actual:'Actual',wx_rain_l:'Light rain',wx_rain_m:'Moderate rain',wx_rain_h:'Heavy rain',wx_mm:'mm/h',wx_storm:'Thunderstorm',wx_gust:'Gusts',wx_kmh:'km/h',wx_humid:'Humid/fog',wx_normal:'Normal',wx_note:'Weather from Open-Meteo (~10 km grid model, not an on-site gauge) · Rain ≥ 0.5 mm/h, strong wind = gusts ≥ 40 km/h · "Match" = rain and wind agree with the log',wx_sum_btn:'🌧 Compare outage weather',wx_sum_title:'Actual vs logged weather',wx_sum_match:'Log matches actual weather',wx_sum_rain:'Outages during actual rain',wx_sum_wind:'Outages during strong wind',wx_sum_base:'usual',wx_sum_obs_rain:'Actual: rain',wx_sum_obs_wind:'Actual: wind',wx_g_normal:'Normal',wx_g_rain:'Rain',wx_g_wind:'Strong wind',wx_g_humid:'Humid/fog',wx_partial:'some areas failed',
+    wx_kpi_missed:'Under-logged (actual rain/wind)',wx_month_title:'Monthly outages vs rainfall',wx_group_title:'By logged weather',wx_mis_title:'Logs that differ from actual weather',wx_mis_missed:'Under-logged',wx_mis_over:'Over-logged',wx_mis_none:'No records',wx_mis_more:'Showing latest {n} of {total} — download CSV for all',wx_col_dt:'Date/time',wx_col_eq:'Equipment / location',wx_csv_mis:'CSV mismatches',wx_csv_all:'CSV all',wx_csv_empty:'Nothing to download',wx_ch_rain_out:'Outages in rain',wx_ch_dry_out:'Outages without rain',wx_ch_rain_mm:'Avg total rain (mm)',wx_ch_y_out:'events',wx_ch_y_mm:'mm',wx_f_label:'Actual weather:',wx_f_rain:'During rain',wx_f_wind:'Strong wind',wx_f_note_rain:'showing outages during actual rain only',wx_f_note_wind:'showing outages during strong wind only',wx_layer_share:'% in rain',wx_share_lbl:'in rain',
+    fc_btn:'⛈ 48h forecast',fc_loading:'Loading forecast…',fc_title:'Weather-driven outage risk, next 48 hours',fc_asof:'as of',fc_refresh:'Refresh',fc_lv0:'Normal',fc_lv1:'Watch',fc_lv2:'Risk',fc_lv3:'High risk',fc_hr:'h',fc_banner_0:'✓ No heavy rain or strong wind expected in the Ao Luek area in the next 48 h',fc_banner_1:'ⓘ Light rain / moderate wind at times — normal watch',fc_banner_2:'⚠ Moderate rain or gusts ≥ 40 km/h expected — consider readying repair crews',fc_banner_3:'⛔ Thunderstorms, heavy rain or strong gusts expected — ready crews and spare materials',fc_col_feeder:'Feeder',fc_col_level:'Level',fc_col_when:'Risk from',fc_col_rain:'Rain max/total (mm)',fc_col_prob:'Rain chance',fc_col_gust:'Gusts (km/h)',fc_col_storm:'Thunder',fc_col_watch:'Equipment to watch (outages in filter)',fc_note:'Hourly forecast from Open-Meteo (free) for every ~10 km grid cell holding that feeder\'s equipment · High = thunderstorm / rain ≥ 10 mm/h / gusts ≥ 55 · Risk = rain ≥ 2.5 or gusts ≥ 40 · Watch = rain ≥ 0.5 or gusts ≥ 30',
     topeq_month:'This Month',topeq_cum:'Cumulative',
     modal_title:'Incident Detail',modal_sub:'Full record data and benchmark comparison',
     modal_benchmark:'Benchmark Comparison',modal_all_fields:'All Fields',
@@ -2339,7 +2367,7 @@ function initMap(){
 }
 function setMapLayer(type){
   mapLayerType=type;
-  ['incidents','duration','customers'].forEach(k=>document.getElementById('ml-'+k)?.classList.toggle('active',k===type));
+  ['incidents','duration','customers','rainshare'].forEach(k=>document.getElementById('ml-'+k)?.classList.toggle('active',k===type));
   renderHeatmap();
 }
 function showMapDetail(marker,data){
@@ -2520,7 +2548,37 @@ async function loadMarkerWeather(marker,data){
 function loadMarkerWeatherRetry(){
   if(_currentDetailMarker&&mapDetailData.has(_currentDetailMarker)) loadMarkerWeather(_currentDetailMarker,mapDetailData.get(_currentDetailMarker));
 }
-// ---- สรุปรวมทุกเหตุการณ์ที่เห็นบนแผนที่ ----
+// ---- ประเมินอากาศจริงของหลายเหตุการณ์พร้อมกัน (ใช้ร่วม: สรุป / กรองแผนที่ / CSV) ----
+const wxEvalCache=new Map();      // 'eq|dt' -> ผล wxEval (null = ไม่มีข้อมูล)
+let _wxEnsuring=null;
+function wxEvKey(ev){return ev.eq+'|'+ev.dt;}
+async function wxEnsureEvents(evs,onProgress){
+  const todo=evs.filter(function(e){return wxParse(e.dt)&&!wxEvalCache.has(wxEvKey(e));});
+  const rg=wxRange(evs);
+  const cellKeys=Array.from(new Set(evs.filter(function(e){return wxParse(e.dt);}).map(function(e){return wxCellKey(e.lat,e.lng);})));
+  const byCell=new Map(); let done=0,failed=0;
+  if(rg){
+    await Promise.all(cellKeys.map(async function(k){
+      const pr=k.split(',');
+      try{ byCell.set(k,await wxGetCell(+pr[0],+pr[1],rg.start,rg.end)); }catch(e){ failed++; }
+      done++; if(onProgress) onProgress(done,cellKeys.length);
+    }));
+  }
+  todo.forEach(function(ev){ const cell=byCell.get(wxCellKey(ev.lat,ev.lng)); if(cell) wxEvalCache.set(wxEvKey(ev),wxEval(cell,ev)); });
+  return {byCell:byCell,failed:failed,cells:cellKeys.length,range:rg};
+}
+function wxResult(ev){return wxEvalCache.get(wxEvKey(ev))||null;}
+
+// ---- ตัวกรองแผนที่ตามอากาศจริง ----
+let mapWxFilter='All';            // All | Rain | Wind
+function setMapWxFilter(val){
+  mapWxFilter=val;
+  document.querySelectorAll('#mapWxFilterTabs .sub-tab').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-wx')===val); });
+  renderHeatmap();
+}
+
+// ---- สรุปรวม + กราฟรายเดือน + รายการบันทึกไม่ตรง ----
+let _wxMismatch=[], _wxAllRows=[], _wxMisFilter='all';
 async function showWxSummary(){
   const panel=document.getElementById('mapWxSummary'); if(!panel)return;
   if(panel.style.display==='block'&&panel.getAttribute('data-busy')!=='1'){panel.style.display='none';return;}
@@ -2528,19 +2586,11 @@ async function showWxSummary(){
   panel.style.display='block';
   if(!evs.length){panel.textContent=t('map_no_data');return;}
   panel.setAttribute('data-busy','1');
-  const rg=wxRange(evs);
-  const cellKeys=Array.from(new Set(evs.map(function(e){return wxCellKey(e.lat,e.lng);})));
-  const byCell=new Map(); cellKeys.forEach(function(k){byCell.set(k,null);});
-  let done=0,failed=0;
-  panel.innerHTML='<div class="wx-load">'+t('wx_loading')+' 0/'+cellKeys.length+'</div>';
-  await Promise.all(cellKeys.map(async function(k){
-    const pr=k.split(',');
-    try{ byCell.set(k,await wxGetCell(+pr[0],+pr[1],rg.start,rg.end)); }catch(e){ failed++; }
-    done++;
-    panel.innerHTML='<div class="wx-load">'+t('wx_loading')+' '+done+'/'+cellKeys.length+'</div>';
-  }));
+  panel.innerHTML='<div class="wx-load">'+t('wx_loading')+'</div>';
+  const res=await wxEnsureEvents(evs,function(d,n){ panel.innerHTML='<div class="wx-load">'+t('wx_loading')+' '+d+'/'+n+'</div>'; });
   panel.removeAttribute('data-busy');
-  if(failed===cellKeys.length){panel.innerHTML='<div class="wx-load">'+t('wx_error')+' <a href="#" onclick="document.getElementById(\'mapWxSummary\').style.display=\'none\';showWxSummary();return false;">'+t('wx_retry')+'</a></div>';return;}
+  const rg=res.range, byCell=res.byCell, failed=res.failed;
+  if(failed===res.cells){panel.innerHTML='<div class="wx-load">'+t('wx_error')+' <a href="#" onclick="document.getElementById(\'mapWxSummary\').style.display=\'none\';showWxSummary();return false;">'+t('wx_retry')+'</a></div>';return;}
   const groups={normal:{n:0,rain:0,wind:0},rain:{n:0,rain:0,wind:0},wind:{n:0,rain:0,wind:0},humid:{n:0,rain:0,wind:0}};
   let total=0,match=0,obsRain=0,obsWind=0,expRain=0,expWind=0;
   const baseCache=new Map();
@@ -2556,33 +2606,222 @@ async function showWxSummary(){
       if(pm==null&&gm==null)continue;
       n++; if((pm||0)>=WX_RAIN_MM)r++; if((gm||0)>=WX_GUST_KMH)w++;
     }
-    const res=n?{rain:r/n,wind:w/n}:null; baseCache.set(k,res); return res;
+    const out=n?{rain:r/n,wind:w/n}:null; baseCache.set(k,out); return out;
   }
+  const months=new Map();                        // 'YYYY-MM' -> {rain:n, dry:n}
+  _wxMismatch=[]; _wxAllRows=[];
   evs.forEach(function(ev){
     const k=wxCellKey(ev.lat,ev.lng), cell=byCell.get(k); if(!cell)return;
-    const r=wxEval(cell,ev); if(!r)return;
+    const r=wxResult(ev); if(!r)return;
     const b=base(k,cell); if(!b)return;
     total++; if(r.match)match++;
     if(r.obs.rain)obsRain++; if(r.obs.wind)obsWind++;
     expRain+=b.rain; expWind+=b.wind;
     const gk=r.logged.rain?'rain':r.logged.wind?'wind':r.logged.humid?'humid':'normal';
     groups[gk].n++; if(r.obs.rain)groups[gk].rain++; if(r.obs.wind)groups[gk].wind++;
+    const mk=wxParse(ev.dt).date.slice(0,7);
+    if(!months.has(mk)) months.set(mk,{rain:0,dry:0});
+    months.get(mk)[r.obs.rain?'rain':'dry']++;
+    const kind=r.match?'match':((r.obs.rain&&!r.logged.rain)||(r.obs.wind&&!r.logged.wind))?'missed':'over';
+    const row={ev:ev,r:r,kind:kind};
+    _wxAllRows.push(row);
+    if(!r.match) _wxMismatch.push(row);
   });
   if(!total){panel.innerHTML='<div class="wx-load">'+t('wx_nodata')+'</div>';return;}
+  _wxMismatch.sort(function(a,b){return String(b.ev.dt).localeCompare(String(a.ev.dt));});
+  _wxAllRows.sort(function(a,b){return String(b.ev.dt).localeCompare(String(a.ev.dt));});
+  // ฝนรายเดือนเฉลี่ยทุกกริดที่ใช้ (มม./เดือน)
+  const monthRain=new Map(), monthRainN=new Map();
+  byCell.forEach(function(cell){
+    if(!cell)return;
+    const sums=new Map();
+    for(let i=0;i<cell.time.length;i++){
+      const tm=cell.time[i]; if(tm<rg.start+'T00:00'||tm>rg.end+'T23:00')continue;
+      const mk=tm.slice(0,7); sums.set(mk,(sums.get(mk)||0)+(cell.p[i]||0));
+    }
+    sums.forEach(function(v,mk){ monthRain.set(mk,(monthRain.get(mk)||0)+v); monthRainN.set(mk,(monthRainN.get(mk)||0)+1); });
+  });
+  const mKeys=Array.from(new Set(Array.from(months.keys()).concat(Array.from(monthRain.keys())))).sort();
   const pct=function(a,b){return b?Math.round(a/b*100)+'%':'-';};
   const names={normal:t('wx_g_normal'),rain:t('wx_g_rain'),wind:t('wx_g_wind'),humid:t('wx_g_humid')};
   let tr='';
   ['normal','rain','wind','humid'].forEach(function(k){const g=groups[k];if(!g.n)return;
     tr+='<tr><td>'+names[k]+'</td><td>'+fmt(g.n)+'</td><td>'+g.rain+' ('+pct(g.rain,g.n)+')</td><td>'+g.wind+' ('+pct(g.wind,g.n)+')</td></tr>';});
   const lift=function(o,e){return e>0?(o/e).toFixed(1):'-';};
-  panel.innerHTML='<div class="wx-sum-title">'+t('wx_sum_title')+' <span>'+fmt(total)+' '+t('times_unit')+'</span></div>'+
+  const nMissed=_wxMismatch.filter(function(x){return x.kind==='missed';}).length;
+  panel.innerHTML='<div class="wx-sum-title">'+t('wx_sum_title')+' <span>'+fmt(total)+' '+t('times_unit')+'</span>'+
+      '<button class="wx-x" onclick="document.getElementById(\'mapWxSummary\').style.display=\'none\'" aria-label="ปิด">✕</button></div>'+
     '<div class="wx-kpis">'+
       '<div><b>'+pct(match,total)+'</b><span>'+t('wx_sum_match')+'</span></div>'+
       '<div><b>'+pct(obsRain,total)+'</b><span>'+t('wx_sum_rain')+' ('+t('wx_sum_base')+' '+pct(expRain,total)+' · '+lift(obsRain,expRain)+'×)</span></div>'+
       '<div><b>'+pct(obsWind,total)+'</b><span>'+t('wx_sum_wind')+' ('+t('wx_sum_base')+' '+pct(expWind,total)+' · '+lift(obsWind,expWind)+'×)</span></div>'+
+      '<div><b>'+fmt(nMissed)+'</b><span>'+t('wx_kpi_missed')+'</span></div>'+
     '</div>'+
+    '<div class="wx-sec">'+t('wx_month_title')+'</div>'+
+    '<div style="position:relative;height:230px;"><canvas id="wxMonthChart"></canvas></div>'+
+    '<div class="wx-sec">'+t('wx_group_title')+'</div>'+
     '<div style="overflow-x:auto;"><table class="wx-tbl"><thead><tr><th>'+t('wx_logged')+'</th><th>'+t('times_unit')+'</th><th>'+t('wx_sum_obs_rain')+'</th><th>'+t('wx_sum_obs_wind')+'</th></tr></thead><tbody>'+tr+'</tbody></table></div>'+
-    '<div class="wx-note">'+t('wx_note')+(failed?' ('+t('wx_partial')+' '+failed+'/'+cellKeys.length+')':'')+'</div>';
+    '<div class="wx-sec" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'+t('wx_mis_title')+' ('+fmt(_wxMismatch.length)+')'+
+      '<span style="flex:1"></span>'+
+      '<button class="map-tab" onclick="wxDownloadCsv(\'mismatch\')">⬇ '+t('wx_csv_mis')+'</button>'+
+      '<button class="map-tab" onclick="wxDownloadCsv(\'all\')">⬇ '+t('wx_csv_all')+'</button></div>'+
+    '<div class="sub-tabs" id="wxMisTabs" style="margin-bottom:6px;">'+
+      '<button class="sub-tab'+(_wxMisFilter==='all'?' active':'')+'" data-mf="all" onclick="setWxMisFilter(\'all\')">'+t('sub_all')+'</button>'+
+      '<button class="sub-tab'+(_wxMisFilter==='missed'?' active':'')+'" data-mf="missed" onclick="setWxMisFilter(\'missed\')">'+t('wx_mis_missed')+'</button>'+
+      '<button class="sub-tab'+(_wxMisFilter==='over'?' active':'')+'" data-mf="over" onclick="setWxMisFilter(\'over\')">'+t('wx_mis_over')+'</button></div>'+
+    '<div id="wxMisList"></div>'+
+    '<div class="wx-note">'+t('wx_note')+(failed?' ('+t('wx_partial')+' '+failed+'/'+res.cells+')':'')+'</div>';
+  renderWxMisList();
+  renderWxMonthChart(mKeys,months,monthRain,monthRainN);
+}
+function wxMonthLabel(mk){
+  const p=mk.split('-'); const th=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const en=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const isEn=(typeof currentLang!=='undefined'&&currentLang==='en');
+  return isEn?en[+p[1]-1]+' '+p[0]:th[+p[1]-1]+' '+String(+p[0]+543).slice(2);
+}
+function renderWxMonthChart(mKeys,months,monthRain,monthRainN){
+  const cv=document.getElementById('wxMonthChart'); if(!cv||typeof Chart==='undefined')return;
+  if(charts.wxMonth){ try{charts.wxMonth.destroy();}catch(e){} }
+  const tc=(typeof tickColor==='function')?tickColor():'#8494ab', gc=(typeof gridColor==='function')?gridColor():'rgba(127,127,127,.15)';
+  charts.wxMonth=new Chart(cv.getContext('2d'),{
+    data:{labels:mKeys.map(wxMonthLabel),datasets:[
+      {type:'bar',label:t('wx_ch_rain_out'),data:mKeys.map(function(k){return (months.get(k)||{}).rain||0;}),backgroundColor:'#2563eb',stack:'o',yAxisID:'y'},
+      {type:'bar',label:t('wx_ch_dry_out'),data:mKeys.map(function(k){return (months.get(k)||{}).dry||0;}),backgroundColor:'rgba(132,148,171,.55)',stack:'o',yAxisID:'y'},
+      {type:'line',label:t('wx_ch_rain_mm'),data:mKeys.map(function(k){return monthRainN.get(k)?Math.round(monthRain.get(k)/monthRainN.get(k)):null;}),borderColor:'#06b6d4',backgroundColor:'#06b6d4',tension:.3,pointRadius:3,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:tc,font:{size:10},boxWidth:10}},datalabels:{display:false}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:tc,font:{size:9}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:9}},title:{display:true,text:t('wx_ch_y_out'),color:tc,font:{size:9}}},
+        y1:{position:'right',beginAtZero:true,grid:{display:false},ticks:{color:tc,font:{size:9}},title:{display:true,text:t('wx_ch_y_mm'),color:tc,font:{size:9}}}}}
+  });
+}
+function setWxMisFilter(v){
+  _wxMisFilter=v;
+  document.querySelectorAll('#wxMisTabs .sub-tab').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-mf')===v); });
+  renderWxMisList();
+}
+function renderWxMisList(){
+  const box=document.getElementById('wxMisList'); if(!box)return;
+  const rows=_wxMismatch.filter(function(x){return _wxMisFilter==='all'||x.kind===_wxMisFilter;});
+  if(!rows.length){box.innerHTML='<div class="wx-load">'+t('wx_mis_none')+'</div>';return;}
+  const LIM=100;
+  let html='<div class="wx-mis-wrap"><table class="wx-tbl"><thead><tr><th>'+t('wx_col_dt')+'</th><th>'+t('wx_col_eq')+'</th><th>'+t('wx_logged')+'</th><th>'+t('wx_actual')+'</th></tr></thead><tbody>';
+  rows.slice(0,LIM).forEach(function(x){
+    html+='<tr><td>'+wxShowDate(x.ev.dt)+'</td><td><b>'+x.ev.eq+'</b><br><span class="wx-loc">'+eqLocation(x.ev.eq,'')+'</span></td><td>'+(x.r.logged.raw||'-')+'</td><td class="'+(x.kind==='missed'?'wx-missed':'wx-over')+'">'+wxObsLabel(x.r.obs)+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  if(rows.length>LIM) html+='<div class="wx-note">'+t('wx_mis_more').replace('{n}',fmt(LIM)).replace('{total}',fmt(rows.length))+'</div>';
+  box.innerHTML=html;
+}
+function wxCsvCell(v){ const s=String(v==null?'':v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+function wxDownloadCsv(which){
+  const rows=which==='all'?_wxAllRows:_wxMismatch;
+  if(!rows.length){ notify(t('wx_csv_empty'),'','info',4000); return; }
+  const head=['วันเวลา','อุปกรณ์','ฟีดเดอร์','จุดติดตั้ง','ละติจูด','ลองจิจูด','สภาพอากาศที่บันทึก','อากาศจริง (Open-Meteo)','ฝนสูงสุด ±1ชม. (มม./ชม.)','ลมกระโชกสูงสุด ±1ชม. (กม./ชม.)','ฟ้าคะนอง','อุณหภูมิ (°C)','ผลเทียบ'];
+  const kindTh={match:'ตรง',missed:'บันทึกไม่ครบ (มีฝน/ลมจริง)',over:'บันทึกเกิน (จริงไม่มีฝน/ลม)'};
+  const lines=[head.map(wxCsvCell).join(',')];
+  rows.forEach(function(x){
+    const o=x.r.obs;
+    lines.push([x.ev.dt,x.ev.eq,feederOf(x.ev.eq),eqLocation(x.ev.eq,''),x.ev.lat,x.ev.lng,x.r.logged.raw,wxObsLabel(o),o.p.toFixed(1),Math.round(o.g),o.storm?'ใช่':'',o.tmp!=null?Math.round(o.tmp):'',kindTh[x.kind]].map(wxCsvCell).join(','));
+  });
+  const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(which==='all'?'weather-outage-all':'weather-outage-mismatch')+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1000);
+}
+
+// ---- พยากรณ์ความเสี่ยงล่วงหน้า 48 ชม. รายฟีดเดอร์ ----
+let _fcCache=null;                // {at, cells:Map}
+function fcLevel(p,g,c){ if((c||0)>=95||(p||0)>=10||(g||0)>=55)return 3; if((p||0)>=2.5||(g||0)>=40)return 2; if((p||0)>=WX_RAIN_MM||(g||0)>=30)return 1; return 0; }
+async function fcFetchCell(key){
+  const pr=key.split(',');
+  await wxSlot();
+  try{
+    const h=await wxFetchJson('https://api.open-meteo.com/v1/forecast?latitude='+pr[0]+'&longitude='+pr[1]+'&hourly=precipitation,precipitation_probability,wind_gusts_10m,weather_code&forecast_days=3&timezone=Asia%2FBangkok&wind_speed_unit=kmh');
+    const now=new Date(Date.now()+7*3600000).toISOString().slice(0,13)+':00';
+    const end=new Date(Date.now()+7*3600000+48*3600000).toISOString().slice(0,13)+':00';
+    const out={maxP:0,sumP:0,maxG:0,maxProb:0,storm:0,level:0,peak:null,firstRisk:null};
+    h.time.forEach(function(tm,i){
+      if(tm<now||tm>end)return;
+      const p=h.precipitation[i]||0,g=h.wind_gusts_10m[i]||0,c=h.weather_code[i]||0,pp=(h.precipitation_probability||[])[i]||0;
+      out.sumP+=p; if(p>out.maxP)out.maxP=p; if(g>out.maxG)out.maxG=g; if(pp>out.maxProb)out.maxProb=pp; if(c>=95)out.storm++;
+      const lv=fcLevel(p,g,c);
+      if(lv>=2&&!out.firstRisk)out.firstRisk=tm;
+      if(lv>out.level||(lv===out.level&&lv>0&&!out.peak)){out.level=lv;out.peak=tm;}
+    });
+    return out;
+  }finally{ wxRelease(); }
+}
+function fcTime(tm){ if(!tm)return '-'; const d=tm.slice(8,10)+'/'+tm.slice(5,7), hh=tm.slice(11,16); return d+' '+hh; }
+async function showForecastPanel(force){
+  const panel=document.getElementById('mapFcPanel'); if(!panel)return;
+  if(!force&&panel.style.display==='block'&&panel.getAttribute('data-busy')!=='1'){panel.style.display='none';return;}
+  panel.style.display='block';
+  const coords=await loadAlaCoords();
+  const eqByFeeder=new Map();
+  Object.keys(coords||{}).forEach(function(eq){
+    const f=feederOf(eq); if(!/^[A-Z]{3}\d{2}$/.test(f))return;
+    if(!eqByFeeder.has(f)) eqByFeeder.set(f,[]);
+    eqByFeeder.get(f).push({eq:eq,key:wxCellKey(coords[eq][0],coords[eq][1])});
+  });
+  const keys=Array.from(new Set([].concat.apply([],Array.from(eqByFeeder.values()).map(function(a){return a.map(function(x){return x.key;});}))));
+  if(!keys.length){panel.innerHTML='<div class="wx-load">'+t('map_no_data')+'</div>';return;}
+  panel.setAttribute('data-busy','1');
+  if(force||!_fcCache||Date.now()-_fcCache.at>30*60000){
+    const cells=new Map(); let done=0;
+    panel.innerHTML='<div class="wx-load">'+t('fc_loading')+' 0/'+keys.length+'</div>';
+    await Promise.all(keys.map(async function(k){
+      try{ cells.set(k,await fcFetchCell(k)); }catch(e){}
+      done++; panel.innerHTML='<div class="wx-load">'+t('fc_loading')+' '+done+'/'+keys.length+'</div>';
+    }));
+    _fcCache={at:Date.now(),cells:cells};
+  }
+  panel.removeAttribute('data-busy');
+  const cells=_fcCache.cells;
+  if(!cells.size){panel.innerHTML='<div class="wx-load">'+t('wx_error')+' <a href="#" onclick="showForecastPanel(true);return false;">'+t('wx_retry')+'</a></div>';return;}
+  // ประวัติไฟดับตามตัวกรองปัจจุบัน ต่อฟีดเดอร์/อุปกรณ์ (ใช้เลือก "จุดที่ควรเฝ้าระวัง")
+  const histEq=new Map(), histRain=new Map();
+  _mapEvents.forEach(function(ev){
+    histEq.set(ev.eq,(histEq.get(ev.eq)||0)+1);
+    const r=wxResult(ev); if(r&&r.obs.rain){ const f=feederOf(ev.eq); histRain.set(f,(histRain.get(f)||0)+1); }
+  });
+  const rows=[];
+  eqByFeeder.forEach(function(list,f){
+    const agg={f:f,level:0,maxP:0,sumP:0,maxG:0,maxProb:0,storm:0,peak:null,firstRisk:null,nEq:list.length,hist:0,top:[]};
+    const seen=new Set();
+    list.forEach(function(x){
+      agg.hist+=histEq.get(x.eq)||0;
+      const c=cells.get(x.key); if(!c||seen.has(x.key))return; seen.add(x.key);
+      if(c.level>agg.level||(c.level===agg.level&&c.peak&&(!agg.peak||c.peak<agg.peak))){agg.level=c.level;agg.peak=c.peak;}
+      if(c.maxP>agg.maxP)agg.maxP=c.maxP; if(c.sumP>agg.sumP)agg.sumP=c.sumP; if(c.maxG>agg.maxG)agg.maxG=c.maxG;
+      if(c.maxProb>agg.maxProb)agg.maxProb=c.maxProb; agg.storm=Math.max(agg.storm,c.storm);
+      if(c.firstRisk&&(!agg.firstRisk||c.firstRisk<agg.firstRisk))agg.firstRisk=c.firstRisk;
+    });
+    agg.top=list.filter(function(x){return histEq.get(x.eq);}).sort(function(a,b){return histEq.get(b.eq)-histEq.get(a.eq);}).slice(0,3).map(function(x){return x.eq+' ('+histEq.get(x.eq)+')';});
+    agg.histRain=histRain.get(f)||0;
+    rows.push(agg);
+  });
+  rows.sort(function(a,b){return b.level-a.level||b.maxP-a.maxP||b.maxG-a.maxG;});
+  const lvName=[t('fc_lv0'),t('fc_lv1'),t('fc_lv2'),t('fc_lv3')], lvCls=['lv0','lv1','lv2','lv3'];
+  const worst=rows.length?rows[0].level:0;
+  let tr='';
+  rows.forEach(function(a){
+    tr+='<tr><td><b>'+a.f+'</b></td><td><span class="fc-badge '+lvCls[a.level]+'">'+lvName[a.level]+'</span></td>'+
+      '<td>'+(a.level>=1?fcTime(a.firstRisk||a.peak):'-')+'</td>'+
+      '<td>'+a.maxP.toFixed(1)+' / '+Math.round(a.sumP)+'</td><td>'+Math.round(a.maxProb)+'%</td><td>'+Math.round(a.maxG)+'</td><td>'+(a.storm?a.storm+' '+t('fc_hr'):'-')+'</td>'+
+      '<td class="fc-top">'+(a.top.join(', ')||'-')+'</td></tr>';
+  });
+  const asOf=new Date(_fcCache.at).toLocaleString('th-TH',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+  panel.innerHTML='<div class="wx-sum-title">'+t('fc_title')+' <span>'+t('fc_asof')+' '+asOf+'</span>'+
+      '<button class="map-tab" style="margin-left:auto;" onclick="showForecastPanel(true)">↻ '+t('fc_refresh')+'</button>'+
+      '<button class="wx-x" style="margin-left:6px;" onclick="document.getElementById(\'mapFcPanel\').style.display=\'none\'" aria-label="ปิด">✕</button></div>'+
+    '<div class="fc-banner '+lvCls[worst]+'">'+t('fc_banner_'+worst)+'</div>'+
+    '<div style="overflow-x:auto;"><table class="wx-tbl"><thead><tr><th>'+t('fc_col_feeder')+'</th><th>'+t('fc_col_level')+'</th><th>'+t('fc_col_when')+'</th><th>'+t('fc_col_rain')+'</th><th>'+t('fc_col_prob')+'</th><th>'+t('fc_col_gust')+'</th><th>'+t('fc_col_storm')+'</th><th>'+t('fc_col_watch')+'</th></tr></thead><tbody>'+tr+'</tbody></table></div>'+
+    '<div class="wx-note">'+t('fc_note')+'</div>';
 }
 
 // เส้นแนวสาย MV (~2,000 เส้นทั่วเขต) เป็น "พื้นหลัง" ที่ไม่เปลี่ยนตามตัวกรองเหตุการณ์ — จะวาดใหม่เฉพาะตอนสลับ
@@ -2645,27 +2884,59 @@ async function renderHeatmap(){
   let matched=0;
   _mapEvents=[];
   const wxPanel=document.getElementById('mapWxSummary'); if(wxPanel&&wxPanel.getAttribute('data-busy')!=='1') wxPanel.style.display='none';
+  const cand=[];
   filteredData.forEach(r=>{
     const eq=String(r[eC]||'').trim();
     const c=coords[eq];
     if(!c)return;
-    matched++;
     const d=parseFloat(String(r[dC]||'').replace(/,/g,''))||0,cust=parseFloat(String(r[cC]||'').replace(/,/g,''))||0;
-    if(!byEq.has(eq)) byEq.set(eq,{eq,lat:c[0],lng:c[1],count:0,sumDur:0,sumCust:0,events:[]});
-    const agg=byEq.get(eq);
-    agg.count++; agg.sumDur+=d; agg.sumCust+=cust;
-    const ev={eq:eq,lat:c[0],lng:c[1],dt:tC?r[tC]:'',weather:wC?r[wC]:''};
+    cand.push({eq:eq,lat:c[0],lng:c[1],dt:tC?r[tC]:'',weather:wC?r[wC]:'',dur:d,cust:cust});
+  });
+  // ตัวกรอง/ชั้นข้อมูลที่ต้องรู้อากาศจริง — โหลดอากาศให้ครบก่อน แล้ววาดใหม่
+  const needWx=(mapWxFilter!=='All'||mapLayerType==='rainshare')&&cand.length;
+  if(needWx&&cand.some(function(ev){return wxParse(ev.dt)&&!wxEvalCache.has(wxEvKey(ev));})){
+    if(note) note.textContent=t('wx_loading');
+    if(!_wxEnsuring){
+      _wxEnsuring=wxEnsureEvents(cand,function(dn,n){ if(note) note.textContent=t('wx_loading')+' '+dn+'/'+n; })
+        .then(function(res){
+          _wxEnsuring=null;
+          // กริดที่ดึงไม่สำเร็จ: ถือว่า "ไม่มีข้อมูล" เพื่อไม่วนโหลดซ้ำไม่จบ
+          cand.forEach(function(ev){ if(wxParse(ev.dt)&&!wxEvalCache.has(wxEvKey(ev))) wxEvalCache.set(wxEvKey(ev),null); });
+          if(res.failed) notify(t('wx_error'),t('wx_partial')+' '+res.failed+'/'+res.cells,'warning',6000);
+          renderHeatmap();
+        }).catch(function(){ _wxEnsuring=null; });
+    }
+    return;
+  }
+  cand.forEach(function(ev){
+    if(mapWxFilter!=='All'){
+      const r=wxResult(ev);
+      if(!r)return;
+      if(mapWxFilter==='Rain'&&!r.obs.rain)return;
+      if(mapWxFilter==='Wind'&&!r.obs.wind)return;
+    }
+    matched++;
+    if(!byEq.has(ev.eq)) byEq.set(ev.eq,{eq:ev.eq,lat:ev.lat,lng:ev.lng,count:0,sumDur:0,sumCust:0,events:[],wxN:0,rainN:0});
+    const agg=byEq.get(ev.eq);
+    agg.count++; agg.sumDur+=ev.dur; agg.sumCust+=ev.cust;
+    const r=needWx?wxResult(ev):null;
+    if(r){ agg.wxN++; if(r.obs.rain) agg.rainN++; }
     agg.events.push(ev); _mapEvents.push(ev);
   });
-  if(note) note.textContent=t('map_scope_note').replace('{n}',fmt(matched)).replace('{total}',fmt(filteredData.length));
+  let noteTxt=t('map_scope_note').replace('{n}',fmt(matched)).replace('{total}',fmt(filteredData.length));
+  if(mapWxFilter!=='All') noteTxt+=' · '+t(mapWxFilter==='Rain'?'wx_f_note_rain':'wx_f_note_wind');
+  if(note) note.textContent=noteTxt;
   const locs=Array.from(byEq.values());
   if(!locs.length)return;
-  const metricOf=loc=>mapLayerType==='incidents'?loc.count:mapLayerType==='duration'?loc.sumDur:loc.sumCust;
+  const isShare=mapLayerType==='rainshare';
+  const metricOf=loc=>mapLayerType==='incidents'?loc.count:mapLayerType==='duration'?loc.sumDur:isShare?(loc.wxN?loc.rainN/loc.wxN:0):loc.sumCust;
   const maxMetric=Math.max(1,...locs.map(metricOf));
   locs.forEach(function(loc){
-    const ratio=metricOf(loc)/maxMetric;
+    // ชั้น "% ขณะฝน" ใช้เกณฑ์คงที่ (<25% / <50% / ≥50%) ไม่เทียบกับค่าสูงสุด
+    const ratio=isShare?(metricOf(loc)<0.25?0:metricOf(loc)<0.5?0.5:1):metricOf(loc)/maxMetric;
     const color=ratio<0.34?'#2563eb':ratio<0.67?'#f59e0b':'#ef4444';
-    const riskLabel=ratio<0.34?t('map_low'):ratio<0.67?t('map_med'):t('map_high');
+    let riskLabel=ratio<0.34?t('map_low'):ratio<0.67?t('map_med'):t('map_high');
+    if(isShare) riskLabel=Math.round(metricOf(loc)*100)+'% '+t('wx_share_lbl')+' ('+loc.rainN+'/'+loc.wxN+')';
     const dotHtml='<div style="width:14px;height:14px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.5);"></div>';
     try{
       // ไม่ใช้ popup ของ Longdo Map ตรงๆ — เก็บข้อมูลไว้ใน mapDetailData แล้วโชว์ผ่านการ์ดของเราเองตอนคลิกโดนหมุด (ดู initMap)
