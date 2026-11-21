@@ -935,7 +935,8 @@ const fmt=(n,d=0)=>(+n||0).toLocaleString(undefined,{maximumFractionDigits:d});
 function smartNum(v){
   v=+v||0; if(v===0) return '0';
   const a=Math.abs(v);
-  const d=a>=100?0:a>=0.01?2:a>=0.001?3:4;
+  if(a<0.001) return String(+v.toPrecision(2));   // เช่น 0.000042
+  const d=a>=100?0:a>=0.01?2:3;
   return v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:d});
 }
 
@@ -1551,8 +1552,8 @@ function renderMonthlyBars(h){
   const monthKeys=Object.keys(byMonth).sort();
   const thMonths=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const labels=monthKeys.map(m=>{const mm=+m.slice(5,7);return thMonths[mm-1]||mm;});
-  const saifi=monthKeys.map(m=>total?+(byMonth[m].affSum/total).toFixed(4):0);
-  const saidi=monthKeys.map(m=>total?+(byMonth[m].custMin/total).toFixed(4):0);
+  const saifi=monthKeys.map(m=>total?byMonth[m].affSum/total:0);
+  const saidi=monthKeys.map(m=>total?byMonth[m].custMin/total:0);
   const cnt=monthKeys.map(m=>byMonth[m].count);
   function draw(id,data,color){
     if(window['__mc_'+id]) window['__mc_'+id].destroy();
