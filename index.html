@@ -1769,7 +1769,7 @@ function renderSubCauseChart(h){
   window.__subCauseChartInst=new Chart(canvas.getContext('2d'),{
     type:'doughnut',
     data:{labels:labels,datasets:[{data:data,backgroundColor:labels.map(function(_,i){return COLORS[i%COLORS.length];}),borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',onClick:function(evt,els){if(els.length){const idx=els[0].index;filters.causeData=[labels[idx]];updateTriggers();updateAllDD();applyFilter(true);}},plugins:{legend:{position:'right',labels:{color:tickColor(),font:{size:9},boxWidth:9}},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:function(v){return v>0?v:'';}}}},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',onClick:function(evt,els){if(els.length){const idx=els[0].index;filters.causeData=[labels[idx]];updateTriggers();updateAllDD();applyFilter(true);}},plugins:{legend:{position:'right',labels:{color:tickColor(),font:{size:9},boxWidth:9,generateLabels:function(ch){const ds=ch.data.datasets[0];const tot=ds.data.reduce(function(a,b){return a+b;},0)||1;return ch.data.labels.map(function(l,i){const v=ds.data[i];return {text:String(l).slice(0,18)+(String(l).length>18?'…':'')+'  '+fmt(v)+' ('+Math.round(v/tot*100)+'%)',fillStyle:ds.backgroundColor[i],strokeStyle:ds.backgroundColor[i],fontColor:tickColor(),hidden:!ch.getDataVisibility(i),index:i};});}}},datalabels:{color:'#fff',font:{size:9,weight:'bold'},display:function(ctx){const d=ctx.dataset.data;const tot=d.reduce(function(a,b){return a+b;},0)||1;return d[ctx.dataIndex]/tot>=0.07;},formatter:function(v){return v>0?fmt(v):'';}}}},
     plugins:[ChartDataLabels]
   });
 }
@@ -1848,7 +1848,7 @@ function renderHourlyChart(h){
   window.__hourlyChartInst=new Chart(canvas.getContext('2d'),{
     type:'bar',
     data:{labels:labels,datasets:[{data:hourCounts,backgroundColor:hourCounts.map(function(v){return v===maxV&&v>0?'#f43f5e':'#3b7ef8bb';}),borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:8,weight:'bold'},anchor:'end',align:'top',offset:2,clamp:true,clip:false,formatter:function(v){return fmt(v);},display:function(ctx){return ctx.dataset.data[ctx.dataIndex]>0;}}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8},maxRotation:60}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true,grace:'15%'}}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{display:false},datalabels:{color:labelColor(),font:{size:8,weight:'bold'},anchor:'end',align:'end',rotation:-90,offset:2,clamp:true,clip:false,formatter:function(v){return fmt(v);},display:function(ctx){return ctx.dataset.data[ctx.dataIndex]>0;}}},scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:8},maxRotation:60}},y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:9}},beginAtZero:true,grace:'28%'}}},
     plugins:[ChartDataLabels]
   });
 }
