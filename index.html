@@ -572,7 +572,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <div class="card">
         <div class="card-header"><span class="card-title">สาเหตุย่อย (Top 8)</span></div>
-        <div style="position:relative;height:130px;padding:16px;"><canvas id="subCauseChart"></canvas></div>
+        <div style="position:relative;height:220px;padding:16px;"><canvas id="subCauseChart"></canvas></div>
       </div>
       </div>
 
@@ -1769,7 +1769,7 @@ function renderSubCauseChart(h){
   window.__subCauseChartInst=new Chart(canvas.getContext('2d'),{
     type:'doughnut',
     data:{labels:labels,datasets:[{data:data,backgroundColor:labels.map(function(_,i){return COLORS[i%COLORS.length];}),borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',onClick:function(evt,els){if(els.length){const idx=els[0].index;filters.causeData=[labels[idx]];updateTriggers();updateAllDD();applyFilter(true);}},plugins:{legend:{position:'right',labels:{color:tickColor(),font:{size:9},boxWidth:9,generateLabels:function(ch){const ds=ch.data.datasets[0];const tot=ds.data.reduce(function(a,b){return a+b;},0)||1;return ch.data.labels.map(function(l,i){const v=ds.data[i];return {text:String(l).slice(0,18)+(String(l).length>18?'…':'')+'  '+fmt(v)+' ('+Math.round(v/tot*100)+'%)',fillStyle:ds.backgroundColor[i],strokeStyle:ds.backgroundColor[i],fontColor:tickColor(),hidden:!ch.getDataVisibility(i),index:i};});}}},datalabels:{color:'#fff',font:{size:9,weight:'bold'},display:function(ctx){const d=ctx.dataset.data;const tot=d.reduce(function(a,b){return a+b;},0)||1;return d[ctx.dataIndex]/tot>=0.07;},formatter:function(v){return v>0?fmt(v):'';}}}},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',onClick:function(evt,els){if(els.length){const idx=els[0].index;filters.causeData=[labels[idx]];updateTriggers();updateAllDD();applyFilter(true);}},plugins:{legend:{position:'right',labels:{color:tickColor(),font:{size:9},boxWidth:9,boxHeight:9,padding:6,generateLabels:function(ch){const ds=ch.data.datasets[0];const tot=ds.data.reduce(function(a,b){return a+b;},0)||1;return ch.data.labels.map(function(l,i){const v=ds.data[i];return {text:String(l).slice(0,18)+(String(l).length>18?'…':'')+'  '+fmt(v)+' ('+Math.round(v/tot*100)+'%)',fillStyle:ds.backgroundColor[i],strokeStyle:ds.backgroundColor[i],fontColor:tickColor(),hidden:!ch.getDataVisibility(i),index:i};});}}},datalabels:{color:'#fff',font:{size:9,weight:'bold'},display:function(ctx){const d=ctx.dataset.data;const tot=d.reduce(function(a,b){return a+b;},0)||1;return d[ctx.dataIndex]/tot>=0.07;},formatter:function(v){return v>0?fmt(v):'';}}}},
     plugins:[ChartDataLabels]
   });
 }
