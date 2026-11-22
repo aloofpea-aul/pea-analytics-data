@@ -436,6 +436,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
               <span data-i="btn_reset">รีเซ็ต</span>
             </button>
+            <button class="btn btn-ghost" id="defUnitBtn" onclick="openDefUnit()" style="font-size:10.5px;" title="ตั้งหน่วยงานที่จะแสดงทันทีเมื่อเปิดแอปในเครื่องนี้">
+              <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+              <span>ค่าเริ่มต้น</span>
+            </button>
           </div>
         </div>
         <div class="card-body" style="overflow:visible;">
@@ -932,6 +936,13 @@ const tickColor=()=>isDark?'#8fa3c0':'#546070';
 const labelColor=()=>isDark?'#fff':'#1a2235';
 const fmt=(n,d=0)=>(+n||0).toLocaleString(undefined,{maximumFractionDigits:d});
 // ตัวเลขบนกราฟ: ค่าน้อยมาก (เช่น SAIFI 0.004) จะไม่ถูกปัดเป็น 0 — เพิ่มทศนิยมตามขนาดค่า
+// แปลง '2569-11-19 9:59' / '2026-11-19' เป็นเวลา (ms, ค.ศ.) — new Date() ของ Safari อ่านรูปแบบนี้ไม่ได้
+function parseDT(s){
+  const m=String(s||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if(!m) return NaN;
+  let y=+m[1]; if(y>2400) y-=543;
+  return new Date(y,+m[2]-1,+m[3],m[4]!=null?+m[4]:0,m[5]!=null?+m[5]:0).getTime();
+}
 function smartNum(v){
   v=+v||0; if(v===0) return '0';
   const a=Math.abs(v);
@@ -1386,9 +1397,9 @@ function updateLastSync(){
   const all=[...dataStore['Dashboard-HV-MV'],...dataStore['Dashboard-LV']];
   if(!all.length)return;
   let latest=null;
-  all.forEach(r=>{const d=new Date(r['Date-Time']||r['Date']);if(!isNaN(d)&&(!latest||d>latest))latest=d;});
+  all.forEach(r=>{const ts=parseDT(r['Date-Time']||r['Date']);if(!isNaN(ts)&&(!latest||ts>latest))latest=ts;});
   if(latest){
-    if(latest.getFullYear()>2500)latest.setFullYear(latest.getFullYear()-543);
+    latest=new Date(latest);
     document.getElementById('lastUpdateText').textContent=latest.toLocaleDateString(t('date_locale'),t('date_options_short'));
     document.getElementById('lastUpdateWrap').style.display='block';
   }
@@ -2277,7 +2288,7 @@ function runComparison(){
   const raw=dataStore[sName],h=metaStore[sName]?.headers||[];
   if(!raw.length)return;
   const dC=h.find(n=>n.includes('Date')); if(!dC)return;
-  const inR=(r,f,to)=>{const d=new Date(r[dC]);return d>=new Date(f)&&d<=new Date(to);};
+  const fT=s=>parseDT(s), inR=(r,f,to)=>{const d=parseDT(r[dC]);return d>=fT(f)&&d<fT(to)+86400000;};
   const sA=calcStats(raw.filter(r=>inR(r,dA1,dA2)),h),sB=calcStats(raw.filter(r=>inR(r,dB1,dB2)),h);
   const sv=(id,v)=>{document.getElementById(id).textContent=v;};
   sv('cA-incidents',sA.incidents);sv('cA-saifi',sA.saifi.toFixed(3));sv('cA-saidi',sA.saidi.toFixed(3));sv('cA-dur',sA.avgDur+' '+t('dur_unit'));
@@ -3023,6 +3034,150 @@ if('serviceWorker' in navigator){
     }catch(e){}
   });
 }
+</script>
+
+<!-- หน่วยงานเริ่มต้น (เก็บในเครื่องของผู้ใช้แต่ละคน) -->
+<div id="defUnitModal" class="du-modal" onclick="if(event.target===this)closeDefUnit()">
+  <div class="du-panel">
+    <div class="du-hd"><b>⚙ หน่วยงานเริ่มต้น</b><button class="du-x" onclick="closeDefUnit()" aria-label="ปิด">✕</button></div>
+    <p class="du-cap">เลือกหน่วยงานที่จะแสดงทันทีทุกครั้งที่เปิดแอปในเครื่องนี้</p>
+    <div class="du-now" id="duNow"></div>
+    <div class="du-sec">เลือกด่วน</div>
+    <div class="du-quick">
+      <button onclick="saveDefUnit('aul')"><b>AUL</b><span>กฟส.อ่าวลึก + กฟส.ปลายพระยา</span></button>
+      <button onclick="saveDefUnit('all')"><b>กฟต.2 ทั้งหมด</b><span>ไม่กรองหน่วยงาน</span></button>
+    </div>
+    <div class="du-sec">หรือเลือกเอง</div>
+    <input class="du-search" id="duSearch" type="search" placeholder="พิมพ์ค้นหา กฟส. เช่น อ่าวลึก, 0421" oninput="renderDuList()">
+    <div class="du-list" id="duList"></div>
+    <label class="du-chk"><input type="checkbox" id="duKeepMode" checked> จำ HV/MV/LV และสถานี/อุปกรณ์ที่เลือกอยู่ตอนนี้ด้วย</label>
+    <div class="du-act">
+      <button class="du-pri" onclick="saveDefUnit('pick')">บันทึกเป็นค่าเริ่มต้น</button>
+      <button onclick="saveDefUnit('current')">ใช้ตัวกรองที่เปิดอยู่ตอนนี้</button>
+      <button onclick="clearDefUnit()">ล้างค่าเริ่มต้น</button>
+    </div>
+    <div class="du-note" id="duNote"></div>
+  </div>
+</div>
+<style>
+.du-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:none;align-items:flex-end;justify-content:center}
+.du-modal.on{display:flex}
+@media(min-width:700px){.du-modal{align-items:center}}
+.du-panel{background:var(--panel);color:var(--text1);border:1px solid var(--border);width:100%;max-width:520px;max-height:90vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.du-panel{border-radius:16px}}
+.du-hd{display:flex;align-items:center;justify-content:space-between;font-size:15px;margin-bottom:6px}
+.du-x{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg2);color:var(--text1);cursor:pointer;font-size:14px}
+.du-cap{font-size:12px;color:var(--text3);margin:0 0 10px}
+.du-now{font-size:12.5px;padding:9px 12px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);margin-bottom:12px;line-height:1.6}
+.du-now b{color:var(--blue)}
+.du-sec{font-size:11px;font-weight:700;color:var(--text3);margin:10px 0 6px}
+.du-quick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.du-quick button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text1);cursor:pointer;text-align:left;font-family:inherit}
+.du-quick button b{font-size:13px}.du-quick button span{font-size:11px;color:var(--text3)}
+.du-quick button:hover{border-color:var(--blue)}
+.du-search{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text1);font-size:14px;font-family:inherit}
+.du-list{max-height:240px;overflow:auto;margin-top:6px;border:1px solid var(--border);border-radius:10px}
+.du-list label{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:13px;border-bottom:1px solid var(--border);cursor:pointer}
+.du-list label:last-child{border-bottom:none}
+.du-list input{width:18px;height:18px;accent-color:var(--blue)}
+.du-chk{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin:10px 0}
+.du-act{display:flex;flex-wrap:wrap;gap:8px}
+.du-act button{flex:1 1 auto;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text1);font-size:13px;cursor:pointer;font-family:inherit}
+.du-act .du-pri{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.du-note{font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6}
+#defUnitBtn.has-default{color:var(--blue);border-color:var(--blue)}
+</style>
+<script>
+// ===== หน่วยงานเริ่มต้น: เก็บในเครื่อง (localStorage) แยกตามผู้ใช้ที่ล็อกอิน =====
+function duUser(){ try{ return (window.PEAHub&&PEAHub.user&&PEAHub.user())||''; }catch(e){ return ''; } }
+function duKey(){ return 'daDefaultUnit:'+duUser(); }
+function duGet(){ try{ return JSON.parse(localStorage.getItem(duKey())||localStorage.getItem('daDefaultUnit:')||'null'); }catch(e){ return null; } }
+function duSet(o){ try{ localStorage.setItem(duKey(),JSON.stringify(o)); return true; }catch(e){ return false; } }
+function duName(code){ return String(code||'').replace(/^\d+\./,'').trim(); }
+function duLabel(d){
+  if(!d) return 'ยังไม่ได้ตั้ง (แสดง กฟต.2 ทั้งหมด)';
+  const pea=d.pea||[];
+  let s=!pea.length?'กฟต.2 ทั้งหมด':pea.length<=3?pea.map(duName).join(', '):duName(pea[0])+' และอีก '+(pea.length-1)+' กฟส.';
+  const extra=[];
+  if(d.mode) extra.push(d.mode+(d.mode==='MV'&&d.subFilter&&d.subFilter!=='All'?(d.subFilter==='Main'?' สายหลัก':' สายแยก'):''));
+  if(d.sub&&d.sub.length) extra.push('สถานี '+d.sub.length+' แห่ง');
+  if(d.eq&&d.eq.length) extra.push('อุปกรณ์ '+d.eq.length+' ตัว');
+  return s+(extra.length?' · '+extra.join(' · '):'');
+}
+let _duPick=[];
+function openDefUnit(){
+  const d=duGet();
+  _duPick=(d&&d.pea?d.pea.slice():filters.pea.slice());
+  document.getElementById('duSearch').value='';
+  renderDuList(); paintDuNow();
+  document.getElementById('defUnitModal').classList.add('on');
+}
+function closeDefUnit(){ document.getElementById('defUnitModal').classList.remove('on'); }
+function paintDuNow(){
+  const d=duGet(), u=duUser();
+  document.getElementById('duNow').innerHTML='ค่าเริ่มต้นตอนนี้: <b>'+duEsc(duLabel(d))+'</b>';
+  document.getElementById('duNote').innerHTML='เก็บในเบราว์เซอร์ของเครื่องนี้'+(u?' สำหรับผู้ใช้ <b>'+u+'</b>':'')+' — แต่ละเครื่อง/แต่ละคนตั้งค่าของตัวเองได้ ไม่กระทบคนอื่น · ปุ่ม "รีเซ็ต" ยังล้างตัวกรองชั่วคราวได้ตามเดิม';
+  document.getElementById('defUnitBtn').classList.toggle('has-default',!!d);
+}
+let _duAll=[];
+function duEsc(x){ return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function renderDuList(){
+  const q=(document.getElementById('duSearch').value||'').trim().toLowerCase();
+  const set=new Set();
+  ['Dashboard-HV-MV','Dashboard-LV'].forEach(k=>(dataStore[k]||[]).forEach(r=>{const v=String(r['PEA_Code']||'').trim(); if(v) set.add(v);}));
+  _duAll=[...set].sort();
+  const box=document.getElementById('duList');
+  if(!_duAll.length){ box.innerHTML='<div style="padding:12px;font-size:12px;color:var(--text3)">รอโหลดข้อมูลให้เสร็จก่อน</div>'; return; }
+  const idx=_duAll.map((v,i)=>i).filter(i=>!q||_duAll[i].toLowerCase().includes(q));
+  idx.sort((a,b)=>(_duPick.includes(_duAll[b])?1:0)-(_duPick.includes(_duAll[a])?1:0)||a-b);   // ที่เลือกไว้ขึ้นก่อน
+  box.innerHTML=idx.length?idx.map(i=>'<label><input type="checkbox" data-k="'+i+'" '+(_duPick.includes(_duAll[i])?'checked':'')+' onchange="duToggle(this)"><span>'+duEsc(_duAll[i])+'</span></label>').join(''):'<div style="padding:12px;font-size:12px;color:var(--text3)">ไม่พบ</div>';
+}
+function duToggle(cb){ const v=_duAll[+cb.getAttribute('data-k')]; if(cb.checked){ if(!_duPick.includes(v))_duPick.push(v); } else _duPick=_duPick.filter(x=>x!==v); }
+function saveDefUnit(how){
+  const keep=document.getElementById('duKeepMode').checked;
+  let d={pea:[]};
+  if(how==='aul') d.pea=AUL_PEA_CODES.slice();
+  else if(how==='pick') d.pea=_duPick.slice();
+  else if(how==='current') d.pea=filters.pea.slice();
+  if(keep||how==='current'){ d.mode=currentMode; d.subFilter=subFilter; d.sub=filters.sub.slice(); d.eq=filters.eq.slice(); }
+  if(!duSet(d)){ notify('บันทึกไม่สำเร็จ','เบราว์เซอร์นี้ปิดการเก็บข้อมูลในเครื่อง','warning',5000); return; }
+  closeDefUnit();
+  duApply(d,true);
+  notify('บันทึกหน่วยงานเริ่มต้นแล้ว',duLabel(d),'info',4000);
+}
+function clearDefUnit(){
+  try{ localStorage.removeItem(duKey()); }catch(e){}
+  paintDuNow(); closeDefUnit();
+  notify('ล้างค่าเริ่มต้นแล้ว','เปิดครั้งต่อไปจะแสดง กฟต.2 ทั้งหมด','info',3500);
+}
+// ใช้ค่ากับตัวกรอง (ตอนเปิดแอป และตอนกดบันทึก)
+function duApply(d,render){
+  if(!d) return;
+  if(d.mode&&['HV','MV','LV'].includes(d.mode)){
+    currentMode=d.mode;
+    ['HV','MV','LV'].forEach(m=>document.getElementById('tab-'+m)?.classList.toggle('active',m===d.mode));
+    const st=document.getElementById('mvSubTabs'); if(st) st.style.display=d.mode==='MV'?'flex':'none';
+    const mb=document.getElementById('modeBadge'); if(mb) mb.textContent=d.mode;
+  }
+  if(d.subFilter&&['All','Main','Branch'].includes(d.subFilter)){
+    subFilter=d.subFilter;
+    ['All','Main','Branch'].forEach(k=>document.getElementById('sub-'+k)?.classList.toggle('active',k===d.subFilter));
+  }
+  filters.pea=(d.pea||[]).slice(); filters.sub=(d.sub||[]).slice(); filters.eq=(d.eq||[]).slice();
+  document.getElementById('defUnitBtn')?.classList.add('has-default');
+  if(render){ updateTriggers(); updateAllDD(); applyFilter(true); }
+}
+// ตั้งค่าก่อนวาดหน้าครั้งแรกหลังโหลดข้อมูล
+(function(){
+  const _fin=finalizeLoad;
+  let applied=false;
+  finalizeLoad=function(){
+    if(!applied){ applied=true; const d=duGet(); if(d) duApply(d,false); }
+    _fin.apply(this,arguments);
+    if(typeof updateTriggers==='function') updateTriggers();
+  };
+  try{ if(duGet()) document.getElementById('defUnitBtn').classList.add('has-default'); }catch(e){}
+})();
 </script>
 </body>
 </html>
