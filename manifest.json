@@ -1,6 +1,6 @@
 {
-  "name": "Distribution Analytics - PEA กฟต.2",
-  "short_name": "Distribution Analytics",
+  "name": "วิเคราะห์ไฟดับ (Distribution Analytics) - PEA กฟต.2",
+  "short_name": "วิเคราะห์ไฟดับ",
   "description": "แดชบอร์ดวิเคราะห์ความเชื่อถือได้ของระบบจำหน่าย (SAIFI/SAIDI) กฟต.2",
   "start_url": "./index.html",
   "scope": "./",
