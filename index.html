@@ -319,6 +319,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* RESPONSIVE */
 @media(max-width:1100px){:root{--sidebar:0px;}.sidebar{transform:translateX(-100%);--sidebar:242px;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.mobile-btn{display:flex!important;}}
+.src-wrap{position:relative;}.src-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);width:280px;max-width:calc(100vw - 24px);background:var(--panel);border:1px solid var(--border2,var(--border));border-radius:10px;padding:6px;z-index:300;box-shadow:0 12px 30px rgba(0,0,0,.35);}.src-menu.open{display:block;}.src-item{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--text1);}.src-item:hover{background:var(--bg2);}.src-item svg{flex-shrink:0;margin-top:1px;}.src-t{font-size:12px;font-weight:600;}.src-s{font-size:10.5px;color:var(--text3);margin-top:1px;}.src-foot{font-size:10px;color:var(--text3);padding:7px 10px 3px;border-top:1px solid var(--border);margin-top:4px;}
+@media(max-width:768px){.src-menu{right:auto;left:0;}}
 @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)!important;}.chart-row{grid-template-columns:1fr!important;}.content{padding:12px 12px 24px;}.topbar{height:auto;flex-wrap:wrap;align-items:center;padding:10px 12px;row-gap:8px;}.topbar-left{width:100%;flex-wrap:wrap;row-gap:6px;}.topbar-right{width:100%;flex-wrap:wrap;justify-content:flex-start;row-gap:6px;}.page-title{font-size:13.5px;}.filter-bar{grid-template-columns:1fr!important;}.comp-grid{grid-template-columns:1fr!important;}.anal-grid{grid-template-columns:1fr!important;}.anal-chart-grid{grid-template-columns:1fr!important;}.rank-recur-grid{grid-template-columns:1fr!important;}.task-mitig-grid{grid-template-columns:1fr!important;}}
 @media(max-width:480px){.topbar-right .btn span{display:none;}.topbar-right .btn{padding:7px 9px;}#lastUpdateWrap{text-align:left!important;}.source-badge span{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;}}
 .mobile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
@@ -398,6 +400,24 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div style="text-align:right;display:none;" id="lastUpdateWrap">
         <div style="font-size:9px;color:var(--text3);letter-spacing:.4px;" data-i="last_sync">อัปเดตล่าสุด</div>
         <div style="font-size:11px;font-weight:600;color:var(--blue);" id="lastUpdateText">—</div>
+      </div>
+      <div class="src-wrap" id="srcWrap">
+        <button class="btn-aul" type="button" id="srcBtn" aria-haspopup="true" aria-expanded="false" onclick="toggleSrcMenu(event)" style="font-size:11px;">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>เว็บต้นฉบับ</span>
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="src-menu" id="srcMenu" role="menu">
+          <a class="src-item" role="menuitem" href="https://shorturl.at/ltCL0" target="_blank" rel="noopener">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="#7fb0ff" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <div><div class="src-t">Dashboard ต้นฉบับ กฟต.2</div><div class="src-s">ของ analysis.planning.s2</div></div>
+          </a>
+          <a class="src-item" role="menuitem" href="https://docs.google.com/spreadsheets/d/1dvfB0hA2BndbWgpqMz0M_LYq39tqHjkNqPxglcNWRBc/edit" target="_blank" rel="noopener">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="#5dcaa5" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+            <div><div class="src-t">ฐานข้อมูล Report50 to Dashboard</div><div class="src-s">Google Sheet · HV-MV / LV</div></div>
+          </a>
+          <div class="src-foot">เปิดในแท็บใหม่ · ต้นฉบับอัปเดตทุกวันก่อน 07:00 น.</div>
+        </div>
       </div>
       <button class="btn btn-ghost" onclick="exportToExcel()" style="font-size:11px;">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -3178,6 +3198,11 @@ function duApply(d,render){
   };
   try{ if(duGet()) document.getElementById('defUnitBtn').classList.add('has-default'); }catch(e){}
 })();
+</script>
+<script>
+function toggleSrcMenu(e){e.stopPropagation();const m=document.getElementById('srcMenu'),b=document.getElementById('srcBtn');const o=m.classList.toggle('open');b.setAttribute('aria-expanded',o);}
+document.addEventListener('click',function(e){const m=document.getElementById('srcMenu');if(m&&m.classList.contains('open')&&!e.target.closest('#srcWrap')){m.classList.remove('open');document.getElementById('srcBtn').setAttribute('aria-expanded','false');}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){const m=document.getElementById('srcMenu');if(m)m.classList.remove('open');}});
 </script>
 </body>
 </html>
